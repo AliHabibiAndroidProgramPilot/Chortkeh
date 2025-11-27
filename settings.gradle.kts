@@ -11,6 +11,9 @@ pluginManagement {
         gradlePluginPortal()
         maven(url = "https://maven.myket.ir")
     }
+
+    enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
 }
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
@@ -23,6 +26,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Chortkeh"
 include(":app")
-
 include(":core:designsystem")
-project(":core:designsystem").projectDir = file("core/core-designsystem")
