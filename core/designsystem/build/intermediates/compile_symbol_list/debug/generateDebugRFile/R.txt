@@ -1,0 +1,6 @@
+int font iran_yekanx_black 0x0
+int font iran_yekanx_bold 0x0
+int font iran_yekanx_extra_black 0x0
+int font iran_yekanx_light 0x0
+int font iran_yekanx_medium 0x0
+int font iran_yekanx_normal 0x0

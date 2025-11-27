@@ -1,0 +1,7 @@
+info.alihabibi.designsystem
+font iran_yekanx_black
+font iran_yekanx_bold
+font iran_yekanx_extra_black
+font iran_yekanx_light
+font iran_yekanx_medium
+font iran_yekanx_normal
