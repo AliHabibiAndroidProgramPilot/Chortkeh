@@ -13,6 +13,9 @@ import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.sp
 import info.alihabibi.designsystem.R
 
+/**
+ * Chortkeh fonts
+ */
 private val font = FontFamily(
     fonts = listOf(
         Font(resId = R.font.iran_yekanx_normal, weight = FontWeight.Normal),
@@ -23,6 +26,9 @@ private val font = FontFamily(
     )
 )
 
+/**
+ * Chortkeh typography
+ */
 internal val Typography = Typography(
 
     headlineLarge = TextStyle(
