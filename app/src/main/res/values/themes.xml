@@ -2,4 +2,18 @@
 <resources>
 
     <style name="Theme.Chortkeh" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.App.Splash" parent="Theme.SplashScreen">
+
+        <!-- Background color -->
+        <item name="windowSplashScreenBackground">@color/primary</item>
+
+        <!-- Logo -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_logo</item>
+
+        <!-- After splash theme -->
+        <item name="postSplashScreenTheme">@style/Theme.Chortkeh</item>
+
+    </style>
+
 </resources>

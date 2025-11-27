@@ -74,6 +74,9 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
+    // Splash Screen
+    implementation(libs.core.splashscreen)
+
     //design system
     implementation(projects.core.designsystem)
 }
