@@ -23,3 +23,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "Chortkeh"
 include(":app")
+
+include(":core:designsystem")
+project(":core:designsystem").projectDir = file("core/core-designsystem")
