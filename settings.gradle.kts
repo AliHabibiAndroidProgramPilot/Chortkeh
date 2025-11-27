@@ -27,3 +27,4 @@ dependencyResolutionManagement {
 rootProject.name = "Chortkeh"
 include(":app")
 include(":core:designsystem")
+include(":features:onboarding")
