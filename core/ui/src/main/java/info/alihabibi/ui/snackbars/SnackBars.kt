@@ -24,7 +24,8 @@ import info.alihabibi.designsystem.theme.White
 
 @Composable
 fun AppSnackBar(
-    description: String
+    description: String,
+    onUndo: () -> Unit = {}
 ) {
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
@@ -36,7 +37,7 @@ fun AppSnackBar(
             action = {
                 Row(
                     modifier = Modifier
-                        .clickable {},
+                        .clickable { onUndo() },
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
