@@ -45,13 +45,9 @@ android {
 dependencies {
     // Core
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-
-    // Material
-    implementation(libs.material)
 
     // DataStore
-    implementation(libs.androidx.datastore)
+    implementation(libs.androidx.datastore.preferences)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
