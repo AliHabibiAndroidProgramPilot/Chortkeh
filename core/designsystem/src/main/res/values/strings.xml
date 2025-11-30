@@ -2,5 +2,7 @@
 <resources>
 
     <string name="undo">برگردون</string>
+    <string name="phone_number">شماره موبایل</string>
+    <string name="empty_phone_number_warning">شماره موبایل نمیتواند خالی باشد</string>
 
 </resources>
