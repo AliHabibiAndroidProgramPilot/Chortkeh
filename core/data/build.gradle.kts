@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "info.alihabibi.datastore"
+    namespace = "info.alihabibi.data"
     compileSdk {
         version = release(36)
     }
@@ -25,6 +25,7 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
@@ -45,11 +46,12 @@ android {
 dependencies {
     // Core
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
 
-    // DataStore
-    implementation(libs.androidx.datastore.preferences)
+    // datastore module
+    implementation(projects.core.datastore)
 
-    // Koin
+    // koin
     implementation(libs.koin.android)
 
     testImplementation(libs.junit)
