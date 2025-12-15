@@ -5,8 +5,8 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStore
-import info.alihabibi.domain.local.Keys
-import info.alihabibi.domain.local.Keys.APP_PREFERENCES
+import info.alihabibi.domain.local.keys.Keys
+import info.alihabibi.domain.local.keys.Keys.APP_PREFERENCES
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch

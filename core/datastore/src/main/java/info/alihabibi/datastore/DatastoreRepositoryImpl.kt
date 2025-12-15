@@ -1,6 +1,6 @@
 package info.alihabibi.datastore
 
-import info.alihabibi.domain.local.DatastoreRepository
+import info.alihabibi.domain.local.repositories.DatastoreRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
