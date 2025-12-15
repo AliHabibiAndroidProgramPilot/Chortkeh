@@ -1,8 +1,15 @@
 package info.alihabibi.datastore.di
 
 import info.alihabibi.datastore.DatastoreManager
+import info.alihabibi.datastore.DatastoreRepositoryImpl
+import info.alihabibi.domain.local.DatastoreRepository
+import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
 val datastoreModule = module {
-    single { DatastoreManager(get()) }
+
+    single { DatastoreManager(androidContext()) }
+
+    single<DatastoreRepository> { DatastoreRepositoryImpl(get()) }
+
 }

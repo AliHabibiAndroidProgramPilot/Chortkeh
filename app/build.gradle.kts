@@ -74,11 +74,18 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
+    // Koin
+    implementation(libs.koin.android)
+
     // Splash Screen
     implementation(libs.core.splashscreen)
 
     //design system
     implementation(projects.core.designsystem)
+
     // ui
     implementation(projects.core.ui)
+
+    // datastore
+    implementation(projects.core.datastore)
 }
