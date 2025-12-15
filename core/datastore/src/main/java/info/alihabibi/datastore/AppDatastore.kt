@@ -1,25 +1,38 @@
 package info.alihabibi.datastore
 
 import android.content.Context
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStore
-import info.alihabibi.datastore.Keys.APP_PREFERENCES
+import info.alihabibi.domain.local.Keys
+import info.alihabibi.domain.local.Keys.APP_PREFERENCES
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 
 val Context.datastore by preferencesDataStore(name = APP_PREFERENCES)
 
 class DatastoreManager(private val context: Context) {
 
-    suspend fun saveFirstLaunch(value: Boolean) {
+    private val firstLaunch = booleanPreferencesKey(Keys.IS_FIRST_LAUNCH)
+
+    suspend fun saveFirstLaunch(value: Boolean) = withContext(Dispatchers.IO) {
         context.datastore.edit { prefs ->
-            prefs[Keys.IS_FIRST_LAUNCH] = value
+            prefs[firstLaunch] = value
         }
     }
 
-    val isFirstLaunch: Flow<Boolean> get() =
-        context.datastore.data.map { prefs ->
-            prefs[Keys.IS_FIRST_LAUNCH] ?: false
-        }
+    val isFirstLaunch: Flow<Boolean>
+        get() =
+            context.datastore.data
+                .catch { emit(emptyPreferences()) }
+                .map { prefs ->
+                    prefs[firstLaunch] ?: false
+                }
+                .flowOn(Dispatchers.IO)
 
 }
