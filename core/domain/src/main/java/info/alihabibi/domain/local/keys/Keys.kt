@@ -1,4 +1,4 @@
-package info.alihabibi.domain.local
+package info.alihabibi.domain.local.keys
 
 object Keys {
     // Datastore
