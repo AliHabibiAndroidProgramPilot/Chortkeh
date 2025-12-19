@@ -12,6 +12,8 @@ pluginManagement {
         maven(url = "https://maven.myket.ir")
     }
 
+    includeBuild("build-logic")
+
     enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 }
