@@ -2,8 +2,10 @@ import com.android.build.gradle.LibraryExtension
 import info.alihabibi.chortkeh.configureKotlinAndroid
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
+import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.kotlin
 
 class AndroidLibraryConventionPlugin : Plugin<Project> {
@@ -18,9 +20,12 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                 configureKotlinAndroid(this)
             }
 
+            val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
+
             // Common dependencies for ALL libraries (like JUnit, Timber, etc)
             dependencies {
                 add("testImplementation", kotlin("test"))
+                add("implementation", libs.findLibrary("koin-android").get())
             }
         }
     }
