@@ -15,9 +15,6 @@ android {
 
 dependencies {
 
-    // Koin
-    implementation(libs.koin.android)
-
     // Splash Screen
     implementation(libs.core.splashscreen)
 
