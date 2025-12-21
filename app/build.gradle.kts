@@ -24,6 +24,9 @@ dependencies {
     // ui
     implementation(projects.core.ui)
 
+    // domain
+    implementation(projects.core.domain)
+
     // datastore
     implementation(projects.core.datastore)
 
