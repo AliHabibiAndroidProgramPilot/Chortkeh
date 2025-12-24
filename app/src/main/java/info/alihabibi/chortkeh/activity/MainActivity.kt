@@ -1,7 +1,6 @@
 package info.alihabibi.chortkeh.activity
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -30,13 +29,13 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(Unit) {
                     viewModel.onEvent(MainActivityIntent.IsFirstLaunch)
                 }
-                Log.d("ALI", uiState.isFirstLaunch.toString())
                 Box(
                     Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (uiState.isFirstLaunch)
+                    if (uiState.isFirstLaunch) {
                         viewModel.onEvent(MainActivityIntent.ChangeFirstLaunchFlag(false))
+                    }
                 }
             }
         }

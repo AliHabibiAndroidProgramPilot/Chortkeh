@@ -44,7 +44,7 @@ class MainActivityViewModel(
 }
 
 data class MainActivityState(
-    val isFirstLaunch: Boolean = true,
+    val isFirstLaunch: Boolean = false,
     val isLoggedOn: Boolean = false
 )
 
