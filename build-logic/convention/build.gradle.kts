@@ -6,6 +6,7 @@ plugins {
 group = "info.alihabibi.chortkeh.buildlogic"
 
 dependencies {
+    implementation(libs.kotlin.serializationPlugin)
     compileOnly(libs.android.gradlePlugin)
     compileOnly(libs.kotlin.gradlePlugin)
     compileOnly(libs.kotlin.composeCompilerPlugin)

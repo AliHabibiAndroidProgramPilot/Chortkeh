@@ -25,6 +25,8 @@ class AndroidComposeConventionPlugin : Plugin<Project> {
 
         pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
 
+        pluginManager.apply("org.jetbrains.kotlin.plugin.serialization")
+
         val androidExtension = extensions.getByName("android") as CommonExtension<*, *, *, *, *, *>
 
         androidExtension.apply {
@@ -46,6 +48,8 @@ class AndroidComposeConventionPlugin : Plugin<Project> {
             add("implementation", libs.findLibrary("androidx-navigation-compose").get())
 
             add("implementation", libs.findLibrary("androidx-activity-compose").get())
+
+            add("implementation", libs.findLibrary("kotlinx-serialization-json").get())
 
             add("debugImplementation", libs.findLibrary("androidx-compose-ui-tooling").get())
             add("debugImplementation", libs.findLibrary("androidx-compose-ui-test-manifest").get())
