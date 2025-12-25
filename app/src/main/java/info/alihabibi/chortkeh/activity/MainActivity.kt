@@ -23,7 +23,7 @@ class MainActivity : ComponentActivity() {
     private val viewModel: MainActivityViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen()
+        installSplashScreen().setKeepOnScreenCondition { viewModel.uiState.value.shouldPassSplash }
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
@@ -33,17 +33,20 @@ class MainActivity : ComponentActivity() {
                     viewModel.onEvent(MainActivityIntent.IsFirstLaunch)
                 }
                 var startDestinationState by remember { mutableStateOf<Any?>(null) }
-                LaunchedEffect(uiState.isFirstLaunch) {
-                    if (uiState.isFirstLaunch)
-                        viewModel.onEvent(MainActivityIntent.ChangeFirstLaunchFlag(false))
-                    if (startDestinationState == null)
-                        startDestinationState = if (uiState.isFirstLaunch) OnBoarding else Home
+                if (uiState.isFirstLaunch != null) {
+                    when (uiState.isFirstLaunch!!) {
+                        true -> {
+                            startDestinationState = OnBoarding
+                            viewModel.onEvent(MainActivityIntent.ChangeFirstLaunchFlag(false))
+                        }
+                        false -> startDestinationState = Home
+                    }
+                    val navController = rememberNavController()
+                    DemoNavHost(
+                        navController = navController,
+                        startDestination = startDestinationState!!
+                    )
                 }
-                val navController = rememberNavController()
-                DemoNavHost(
-                    navController = navController,
-                    startDestination = startDestinationState ?: OnBoarding
-                )
             }
         }
     }

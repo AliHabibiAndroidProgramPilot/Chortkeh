@@ -29,7 +29,6 @@ class MainActivityViewModel(
 
     private fun changeFirstLaunchFlag(firstLaunchFlag: Boolean) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isFirstLaunch = firstLaunchFlag) }
             datastoreUseCase.saveFirstLaunchUseCase.invoke(firstLaunchFlag)
         }
     }
@@ -37,14 +36,15 @@ class MainActivityViewModel(
     private fun isFirstLaunch() {
         viewModelScope.launch {
             val isFirstLaunch = datastoreUseCase.getIsAppFirstLaunch.invoke().first()
-            _uiState.update { it.copy(isFirstLaunch = isFirstLaunch) }
+            _uiState.update { it.copy(isFirstLaunch = isFirstLaunch, shouldPassSplash = true) }
         }
     }
 
 }
 
 data class MainActivityState(
-    val isFirstLaunch: Boolean = false,
+    val shouldPassSplash: Boolean = false,
+    val isFirstLaunch: Boolean? = null,
     val isLoggedOn: Boolean = false
 )
 
