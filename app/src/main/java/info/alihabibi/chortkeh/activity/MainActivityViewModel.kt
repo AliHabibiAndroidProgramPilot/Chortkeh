@@ -17,13 +17,13 @@ class MainActivityViewModel(
     private val _uiState = MutableStateFlow(MainActivityState())
     val uiState: StateFlow<MainActivityState> = _uiState.asStateFlow()
 
+    init {
+        isFirstLaunch()
+    }
+
     fun onEvent(event: MainActivityIntent) {
         when (event) {
-
             is MainActivityIntent.ChangeFirstLaunchFlag -> changeFirstLaunchFlag(event.value)
-
-            is MainActivityIntent.IsFirstLaunch -> isFirstLaunch()
-
         }
     }
 
@@ -36,21 +36,18 @@ class MainActivityViewModel(
     private fun isFirstLaunch() {
         viewModelScope.launch {
             val isFirstLaunch = datastoreUseCase.getIsAppFirstLaunch.invoke().first()
-            _uiState.update { it.copy(isFirstLaunch = isFirstLaunch, shouldPassSplash = true) }
+            _uiState.update { it.copy(isFirstLaunch = isFirstLaunch) }
         }
     }
 
 }
 
 data class MainActivityState(
-    val shouldPassSplash: Boolean = false,
     val isFirstLaunch: Boolean? = null,
     val isLoggedOn: Boolean = false
 )
 
 sealed interface MainActivityIntent {
-
-    object IsFirstLaunch : MainActivityIntent
 
     data class ChangeFirstLaunchFlag(val value: Boolean) : MainActivityIntent
 

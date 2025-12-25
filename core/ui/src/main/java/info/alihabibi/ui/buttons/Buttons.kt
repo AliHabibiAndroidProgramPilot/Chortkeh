@@ -35,7 +35,7 @@ fun AppButton(
     Button(
         onClick = onClick,
         modifier = modifier,
-        shape = RoundedCornerShape(8),
+        shape = RoundedCornerShape(20),
         colors = ButtonDefaults.buttonColors(containerColor = color, contentColor = contentColor),
         contentPadding = PaddingValues(vertical = 6.dp, horizontal = 4.dp)
     ) {
@@ -74,7 +74,7 @@ fun AppOutlinedButton(
     OutlinedButton(
         onClick = onClick,
         modifier = modifier,
-        shape = RoundedCornerShape(8),
+        shape = RoundedCornerShape(20),
         colors = ButtonDefaults.outlinedButtonColors(contentColor = color),
         border = BorderStroke(width = 2.dp, color = color),
         contentPadding = PaddingValues(vertical = 6.dp, horizontal = 4.dp)
