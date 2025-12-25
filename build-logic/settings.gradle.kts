@@ -2,8 +2,10 @@
 
 dependencyResolutionManagement {
     repositories {
-        google()
-        mavenCentral()
+//        google()
+//        mavenCentral()
+        maven(url = "https://maven.myket.ir")
+        maven { url = uri("https://srepo.tosantechno.net/repository/maven-group/") }
     }
 
     versionCatalogs {

@@ -21,6 +21,9 @@ dependencies {
     //design system
     implementation(projects.core.designsystem)
 
+    // onboarding
+    implementation(projects.features.onboarding)
+
     // ui
     implementation(projects.core.ui)
 
