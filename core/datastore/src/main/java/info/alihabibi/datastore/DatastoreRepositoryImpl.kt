@@ -16,7 +16,6 @@ class DatastoreRepositoryImpl(
 
     override val isFirstLaunch: Flow<Boolean>
         get() = datastore.isFirstLaunch
-            .catch { emit(false) }
             .flowOn(Dispatchers.IO)
 
 }

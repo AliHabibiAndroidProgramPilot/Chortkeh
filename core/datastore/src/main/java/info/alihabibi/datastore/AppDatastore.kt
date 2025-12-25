@@ -31,7 +31,7 @@ class DatastoreManager(private val context: Context) {
             context.datastore.data
                 .catch { emit(emptyPreferences()) }
                 .map { prefs ->
-                    prefs[firstLaunch] ?: false
+                    prefs[firstLaunch] ?: true
                 }
                 .flowOn(Dispatchers.IO)
 
