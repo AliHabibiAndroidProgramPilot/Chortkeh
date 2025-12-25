@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,15 +22,12 @@ class MainActivity : ComponentActivity() {
     private val viewModel: MainActivityViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen().setKeepOnScreenCondition { viewModel.uiState.value.shouldPassSplash }
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             ChortkehTheme {
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-                LaunchedEffect(Unit) {
-                    viewModel.onEvent(MainActivityIntent.IsFirstLaunch)
-                }
                 var startDestinationState by remember { mutableStateOf<Any?>(null) }
                 if (uiState.isFirstLaunch != null) {
                     when (uiState.isFirstLaunch!!) {
@@ -44,6 +40,7 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     DemoNavHost(
                         navController = navController,
+//                        startDestination = OnBoarding
                         startDestination = startDestinationState!!
                     )
                 }
