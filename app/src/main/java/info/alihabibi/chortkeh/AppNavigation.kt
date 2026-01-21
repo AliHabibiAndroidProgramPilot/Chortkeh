@@ -28,7 +28,11 @@ fun DemoNavHost(
 
         composable<OnBoarding> {
             OnBoardingDestination(
-                onEnterApplication = {  }
+                onEnterApplication = {
+                    navController.navigate(Home) {
+                        popUpTo(OnBoarding) { inclusive = true }
+                    }
+                }
             )
         }
 

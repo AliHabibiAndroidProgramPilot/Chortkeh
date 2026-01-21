@@ -15,4 +15,7 @@ dependencies {
     // ui
     implementation(projects.core.ui)
 
+    // common
+    implementation(projects.core.common)
+
 }

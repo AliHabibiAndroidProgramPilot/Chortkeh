@@ -1,5 +1,6 @@
 package info.alihabibi.onboarding
 
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,10 +22,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,40 +43,21 @@ fun OnBoardingDestination(
     onEnterApplication: () -> Unit
 ) {
 
+    val orientation = LocalConfiguration.current.orientation
+
+    val pagerContent = providePagerContent(isLandScape = orientation, onEnterApplication = onEnterApplication)
+
     OnBoardingScreen(
-        pages = listOf(
-            {
-                PagerContent(
-                    image = painterResource(R.drawable.saving_pana_onboard),
-                    title = stringResource(R.string.piggy_bank),
-                    description = stringResource(R.string.piggy_bank_description),
-                    onButtonClick = onEnterApplication
-                )
-            },
-            {
-                PagerContent(
-                    image = painterResource(R.drawable.budget_pana_onboard),
-                    title = stringResource(R.string.budgeting),
-                    description = stringResource(R.string.budgeting_description),
-                    onButtonClick = onEnterApplication
-                )
-            },
-            {
-                PagerContent(
-                    image = painterResource(R.drawable.stairs_onboead),
-                    title = stringResource(R.string.stairs),
-                    description = stringResource(R.string.stairs_description),
-                    onButtonClick = onEnterApplication
-                )
-            }
-        )
+        screenOrientation = orientation,
+        pages = pagerContent
     )
 
 }
 
 @Composable
 private fun OnBoardingScreen(
-    pages: List<@Composable () -> Unit>
+    screenOrientation: Int = Configuration.ORIENTATION_PORTRAIT,
+    pages: Array<@Composable () -> Unit>
 ) {
 
     val pagerState = rememberPagerState(pageCount = { pages.size })
@@ -80,25 +65,27 @@ private fun OnBoardingScreen(
     Box(modifier = Modifier.fillMaxSize()) {
 
         HorizontalPager(
-            state = pagerState,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .align(Alignment.Center),
+            state = pagerState
         ) { page ->
             pages[page]()
         }
 
         PagerIndicator(
-            pagerState = pagerState,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 220.dp)
+                .padding(bottom = if (screenOrientation == Configuration.ORIENTATION_PORTRAIT) 250.dp else 50.dp),
+            pagerState = pagerState
         )
-    }
 
+    }
 
 }
 
 @Composable
-private fun PagerContent(
+private fun PagerContentVertical(
     onButtonClick: () -> Unit,
     image: Painter,
     title: String,
@@ -134,6 +121,9 @@ private fun PagerContent(
                 text = description,
                 style = MaterialTheme.typography.bodyMedium.copy(color = Gray8)
             )
+
+            Spacer(modifier = Modifier.height(28.dp))
+
         }
 
         AppButton(
@@ -146,14 +136,68 @@ private fun PagerContent(
         )
     }
 
+}
+
+@Composable
+private fun PagerContentLandscape(
+    image: Painter,
+    title: String,
+    description: String,
+    onButtonClick: () -> Unit
+) {
+
+    Row(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(20.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        Image(
+            painter = image,
+            contentDescription = null,
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
+            contentScale = ContentScale.Fit
+        )
+
+        Spacer(Modifier.width(24.dp))
+
+        Column(
+            modifier = Modifier.weight(1f),
+            horizontalAlignment = AbsoluteAlignment.Right,
+            verticalArrangement = Arrangement.Center
+        ) {
+
+            Text(title, style = MaterialTheme.typography.headlineSmall)
+
+            Spacer(Modifier.height(12.dp))
+
+            Text(
+                description,
+                style = MaterialTheme.typography.bodyMedium.copy(color = Gray8)
+            )
+
+            Spacer(Modifier.height(24.dp))
+
+            AppButton(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = onButtonClick,
+                text = stringResource(R.string.enter_app)
+            )
+        }
+    }
 
 }
+
 
 @Composable
 private fun PagerIndicator(
     modifier: Modifier = Modifier,
     pagerState: PagerState
 ) {
+
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.Center
@@ -172,6 +216,70 @@ private fun PagerIndicator(
             )
         }
     }
+
+}
+
+private fun providePagerContent(
+    isLandScape: Int,
+    onEnterApplication: () -> Unit
+): Array<@Composable () -> Unit> {
+
+    return if (isLandScape == Configuration.ORIENTATION_LANDSCAPE) {
+        arrayOf<@Composable () -> Unit>(
+            {
+                PagerContentLandscape(
+                    image = painterResource(R.drawable.saving_pana_onboard),
+                    title = stringResource(R.string.piggy_bank),
+                    description = stringResource(R.string.piggy_bank_description),
+                    onButtonClick = onEnterApplication
+                )
+            },
+            {
+                PagerContentLandscape(
+                    image = painterResource(R.drawable.budget_pana_onboard),
+                    title = stringResource(R.string.budgeting),
+                    description = stringResource(R.string.budgeting_description),
+                    onButtonClick = onEnterApplication
+                )
+            },
+            {
+                PagerContentLandscape(
+                    image = painterResource(R.drawable.stairs_onboead),
+                    title = stringResource(R.string.stairs),
+                    description = stringResource(R.string.stairs_description),
+                    onButtonClick = onEnterApplication
+                )
+            }
+        )
+    } else {
+        arrayOf<@Composable () -> Unit>(
+            {
+                PagerContentVertical(
+                    image = painterResource(R.drawable.saving_pana_onboard),
+                    title = stringResource(R.string.piggy_bank),
+                    description = stringResource(R.string.piggy_bank_description),
+                    onButtonClick = onEnterApplication
+                )
+            },
+            {
+                PagerContentVertical(
+                    image = painterResource(R.drawable.budget_pana_onboard),
+                    title = stringResource(R.string.budgeting),
+                    description = stringResource(R.string.budgeting_description),
+                    onButtonClick = onEnterApplication
+                )
+            },
+            {
+                PagerContentVertical(
+                    image = painterResource(R.drawable.stairs_onboead),
+                    title = stringResource(R.string.stairs),
+                    description = stringResource(R.string.stairs_description),
+                    onButtonClick = onEnterApplication
+                )
+            }
+        )
+    }
+
 }
 
 
@@ -180,7 +288,7 @@ private fun PagerIndicator(
 private fun OnBoardingPreview() {
 
     OnBoardingScreen(
-        pages = emptyList()
+        pages = emptyArray()
     )
 
 }
