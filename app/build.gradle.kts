@@ -24,6 +24,9 @@ dependencies {
     // onboarding
     implementation(projects.features.onboarding)
 
+    // otp
+    implementation(projects.features.otp)
+
     // ui
     implementation(projects.core.ui)
 

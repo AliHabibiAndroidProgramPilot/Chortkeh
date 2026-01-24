@@ -15,4 +15,7 @@
     <string name="stairs">پله پله</string>
     <string name="stairs_description">پله هات رو برای رسیدن به آرزو هات بچین</string>
 
+    // Otp
+    <string name="please_add_number">لطفا شماره موبایل خود را وارد کنید</string>
+
 </resources>
