@@ -7,10 +7,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import info.alihabibi.onboarding.OnBoardingDestination
+import info.alihabibi.otp.OtpDestination
 import kotlinx.serialization.Serializable
 
 @Serializable
 object OnBoarding
+
+@Serializable
+object Otp
 
 @Serializable
 object Home
@@ -29,11 +33,15 @@ fun DemoNavHost(
         composable<OnBoarding> {
             OnBoardingDestination(
                 onEnterApplication = {
-                    navController.navigate(Home) {
+                    navController.navigate(Otp) {
                         popUpTo(OnBoarding) { inclusive = true }
                     }
                 }
             )
+        }
+
+        composable<Otp> {
+            OtpDestination()
         }
 
         composable<Home> {
