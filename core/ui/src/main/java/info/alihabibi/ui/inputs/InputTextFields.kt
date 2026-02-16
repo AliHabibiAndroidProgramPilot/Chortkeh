@@ -2,7 +2,6 @@ package info.alihabibi.ui.inputs
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -36,36 +35,40 @@ import info.alihabibi.designsystem.theme.Primary
 
 @Composable
 fun PhoneNumberTextField(
+    modifier: Modifier = Modifier,
     phone: String,
     onValueChange: (newValue: String) -> Unit,
-    paddingValues: PaddingValues = PaddingValues(horizontal = 8.dp, vertical = 8.dp),
     error: Boolean = false,
+    placeHolderText: String = "",
+    enableLeadingIcon: Boolean = true,
+    enableTrailingIcon: Boolean = true,
     errorMessage: String = stringResource(id = R.string.empty_phone_number_warning),
     enabled: Boolean = true
 ) {
 
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        Text(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 2.dp),
-            text = stringResource(id = R.string.phone_number),
-            style = MaterialTheme.typography.labelLarge.copy(
-                fontSize = 18.sp,
-                textAlign = TextAlign.End
-            )
-        )
+        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
 
-        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-
-            OutlinedTextField(
+            Text(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(paddingValues),
+                    .padding(horizontal = 12.dp, vertical = 2.dp),
+                text = stringResource(id = R.string.phone_number),
+                style = MaterialTheme.typography.labelLarge.copy(
+                    fontSize = 18.sp,
+                    textAlign = TextAlign.End
+                )
+            )
+
+            OutlinedTextField(
+                modifier = modifier.then(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(start = 12.dp, end = 12.dp, top = 6.dp)
+                ),
                 value = phone,
                 onValueChange = onValueChange,
                 textStyle = MaterialTheme.typography.bodyLarge,
@@ -78,14 +81,19 @@ fun PhoneNumberTextField(
                 ),
                 isError = error,
                 singleLine = true,
-                trailingIcon = { MobileTextFieldIcons() },
-                leadingIcon = { MobileTextFieldIcons() },
+                leadingIcon = {
+                    if (enableLeadingIcon) MobileTextFieldIcons()
+                },
+                trailingIcon = {
+                    if (enableTrailingIcon) MobileTextFieldIcons()
+                },
                 placeholder = {
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = stringResource(id = R.string.phone_number),
-                        style = MaterialTheme.typography.labelLarge.copy(textAlign = TextAlign.End)
-                    )
+                    if (placeHolderText.isNotEmpty())
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = placeHolderText,
+                            style = MaterialTheme.typography.labelLarge.copy(textAlign = TextAlign.End)
+                        )
                 },
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
