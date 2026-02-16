@@ -1,8 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    // Components
     <string name="undo">برگردون</string>
     <string name="phone_number">شماره موبایل</string>
     <string name="empty_phone_number_warning">شماره موبایل نمیتواند خالی باشد</string>
+
+    // On Boarding
+    <string name="piggy_bank">قلک</string>
+    <string name="piggy_bank_description">تا قلک پره نگران هیج اتفاق غیر قابل پیش بینی نباش</string>
+    <string name="enter_app">ورود به اپلیکیشن</string>
+    <string name="budgeting">بودجه بندی</string>
+    <string name="budgeting_description">با کیف پول های جدا دیگه نگران دخل و خرجت نباش</string>
+    <string name="stairs">پله پله</string>
+    <string name="stairs_description">پله هات رو برای رسیدن به آرزو هات بچین</string>
+
+    // Otp
+    <string name="please_add_number">لطفا شماره موبایل خود را وارد کنید</string>
 
 </resources>

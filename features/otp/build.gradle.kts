@@ -4,18 +4,18 @@ plugins {
 }
 
 android {
-    namespace = "info.alihabibi.onboarding"
+    namespace = "info.alihabibi.otp"
 }
 
 dependencies {
+
+    //common
+    implementation(projects.core.common)
 
     // design system
     implementation(projects.core.designsystem)
 
     // ui
     implementation(projects.core.ui)
-
-    // common
-    implementation(projects.core.common)
 
 }
