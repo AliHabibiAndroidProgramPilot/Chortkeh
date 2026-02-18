@@ -5,6 +5,10 @@
     <string name="undo">برگردون</string>
     <string name="phone_number">شماره موبایل</string>
     <string name="empty_phone_number_warning">شماره موبایل نمیتواند خالی باشد</string>
+    <string name="notification_access">دسترسی نوتیفیکیشن</string>
+    <string name="notification_access_message">برای استفاده از تمامی قابلیت های برنامه نیازه تا اجازه نوتیفیکشن رو داشته باشیم</string>
+    <string name="I_give_permission">اجازه میدم</string>
+    <string name="dismiss">انصراف</string>
 
     // On Boarding
     <string name="piggy_bank">قلک</string>

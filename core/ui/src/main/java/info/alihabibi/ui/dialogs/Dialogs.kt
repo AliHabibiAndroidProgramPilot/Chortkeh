@@ -23,7 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -60,7 +60,7 @@ fun AppDialogs(
                 onConfirmClicked = onConfirmClicked,
                 onDismissIconClick = onDismissRequest
             )
-        },
+        }
     )
 
 }
@@ -107,12 +107,12 @@ private fun DialogContent(
                 ) {
                     Text(
                         text = title,
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold)
+                        style = MaterialTheme.typography.bodyLarge
                     )
                     Spacer(modifier = Modifier.height(14.dp))
                     Text(
                         text = message,
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center)
                     )
                     Spacer(modifier = Modifier.height(14.dp))
                     Row(
