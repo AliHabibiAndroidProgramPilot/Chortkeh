@@ -28,8 +28,8 @@ fun AppButton(
     color: Color = Primary,
     contentColor: Color = White,
     text: String = "",
-    startIcon: @Composable () -> Unit = {},
-    endIcon: @Composable () -> Unit = {},
+    startIcon: (@Composable () -> Unit)? = null,
+    endIcon: (@Composable () -> Unit)? = null,
 ) {
 
     Button(
@@ -46,14 +46,14 @@ fun AppButton(
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
 
-            startIcon()
+            startIcon?.invoke()
 
             Text(
                 text = text,
                 style = MaterialTheme.typography.labelLarge
             )
 
-            endIcon()
+            endIcon?.invoke()
 
         }
 
@@ -65,18 +65,30 @@ fun AppButton(
 fun AppOutlinedButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    color: Color = Primary,
+    color: Color? = null,
+    borderColor: Color = Primary,
     text: String = "",
-    startIcon: @Composable () -> Unit = {},
-    endIcon: @Composable () -> Unit = {},
+    startIcon: (@Composable () -> Unit)? = null,
+    endIcon: (@Composable () -> Unit)? = null,
 ) {
+
+    val buttonColors = if (color != null) {
+        ButtonDefaults.outlinedButtonColors(
+            containerColor = color,
+            contentColor = borderColor
+        )
+    } else {
+        ButtonDefaults.outlinedButtonColors(
+            contentColor = borderColor
+        )
+    }
 
     OutlinedButton(
         onClick = onClick,
         modifier = modifier,
         shape = RoundedCornerShape(20),
-        colors = ButtonDefaults.outlinedButtonColors(contentColor = color),
-        border = BorderStroke(width = 2.dp, color = color),
+        colors = buttonColors,
+        border = BorderStroke(width = 2.dp, color = borderColor),
         contentPadding = PaddingValues(vertical = 6.dp, horizontal = 4.dp)
     ) {
 
@@ -86,14 +98,14 @@ fun AppOutlinedButton(
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
 
-            startIcon()
+            startIcon?.invoke()
 
             Text(
                 text = text,
                 style = MaterialTheme.typography.labelLarge
             )
 
-            endIcon()
+            endIcon?.invoke()
 
         }
 
