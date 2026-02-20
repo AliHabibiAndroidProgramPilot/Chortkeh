@@ -46,7 +46,7 @@ fun OnBoardingDestination(
     val orientation = LocalConfiguration.current.orientation
 
     val pagerContent =
-        providePagerContent(isLandScape = orientation, onEnterApplication = onEnterApplication)
+        providePagerContent(isLandScape = orientation)
 
     OnBoardingScreen(
         screenOrientation = orientation,
@@ -222,8 +222,7 @@ private fun PagerIndicator(
 }
 
 private fun providePagerContent(
-    isLandScape: Int,
-    onEnterApplication: () -> Unit
+    isLandScape: Int
 ): Array<@Composable () -> Unit> {
 
     return if (isLandScape == Configuration.ORIENTATION_LANDSCAPE) {
