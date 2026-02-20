@@ -10,7 +10,7 @@ pluginManagement {
         mavenCentral()
         gradlePluginPortal()*/
         maven(url = "https://maven.myket.ir")
-        maven { url = uri("https://srepo.tosantechno.net/repository/maven-group/") }
+//        maven { url = uri("https://srepo.tosantechno.net/repository/maven-group/") }
     }
 
     includeBuild("build-logic")
@@ -24,7 +24,7 @@ dependencyResolutionManagement {
 //        google()
 //        mavenCentral()
         maven(url = "https://maven.myket.ir")
-        maven { url = uri("https://srepo.tosantechno.net/repository/maven-group/") }
+//        maven { url = uri("https://srepo.tosantechno.net/repository/maven-group/") }
     }
 }
 
@@ -38,3 +38,4 @@ include(":core:domain")
 include(":core:common")
 include(":features:otp")
 include(":core:common_android")
+include(":features:home")
