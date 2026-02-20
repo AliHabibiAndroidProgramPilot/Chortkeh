@@ -40,8 +40,8 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     DemoNavHost(
                         navController = navController,
-//                        startDestination = OnBoarding
-                        startDestination = startDestinationState!!
+                        startDestination = OnBoarding
+//                        startDestination = startDestinationState!!
                     )
                 }
             }
