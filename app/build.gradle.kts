@@ -27,6 +27,9 @@ dependencies {
     // otp
     implementation(projects.features.otp)
 
+    // home
+    implementation(projects.features.home)
+
     // ui
     implementation(projects.core.ui)
 

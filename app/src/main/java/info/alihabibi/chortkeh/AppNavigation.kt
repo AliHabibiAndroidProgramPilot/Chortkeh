@@ -1,11 +1,10 @@
 package info.alihabibi.chortkeh
 
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import info.alihabibi.home.HomeDestination
 import info.alihabibi.onboarding.OnBoardingDestination
 import info.alihabibi.otp.OtpDestination
 import kotlinx.serialization.Serializable
@@ -33,7 +32,7 @@ fun DemoNavHost(
         composable<OnBoarding> {
             OnBoardingDestination(
                 onEnterApplication = {
-                    navController.navigate(Otp) {
+                    navController.navigate(Home) {
                         popUpTo(OnBoarding) { inclusive = true }
                     }
                 }
@@ -45,7 +44,7 @@ fun DemoNavHost(
         }
 
         composable<Home> {
-            Text("HOME", fontSize = 48.sp)
+            HomeDestination()
         }
 
     }
