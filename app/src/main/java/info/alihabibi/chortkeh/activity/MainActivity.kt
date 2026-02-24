@@ -2,6 +2,7 @@ package info.alihabibi.chortkeh.activity
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.getValue
@@ -24,7 +25,16 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.light(
+                scrim = android.graphics.Color.TRANSPARENT,
+                darkScrim = android.graphics.Color.TRANSPARENT
+            ),
+            navigationBarStyle = SystemBarStyle.light(
+                scrim = android.graphics.Color.TRANSPARENT,
+                darkScrim = android.graphics.Color.TRANSPARENT
+            )
+        )
         setContent {
             ChortkehTheme {
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -40,8 +50,8 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     DemoNavHost(
                         navController = navController,
-//                        startDestination = OnBoarding
-                        startDestination = startDestinationState!!
+                        startDestination = OnBoarding
+//                        startDestination = startDestinationState!!
                     )
                 }
             }
