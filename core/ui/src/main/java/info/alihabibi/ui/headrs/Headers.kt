@@ -82,7 +82,7 @@ fun HomePageHeader(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Header(
+fun AppHeader(
     modifier: Modifier= Modifier,
     title: String,
     onNavigationClick: () -> Unit = {}
@@ -132,7 +132,7 @@ fun HeadersPreview() {
 
             Spacer(modifier = Modifier.height(30.dp))
 
-            Header(title = "خرید موبایل")
+            AppHeader(title = "خرید موبایل")
 
         }
 
