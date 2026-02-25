@@ -28,28 +28,28 @@ private fun HomeScreen() {
             AppBottomNavigation(
                 items = listOf(
                     BottomNavItem(
-                        route = null,
+                        route = "PROFILE",
                         label = stringResource(id = R.string.profile),
                         icon = painterResource(id = R.drawable.profile)
                     ),
                     BottomNavItem(
-                        route = null,
+                        route = "REMINDER",
                         label = stringResource(id = R.string.reminder),
                         icon = painterResource(id = R.drawable.reminder)
                     ),
                     BottomNavItem(
-                        route = null,
+                        route = "REPORTS",
                         label = stringResource(id = R.string.reports),
                         icon = painterResource(id = R.drawable.reports)
                     ),
                     BottomNavItem(
-                        route = null,
+                        route = "HOME",
                         label = stringResource(id = R.string.home),
                         icon = painterResource(id = R.drawable.home)
                     )
                 ),
-                onItemClicked = {},
-                onFabClicked = {}
+                onFabClick = {},
+                onNavItemClicked = {}
             )
         }
     ) { }
