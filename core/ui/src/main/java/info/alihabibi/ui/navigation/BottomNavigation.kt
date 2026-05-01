@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -38,13 +39,14 @@ import info.alihabibi.designsystem.theme.White
 
 @Composable
 fun AppBottomNavigation(
-    items: List<BottomNavItem>,
     onNavItemClicked: (BottomNavItem) -> Unit,
     onFabClick: () -> Unit
 ) {
 
+    val navItems = BottomNavItem.entries.toList()
+
     NavBar(
-        navItems = items,
+        navItems = navItems,
         onFabClick = onFabClick,
         onNavItemClicked = { onNavItemClicked(it) }
     )
@@ -58,9 +60,11 @@ private fun NavBar(
     onFabClick: () -> Unit,
 ) {
 
-    var selected by rememberSaveable { mutableStateOf(navItems.last().route) }
+    var selected by rememberSaveable { mutableStateOf(navItems.last().name) }
     Box(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .defaultMinSize(minHeight = 80.dp)
     ) {
         Surface(color = White) {
             Column {
@@ -78,9 +82,9 @@ private fun NavBar(
                         NavItem(
                             modifier = Modifier.weight(1f),
                             navItem = index,
-                            selected = (selected == index.route),
+                            selected = (selected == index.name),
                             onClick = {
-                                selected = index.route
+                                selected = index.name
                                 onNavItemClicked(index)
                             }
                         )
@@ -89,9 +93,9 @@ private fun NavBar(
                         NavItem(
                             modifier = Modifier.weight(1f),
                             navItem = index,
-                            selected = (selected == index.route),
+                            selected = (selected == index.name),
                             onClick = {
-                                selected = index.route
+                                selected = index.name
                                 onNavItemClicked(index)
                             }
                         )
@@ -124,17 +128,10 @@ private fun NavItem(
     onClick: () -> Unit
 ) {
     val color = if (selected) Primary else Gray10
-//    val interactionSource = remember { MutableInteractionSource() }
     Column(
         modifier = modifier
             .fillMaxHeight()
-            .clickable { onClick() }
-            /*.clickable(
-                interactionSource = interactionSource,
-                indication = ripple(bounded = false)
-            ) {
-                onClick()
-            }*/,
+            .clickable { onClick() },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
@@ -145,13 +142,13 @@ private fun NavItem(
         )
         Spacer(Modifier.height(10.dp))
         Icon(
-            painter = navItem.icon,
+            painter = painterResource(id = navItem.iconResId),
             contentDescription = null,
             tint = color
         )
         Spacer(Modifier.height(4.dp))
         Text(
-            text = navItem.label,
+            text = stringResource(id = navItem.labelResId),
             style = MaterialTheme.typography.labelMedium.copy(color = color)
         )
     }
@@ -163,28 +160,7 @@ fun AppBottomNavigationPreview() {
 
     ChortkehTheme {
         NavBar(
-            navItems = listOf(
-                BottomNavItem(
-                    route = null,
-                    label = stringResource(id = R.string.profile),
-                    icon = painterResource(id = R.drawable.profile)
-                ),
-                BottomNavItem(
-                    route = null,
-                    label = stringResource(id = R.string.profile),
-                    icon = painterResource(id = R.drawable.profile)
-                ),
-                BottomNavItem(
-                    route = null,
-                    label = stringResource(id = R.string.profile),
-                    icon = painterResource(id = R.drawable.profile)
-                ),
-                BottomNavItem(
-                    route = null,
-                    label = stringResource(id = R.string.profile),
-                    icon = painterResource(id = R.drawable.profile)
-                )
-            ),
+            navItems = emptyList(),
             onFabClick = {},
             onNavItemClicked = {}
         )
