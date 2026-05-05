@@ -5,12 +5,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import info.alihabibi.chortkeh.DemoNavHost
 import info.alihabibi.chortkeh.Home
@@ -23,7 +19,7 @@ class MainActivity : ComponentActivity() {
     private val viewModel: MainActivityViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen()
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.light(
@@ -35,24 +31,29 @@ class MainActivity : ComponentActivity() {
                 darkScrim = android.graphics.Color.TRANSPARENT
             )
         )
+
+        splashScreen.setKeepOnScreenCondition { viewModel.uiState.value.shouldKeepSplashScreen() }
+
         setContent {
             ChortkehTheme {
-                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-                var startDestinationState by remember { mutableStateOf<Any?>(null) }
-                if (uiState.isFirstLaunch != null) {
-                    when (uiState.isFirstLaunch!!) {
-                        true -> {
-                            startDestinationState = OnBoarding
-                            viewModel.onEvent(MainActivityIntent.ChangeFirstLaunchFlag(false))
+                val navController = rememberNavController()
+                val uiState = viewModel.uiState.collectAsState()
+                when (val state = uiState.value) {
+
+                    is MainActivityUiState.Loading -> { /* still showing splash screen */ }
+
+                    is MainActivityUiState.Success -> {
+                        val startDestination = when (state.isFirstLaunch) {
+                            true -> OnBoarding
+                            false -> Home
                         }
-                        false -> startDestinationState = Home
+
+                        DemoNavHost(
+                            navController = navController,
+                            startDestination = startDestination
+                        )
                     }
-                    val navController = rememberNavController()
-                    DemoNavHost(
-                        navController = navController,
-                        startDestination = OnBoarding
-//                        startDestination = startDestinationState!!
-                    )
+
                 }
             }
         }

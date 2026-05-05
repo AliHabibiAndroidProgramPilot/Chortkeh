@@ -21,4 +21,7 @@ dependencies {
     // common android
     implementation(projects.core.commonAndroid)
 
+    //domain
+    implementation(projects.core.domain)
+
 }

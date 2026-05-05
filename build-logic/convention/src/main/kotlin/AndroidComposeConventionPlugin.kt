@@ -53,6 +53,8 @@ class AndroidComposeConventionPlugin : Plugin<Project> {
 
             add("debugImplementation", libs.findLibrary("androidx-compose-ui-tooling").get())
             add("debugImplementation", libs.findLibrary("androidx-compose-ui-test-manifest").get())
+
+            add("implementation", libs.findLibrary("koin-androidx-compose").get())
         }
     }
 }
