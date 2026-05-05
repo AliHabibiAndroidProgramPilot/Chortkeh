@@ -3,52 +3,36 @@ package info.alihabibi.chortkeh.activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import info.alihabibi.domain.local.usecases.datastore.usecase.DatastoreUseCases
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 
-class MainActivityViewModel(
-    private val datastoreUseCase: DatastoreUseCases
-) : ViewModel() {
+class MainActivityViewModel(datastoreUseCase: DatastoreUseCases) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(MainActivityState())
-    val uiState: StateFlow<MainActivityState> = _uiState.asStateFlow()
-
-    init {
-        isFirstLaunch()
-    }
-
-    fun onEvent(event: MainActivityIntent) {
-        when (event) {
-            is MainActivityIntent.ChangeFirstLaunchFlag -> changeFirstLaunchFlag(event.value)
+    val uiState: StateFlow<MainActivityUiState> =
+        datastoreUseCase.getIsAppFirstLaunch.invoke().map {
+            MainActivityUiState.Success(it)
         }
-    }
-
-    private fun changeFirstLaunchFlag(firstLaunchFlag: Boolean) {
-        viewModelScope.launch {
-            datastoreUseCase.saveFirstLaunchUseCase.invoke(firstLaunchFlag)
-        }
-    }
-
-    private fun isFirstLaunch() {
-        viewModelScope.launch {
-            val isFirstLaunch = datastoreUseCase.getIsAppFirstLaunch.invoke().first()
-            _uiState.update { it.copy(isFirstLaunch = isFirstLaunch) }
-        }
-    }
+            .catch { throw Exception("DATA STORE CAN NOT PROVIDE FIRST LAUNCH FLAG") }
+            .stateIn(
+                scope = viewModelScope,
+                initialValue = MainActivityUiState.Loading,
+                started = SharingStarted.Eagerly
+            )
 
 }
 
-data class MainActivityState(
-    val isFirstLaunch: Boolean? = null,
-    val isLoggedOn: Boolean = false
-)
+sealed interface MainActivityUiState {
 
-sealed interface MainActivityIntent {
+    data object Loading : MainActivityUiState
 
-    data class ChangeFirstLaunchFlag(val value: Boolean) : MainActivityIntent
+    /**
+     * Returns `true` if the ui state wasn't loaded yet and it should keep showing the splash screen.
+     */
+    fun shouldKeepSplashScreen(): Boolean = this is Loading
+
+    data class Success(val isFirstLaunch: Boolean) : MainActivityUiState
 
 }

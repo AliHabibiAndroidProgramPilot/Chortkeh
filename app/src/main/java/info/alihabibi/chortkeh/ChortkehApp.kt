@@ -5,6 +5,7 @@ import info.alihabibi.chortkeh.di.mainActivityModule
 import org.koin.core.context.startKoin
 import info.alihabibi.datastore.di.datastoreModule
 import info.alihabibi.domain.local.di.domainModule
+import info.alihabibi.onboarding.di.onBoardingModule
 import org.koin.android.ext.koin.androidContext
 
 class ChortkehApp : Application() {
@@ -16,7 +17,8 @@ class ChortkehApp : Application() {
                 modules = listOf(
                     mainActivityModule,
                     domainModule,
-                    datastoreModule
+                    datastoreModule,
+                    onBoardingModule
                 )
             )
         }

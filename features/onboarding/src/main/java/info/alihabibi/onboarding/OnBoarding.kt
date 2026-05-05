@@ -37,10 +37,12 @@ import info.alihabibi.designsystem.theme.Gray5
 import info.alihabibi.designsystem.theme.Gray8
 import info.alihabibi.designsystem.theme.Primary
 import info.alihabibi.ui.buttons.AppButton
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun OnBoardingDestination(
-    onEnterApplication: () -> Unit
+    onEnterApplication: () -> Unit,
+    viewModel: OnBoardingViewModel = koinViewModel()
 ) {
 
     val orientation = LocalConfiguration.current.orientation
@@ -51,7 +53,10 @@ fun OnBoardingDestination(
     OnBoardingScreen(
         screenOrientation = orientation,
         pages = pagerContent,
-        onEnterApplication = onEnterApplication
+        onEnterApplication = {
+            viewModel.onEvent(OnBoardingUiIntent.ChangeIsFirstLaunchFlag(false))
+            onEnterApplication()
+        }
     )
 
 }
