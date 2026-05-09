@@ -25,74 +25,33 @@ object Otp
 @Serializable
 object Home
 
-@Serializable
-object Profile
-
-@Serializable
-object Reminder
-
-@Serializable
-object Reports
-
 @Composable
 fun DemoNavHost(
     navController: NavHostController,
     startDestination: Any = OnBoarding
 ) {
 
-    BaseScaffold(
-        modifier = Modifier.fillMaxSize(),
-        bottomBar = {
-            AppBottomNavigation(
-                onNavItemClicked = { item ->
-                    val destination = when(item) {
-                        BottomNavItem.HOME -> Home
-                        BottomNavItem.PROFILE -> Profile
-                        BottomNavItem.REMINDER -> Reminder
-                        BottomNavItem.REPORTS -> Reports
-                    }
-                    navController.navigate(destination)
-                },
-                onFabClick = {}
-            )
-        }
+    NavHost(
+        navController = navController,
+        startDestination = startDestination
     ) {
 
-        NavHost(
-            navController = navController,
-            startDestination = startDestination
-        ) {
-
-            composable<OnBoarding> {
-                OnBoardingDestination(
-                    onEnterApplication = {
-                        navController.navigate(Home) {
-                            popUpTo(OnBoarding) { inclusive = true }
-                        }
+        composable<OnBoarding> {
+            OnBoardingDestination(
+                onEnterApplication = {
+                    navController.navigate(Home) {
+                        popUpTo(OnBoarding) { inclusive = true }
                     }
-                )
-            }
+                }
+            )
+        }
 
-            composable<Otp> {
-                OtpDestination()
-            }
+        composable<Otp> {
+            OtpDestination()
+        }
 
-            composable<Home> {
-                HomeDestination()
-            }
-
-            composable<Profile> {
-                Text(text = "profile", fontSize = 38.sp)
-            }
-
-            composable<Reminder> {
-                Text(text = "Reminders", fontSize = 38.sp)
-            }
-
-            composable<Reports> {
-                Text(text = "Reports", fontSize = 38.sp)
-            }
-
+        composable<Home> {
+            HomeDestination()
         }
 
     }

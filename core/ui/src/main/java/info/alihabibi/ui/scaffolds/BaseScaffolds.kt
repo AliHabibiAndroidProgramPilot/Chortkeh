@@ -19,9 +19,7 @@ fun BaseScaffold(
     bottomBar: (@Composable () -> Unit)? = null,
     floatingActionButton: (@Composable () -> Unit)? = null,
     fabPosition: FabPosition = FabPosition.End,
-    contentWindowInsets: WindowInsets = ScaffoldDefaults.contentWindowInsets
-        .exclude(WindowInsets.statusBars)
-        .exclude(WindowInsets.navigationBars),
+    contentWindowInsets: WindowInsets = ScaffoldDefaults.contentWindowInsets,
     content: @Composable (innerPadding: androidx.compose.foundation.layout.PaddingValues) -> Unit
 ) {
     Scaffold(
