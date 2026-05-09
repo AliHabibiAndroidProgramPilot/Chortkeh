@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import info.alihabibi.announcements.AnnouncementsDestination
 import info.alihabibi.home.HomeDestination
 import info.alihabibi.onboarding.OnBoardingDestination
 import info.alihabibi.otp.OtpDestination
@@ -17,6 +18,9 @@ object Otp
 
 @Serializable
 object Home
+
+@Serializable
+object Announcements
 
 @Composable
 fun DemoNavHost(
@@ -44,7 +48,19 @@ fun DemoNavHost(
         }
 
         composable<Home> {
-            HomeDestination()
+            HomeDestination(
+                onAnnouncements = {
+                    navController.navigate(Announcements)
+                }
+            )
+        }
+
+        composable<Announcements> {
+            AnnouncementsDestination(
+                onBackPressed = {
+                    navController.navigateUp()
+                }
+            )
         }
 
     }

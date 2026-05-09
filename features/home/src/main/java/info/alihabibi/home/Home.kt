@@ -24,7 +24,9 @@ import info.alihabibi.ui.navigation.BottomNavItem
 import info.alihabibi.ui.scaffolds.BaseScaffold
 
 @Composable
-fun HomeDestination() {
+fun HomeDestination(
+    onAnnouncements: () -> Unit = {}
+) {
 
     var selectedBottomNavItem by remember { mutableStateOf(BottomNavItem.HOME.name) }
     val navItems = BottomNavItem.entries.toList()
@@ -54,7 +56,7 @@ fun HomeDestination() {
         ) { bottomNavItem ->
 
             when (bottomNavItem) {
-                BottomNavItem.HOME.name -> HomeScreen()
+                BottomNavItem.HOME.name -> HomeScreen(onAnnouncements = onAnnouncements)
                 BottomNavItem.PROFILE.name -> ProfileScreen()
                 BottomNavItem.REPORTS.name -> ReportsScreen()
                 BottomNavItem.REMINDER.name -> ReminderScreen()
@@ -67,14 +69,19 @@ fun HomeDestination() {
 }
 
 @Composable
-private fun HomeScreen() {
+private fun HomeScreen(
+    onAnnouncements: () -> Unit = {}
+) {
 
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        HomePageHeader(isBadgeAvailable = false)
+        HomePageHeader(
+            isBadgeAvailable = false,
+            onNavigationClick = onAnnouncements
+        )
 
     }
 
