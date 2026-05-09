@@ -6,21 +6,19 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import info.alihabibi.ui.headrs.HomePageHeader
 import info.alihabibi.ui.navigation.AppBottomNavigation
 import info.alihabibi.ui.navigation.BottomNavItem
 import info.alihabibi.ui.scaffolds.BaseScaffold
@@ -40,30 +38,29 @@ fun HomeDestination() {
                 onNavItemClicked = { item -> selectedBottomNavItem = item.name }
             )
         }
-    ) { paddingValues ->
+    ) { _ ->
 
-            AnimatedContent(
-                modifier = Modifier.padding(paddingValues = paddingValues),
-                targetState = selectedBottomNavItem,
-                transitionSpec = {
-                    fadeIn(
-                        animationSpec = tween(220, delayMillis = 90)
-                    ) + scaleIn(
-                        initialScale = 0.98f,
-                        animationSpec = tween(220, delayMillis = 90)
-                    ) togetherWith
-                            fadeOut(animationSpec = tween(90))
-                }
-            ) { bottomNavItem ->
-
-                when (bottomNavItem) {
-                    BottomNavItem.HOME.name -> HomeScreen()
-                    BottomNavItem.PROFILE.name -> ProfileScreen()
-                    BottomNavItem.REPORTS.name -> ReportsScreen()
-                    BottomNavItem.REMINDER.name -> ReminderScreen()
-                }
-
+        AnimatedContent(
+            targetState = selectedBottomNavItem,
+            transitionSpec = {
+                fadeIn(
+                    animationSpec = tween(220, delayMillis = 90)
+                ) + scaleIn(
+                    initialScale = 0.98f,
+                    animationSpec = tween(220, delayMillis = 90)
+                ) togetherWith
+                        fadeOut(animationSpec = tween(90))
             }
+        ) { bottomNavItem ->
+
+            when (bottomNavItem) {
+                BottomNavItem.HOME.name -> HomeScreen()
+                BottomNavItem.PROFILE.name -> ProfileScreen()
+                BottomNavItem.REPORTS.name -> ReportsScreen()
+                BottomNavItem.REMINDER.name -> ReminderScreen()
+            }
+
+        }
 
     }
 
@@ -72,13 +69,21 @@ fun HomeDestination() {
 @Composable
 private fun HomeScreen() {
 
-    Text(text = "home", fontSize = 32.sp)
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        HomePageHeader(isBadgeAvailable = false)
+
+    }
 
 }
 
 @Composable
 private fun ProfileScreen() {
 
+    //TODO(give window insets padding from Modifier for content)
     Text(text = "profile", fontSize = 32.sp)
 
 }
@@ -86,6 +91,7 @@ private fun ProfileScreen() {
 @Composable
 private fun ReportsScreen() {
 
+    //TODO(give window insets padding from Modifier for content)
     Text(text = "Report", fontSize = 32.sp)
 
 }
@@ -93,5 +99,15 @@ private fun ReportsScreen() {
 @Composable
 private fun ReminderScreen() {
 
+    //TODO(give window insets padding from Modifier for content)
     Text(text = "reminder", fontSize = 32.sp)
+
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun HomeDestinationPreview() {
+
+    HomeDestination()
+
 }
