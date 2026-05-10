@@ -28,5 +28,8 @@
 
     // Announcements
     <string name="announcements">اعلان‌ها</string>
+    <string name="empty_mail_box_message">اعلانی برای نمایش نداری</string>
+    <string name="bank">بانک</string>
+    <string name="inApp">درون برنامه</string>
 
 </resources>
