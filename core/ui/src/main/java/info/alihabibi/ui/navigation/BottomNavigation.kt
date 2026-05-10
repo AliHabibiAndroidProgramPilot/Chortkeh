@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
@@ -40,14 +41,15 @@ import info.alihabibi.designsystem.theme.White
 @Composable
 fun AppBottomNavigation(
     onNavItemClicked: (BottomNavItem) -> Unit,
+    navItems: List<BottomNavItem>,
+    selectedNavItem: String,
     onFabClick: () -> Unit
 ) {
-
-    val navItems = BottomNavItem.entries.toList()
 
     NavBar(
         navItems = navItems,
         onFabClick = onFabClick,
+        selectedNavItem = selectedNavItem,
         onNavItemClicked = { onNavItemClicked(it) }
     )
 
@@ -56,15 +58,18 @@ fun AppBottomNavigation(
 @Composable
 private fun NavBar(
     navItems: List<BottomNavItem>,
+    selectedNavItem: String,
     onNavItemClicked: (BottomNavItem) -> Unit,
     onFabClick: () -> Unit,
 ) {
 
-    var selected by rememberSaveable { mutableStateOf(navItems.last().name) }
+    var selected by rememberSaveable { mutableStateOf(selectedNavItem) }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .defaultMinSize(minHeight = 80.dp)
+            .navigationBarsPadding()
     ) {
         Surface(color = White) {
             Column {
@@ -161,6 +166,7 @@ fun AppBottomNavigationPreview() {
     ChortkehTheme {
         NavBar(
             navItems = emptyList(),
+            selectedNavItem = "",
             onFabClick = {},
             onNavItemClicked = {}
         )

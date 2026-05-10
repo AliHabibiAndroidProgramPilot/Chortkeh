@@ -30,6 +30,9 @@ dependencies {
     // home
     implementation(projects.features.home)
 
+    // announcements
+    implementation(projects.features.announcements)
+
     // ui
     implementation(projects.core.ui)
 
