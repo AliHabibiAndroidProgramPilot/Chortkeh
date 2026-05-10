@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -85,26 +86,31 @@ fun HomePageHeader(
 fun AppHeader(
     modifier: Modifier= Modifier,
     title: String,
+    isMenuAvailable: Boolean = true,
+    onMenuClick: () -> Unit = {},
     onNavigationClick: () -> Unit = {}
 ) {
 
-    TopAppBar(
+    CenterAlignedTopAppBar(
         modifier = Modifier
             .fillMaxWidth()
             .then(modifier),
         title = {
             Text(
-                modifier = Modifier.fillMaxWidth(),
                 text = title,
                 style = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Center)
             )
         },
         navigationIcon = {
-            Icon(
-                modifier = Modifier.padding(12.dp),
-                painter = painterResource(id = R.drawable.kebab_menu),
-                contentDescription = null
-            )
+            if (isMenuAvailable)
+                IconButton(
+                    onClick = onMenuClick
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.kebab_menu),
+                        contentDescription = null
+                    )
+                }
         },
         actions = {
             IconButton(
