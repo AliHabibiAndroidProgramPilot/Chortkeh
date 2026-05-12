@@ -39,7 +39,7 @@ fun <T> AppToggle(
     onToggleSelectionChanged: (item: T) -> Unit
 ) {
 
-    var selectedIndex by remember { mutableIntStateOf(toggleItems.indices.first) }
+    var selectedIndex by remember { mutableIntStateOf(toggleItems.lastIndex) }
 
     val shape = RoundedCornerShape(20)
     val selectedColor = Primary
