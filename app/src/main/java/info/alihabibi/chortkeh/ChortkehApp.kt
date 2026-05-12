@@ -2,11 +2,12 @@ package info.alihabibi.chortkeh
 
 import android.app.Application
 import info.alihabibi.chortkeh.di.mainActivityModule
-import org.koin.core.context.startKoin
 import info.alihabibi.datastore.di.datastoreModule
 import info.alihabibi.domain.local.di.domainModule
+import info.alihabibi.home.di.homeModule
 import info.alihabibi.onboarding.di.onBoardingModule
 import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.startKoin
 
 class ChortkehApp : Application() {
 
@@ -18,7 +19,8 @@ class ChortkehApp : Application() {
                     mainActivityModule,
                     domainModule,
                     datastoreModule,
-                    onBoardingModule
+                    onBoardingModule,
+                    homeModule
                 )
             )
         }

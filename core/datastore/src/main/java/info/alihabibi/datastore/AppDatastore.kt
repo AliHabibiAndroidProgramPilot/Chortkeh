@@ -19,6 +19,7 @@ val Context.datastore by preferencesDataStore(name = APP_PREFERENCES)
 class DatastoreManager(private val context: Context) {
 
     private val firstLaunch = booleanPreferencesKey(Keys.IS_FIRST_LAUNCH)
+    private val smsModalShown = booleanPreferencesKey(Keys.SMS_MODAL_SHOWN)
 
     suspend fun saveFirstLaunch(value: Boolean) = withContext(Dispatchers.IO) {
         context.datastore.edit { prefs ->
@@ -32,6 +33,21 @@ class DatastoreManager(private val context: Context) {
                 .catch { emit(emptyPreferences()) }
                 .map { prefs ->
                     prefs[firstLaunch] ?: true
+                }
+                .flowOn(Dispatchers.IO)
+
+    suspend fun saveSmsModalState(value: Boolean) = withContext(Dispatchers.IO) {
+        context.datastore.edit { prefs ->
+            prefs[smsModalShown] = value
+        }
+    }
+
+    val isSmsModalShown: Flow<Boolean>
+        get() =
+            context.datastore.data
+                .catch { emptyPreferences() }
+                .map { prefs ->
+                    prefs[smsModalShown] ?: false
                 }
                 .flowOn(Dispatchers.IO)
 

@@ -17,4 +17,12 @@ class DatastoreRepositoryImpl(
         get() = datastore.isFirstLaunch
             .flowOn(Dispatchers.IO)
 
+    override suspend fun saveSmsModalShownState(value: Boolean) {
+        datastore.saveSmsModalState(value = value)
+    }
+
+    override val isSmsModalShown: Flow<Boolean>
+        get() = datastore.isSmsModalShown
+            .flowOn(Dispatchers.IO)
+
 }

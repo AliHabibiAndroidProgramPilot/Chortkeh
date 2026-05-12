@@ -15,4 +15,13 @@ dependencies {
     // ui
     implementation(projects.core.ui)
 
+    // common-android
+    implementation(projects.core.commonAndroid)
+
+    // domain
+    implementation(projects.core.domain)
+
+    // accompanist
+    implementation(libs.accompanist.permissions)
+
 }
