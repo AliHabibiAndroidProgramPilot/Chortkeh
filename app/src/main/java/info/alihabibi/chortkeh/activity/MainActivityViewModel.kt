@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.stateIn
 class MainActivityViewModel(datastoreUseCase: DatastoreUseCases) : ViewModel() {
 
     val uiState: StateFlow<MainActivityUiState> =
-        datastoreUseCase.getIsAppFirstLaunch.invoke().map {
+        datastoreUseCase.getIsAppFirstLaunchUseCase.invoke().map {
             MainActivityUiState.Success(it)
         }
             .catch { throw Exception("DATA STORE CAN NOT PROVIDE FIRST LAUNCH FLAG") }

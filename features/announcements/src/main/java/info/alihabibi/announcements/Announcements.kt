@@ -67,7 +67,7 @@ private fun AnnouncementsScreen(
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+            verticalArrangement = Arrangement.Center
         ) {
 
             Image(

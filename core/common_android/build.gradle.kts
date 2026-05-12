@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "info.alihabibi.designsystem"
+    namespace = "info.alihabibi.common_android"
 }
 
 dependencies {
@@ -14,5 +14,8 @@ dependencies {
 
     // components
     implementation(projects.core.ui)
+
+    //design system
+    implementation(projects.core.designsystem)
 
 }

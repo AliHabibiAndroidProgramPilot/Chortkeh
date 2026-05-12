@@ -6,8 +6,16 @@
     <string name="phone_number">شماره موبایل</string>
     <string name="empty_phone_number_warning">شماره موبایل نمیتواند خالی باشد</string>
     <string name="notification_access">دسترسی نوتیفیکیشن</string>
+    <string name="sms_access">اجازه دسترسی به پیامک های بانکی</string>
     <string name="notification_access_message">برای استفاده از تمامی قابلیت های برنامه نیازه تا اجازه نوتیفیکشن رو داشته باشیم</string>
+    <string name="sms_access_message">
+        ما در چُرتکه تضمین می‌کنیم کسی قادر به دیدن پیامک‌های بانکی شما نیست.
+        \n
+        \n
+        با دادن اجازه دسترسی به پیامک‌های بانکی بدون نیاز به وارد کردن دستی دریافتی و پرداختی، آنها را ثبت کنید.
+    </string>
     <string name="I_give_permission">اجازه میدم</string>
+    <string name="I_give_access_permission">اجازه دسترسی میدم</string>
     <string name="dismiss">انصراف</string>
     <string name="profile">پروفایل</string>
     <string name="reminder">یادآور</string>
