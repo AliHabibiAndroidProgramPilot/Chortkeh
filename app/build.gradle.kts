@@ -9,6 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "info.alihabibi.chortkeh"
+        testInstrumentationRunner =  "androidx.test.runner.AndroidJUnitRunner"
     }
 
 }
@@ -41,5 +42,13 @@ dependencies {
 
     // datastore
     implementation(projects.core.datastore)
+
+    // Unit Tests
+    testImplementation(libs.junit)
+
+    // Instrumented Tests
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.test.runner)
 
 }
