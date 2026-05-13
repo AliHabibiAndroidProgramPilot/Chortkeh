@@ -21,6 +21,10 @@
     <string name="reminder">یادآور</string>
     <string name="reports">گزارشات</string>
     <string name="home">خانه</string>
+    <string name="user_account_info">اطلاعات حساب کاربری</string>
+    <string name="privacy_policy">امنیت و حریم خصوصی</string>
+    <string name="currency">واحد پول</string>
+    <string name="exit">خروج</string>
 
     // On Boarding
     <string name="piggy_bank">قلک</string>
@@ -39,5 +43,8 @@
     <string name="empty_mail_box_message">اعلانی برای نمایش نداری</string>
     <string name="bank">بانک</string>
     <string name="inApp">درون برنامه</string>
+
+    // Profile
+    <string name="made_with_love">Made with 💙</string>
 
 </resources>

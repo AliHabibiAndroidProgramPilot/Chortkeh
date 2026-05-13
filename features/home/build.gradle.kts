@@ -18,6 +18,9 @@ dependencies {
     // common-android
     implementation(projects.core.commonAndroid)
 
+    // common
+    implementation(projects.core.common)
+
     // domain
     implementation(projects.core.domain)
 
