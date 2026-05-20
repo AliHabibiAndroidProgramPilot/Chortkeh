@@ -51,6 +51,11 @@ fun DemoNavHost(
             HomeDestination(
                 onAnnouncements = {
                     navController.navigate(Announcements)
+                },
+                onExitOfAccount = {
+                    navController.navigate(OnBoarding) {
+                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                    }
                 }
             )
         }

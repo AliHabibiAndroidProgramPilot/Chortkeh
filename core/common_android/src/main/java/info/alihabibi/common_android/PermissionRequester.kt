@@ -15,7 +15,7 @@ import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import info.alihabibi.designsystem.R
-import info.alihabibi.ui.dialogs.AppDialogs
+import info.alihabibi.ui.dialogs.AppDialog
 import info.alihabibi.ui.dialogs.AppSimpleBottomSheet
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -33,7 +33,7 @@ fun RequestNotificationPermission() {
     val shouldShowRationale =
         (permission.status as? PermissionStatus.Denied)?.shouldShowRationale == true
     if (shouldShowRationale && showDialog) {
-        AppDialogs(
+        AppDialog(
             title = stringResource(id = R.string.notification_access),
             message = stringResource(id = R.string.notification_access_message),
             confirmButtonText = stringResource(id = R.string.I_give_permission),
@@ -44,7 +44,8 @@ fun RequestNotificationPermission() {
             },
             onDismissRequest = {
                 showDialog = false
-            }
+            },
+            onCancelClicked = {}
         )
     }
 

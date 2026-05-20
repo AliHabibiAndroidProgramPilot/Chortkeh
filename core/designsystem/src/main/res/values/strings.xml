@@ -46,5 +46,7 @@
 
     // Profile
     <string name="made_with_love">Made with 💙</string>
+    <string name="exit_from_account">خروج از حساب کاربری</string>
+    <string name="exit_from_account_description">مطمعنی میخوای از حساب کاربری خارج بشی؟</string>
 
 </resources>

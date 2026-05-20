@@ -46,6 +46,7 @@ import info.alihabibi.common_android.RequestNotificationPermission
 import info.alihabibi.common_android.RequestSMSPermission
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray7
+import info.alihabibi.ui.dialogs.AppDialog
 import info.alihabibi.ui.headrs.HomePageHeader
 import info.alihabibi.ui.items.AppDangerousListItem
 import info.alihabibi.ui.items.AppSimpleListItem
@@ -57,7 +58,8 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun HomeDestination(
     viewModel: HomeViewModel = koinViewModel(),
-    onAnnouncements: () -> Unit = {}
+    onAnnouncements: () -> Unit = {},
+    onExitOfAccount: () -> Unit = {}
 ) {
 
     var selectedBottomNavItem by remember { mutableStateOf(BottomNavItem.HOME.name) }
@@ -102,7 +104,9 @@ fun HomeDestination(
                     onAnnouncements = onAnnouncements
                 )
 
-                BottomNavItem.PROFILE.name -> ProfileScreen()
+                BottomNavItem.PROFILE.name -> ProfileScreen(
+                    onExitOfAccount = onExitOfAccount
+                )
                 BottomNavItem.REPORTS.name -> ReportsScreen()
                 BottomNavItem.REMINDER.name -> ReminderScreen()
             }
@@ -122,7 +126,8 @@ private fun HomeScreen(
     onAnnouncements: () -> Unit
 ) {
 
-    val notificationPermissionState = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
+    val notificationPermissionState =
+        rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
     val smsPermissionState = rememberPermissionState(permission = Manifest.permission.RECEIVE_SMS)
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !notificationPermissionState.status.isGranted)
@@ -146,7 +151,9 @@ private fun HomeScreen(
 }
 
 @Composable
-private fun ProfileScreen() {
+private fun ProfileScreen(
+    onExitOfAccount: () -> Unit = {}
+) {
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
@@ -178,7 +185,10 @@ private fun ProfileScreen() {
                         .fillMaxWidth()
                         .padding(top = 24.dp),
                     text = stringResource(id = R.string.profile),
-                    style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center, fontSize = 16.sp)
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        textAlign = TextAlign.Center,
+                        fontSize = 16.sp
+                    )
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -207,6 +217,21 @@ private fun ProfileScreen() {
             modifier = Modifier.fillMaxWidth()
         ) {
 
+            var showExitDialog by remember { mutableStateOf(false) }
+            if (showExitDialog)
+                AppDialog(
+                    title = stringResource(id = R.string.exit_from_account),
+                    message = stringResource(id = R.string.exit_from_account_description),
+                    confirmButtonText = stringResource(id = R.string.dismiss),
+                    cancelButtonText = stringResource(id = R.string.exit),
+                    onDismissRequest = { showExitDialog = false },
+                    onCancelClicked = {
+                        showExitDialog = false
+                        onExitOfAccount()
+                    },
+                    onConfirmClicked = { showExitDialog = false }
+                )
+
             AppSimpleListItem(
                 modifier = Modifier.padding(vertical = 8.dp),
                 title = stringResource(id = R.string.user_account_info),
@@ -227,6 +252,7 @@ private fun ProfileScreen() {
 
             AppDangerousListItem(
                 modifier = Modifier.padding(vertical = 8.dp),
+                onClick = { showExitDialog = true },
                 title = stringResource(id = R.string.exit),
                 startIcon = painterResource(id = R.drawable.logout)
             )

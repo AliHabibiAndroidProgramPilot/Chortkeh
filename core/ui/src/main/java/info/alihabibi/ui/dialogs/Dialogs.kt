@@ -47,12 +47,13 @@ import info.alihabibi.ui.buttons.AppButton
 import info.alihabibi.ui.buttons.AppOutlinedButton
 
 @Composable
-fun AppDialogs(
+fun AppDialog(
     title: String,
     message: String = "",
     confirmButtonText: String,
     cancelButtonText: String,
     onConfirmClicked: () -> Unit,
+    onCancelClicked: () -> Unit,
     onDismissRequest: () -> Unit,
 ) {
 
@@ -67,6 +68,7 @@ fun AppDialogs(
                 confirmButtonText = confirmButtonText,
                 cancelButtonText = cancelButtonText,
                 onConfirmClicked = onConfirmClicked,
+                onCancelClicked = onCancelClicked,
                 onDismissIconClick = onDismissRequest
             )
         }
@@ -137,6 +139,7 @@ private fun DialogContent(
     confirmButtonText: String,
     cancelButtonText: String,
     onConfirmClicked: () -> Unit,
+    onCancelClicked: () -> Unit,
     onDismissIconClick: () -> Unit
 ) {
 
@@ -151,6 +154,7 @@ private fun DialogContent(
             shadowElevation = 20.dp,
             color = White
         ) {
+
             Box(modifier = Modifier.padding(20.dp)) {
                 IconButton(
                     onClick = onDismissIconClick,
@@ -164,6 +168,7 @@ private fun DialogContent(
                         contentDescription = null
                     )
                 }
+
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -174,34 +179,45 @@ private fun DialogContent(
                         text = title,
                         style = MaterialTheme.typography.bodyLarge
                     )
+
                     Spacer(modifier = Modifier.height(14.dp))
+
                     Text(
                         text = message,
                         style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center)
                     )
+
                     Spacer(modifier = Modifier.height(14.dp))
+
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+
                         AppOutlinedButton(
                             modifier = Modifier.width(140.dp),
                             onClick = onConfirmClicked,
                             text = confirmButtonText,
                             borderColor = Primary
                         )
+
                         Spacer(modifier = Modifier.width(14.dp))
+
                         AppOutlinedButton(
                             modifier = Modifier.width(140.dp),
-                            onClick = onDismissIconClick,
+                            onClick = onCancelClicked,
                             text = cancelButtonText,
                             color = ErrorExtraRedLight,
                             borderColor = ErrorRed
                         )
+
                     }
+
                 }
+
             }
+
         }
 
     }
@@ -210,16 +226,17 @@ private fun DialogContent(
 
 @Preview
 @Composable
-private fun DialogsPreview() {
+private fun DialogPreview() {
 
     Column {
 
-        AppDialogs(
+        AppDialog(
             title = "خروج از برنامه",
             message = "مطمعنی میخوای خارج بشی؟",
             confirmButtonText = "انصراف",
             cancelButtonText = "خروج",
             onConfirmClicked = {},
+            onCancelClicked = {},
             onDismissRequest = {}
         )
 
