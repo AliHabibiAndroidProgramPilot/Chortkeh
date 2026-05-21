@@ -47,6 +47,7 @@ import info.alihabibi.common_android.RequestSMSPermission
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray7
 import info.alihabibi.ui.dialogs.AppDialog
+import info.alihabibi.ui.dialogs.AppRadioSelectionBottomSheet
 import info.alihabibi.ui.headrs.HomePageHeader
 import info.alihabibi.ui.items.AppDangerousListItem
 import info.alihabibi.ui.items.AppSimpleListItem
@@ -63,7 +64,7 @@ fun HomeDestination(
 ) {
 
     var selectedBottomNavItem by remember { mutableStateOf(BottomNavItem.HOME.name) }
-    val navItems = BottomNavItem.entries.toList()
+    val navItems = remember { BottomNavItem.entries.toList() }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -107,6 +108,7 @@ fun HomeDestination(
                 BottomNavItem.PROFILE.name -> ProfileScreen(
                     onExitOfAccount = onExitOfAccount
                 )
+
                 BottomNavItem.REPORTS.name -> ReportsScreen()
                 BottomNavItem.REMINDER.name -> ReminderScreen()
             }
@@ -232,6 +234,31 @@ private fun ProfileScreen(
                     onConfirmClicked = { showExitDialog = false }
                 )
 
+            val context = LocalContext.current
+            val currencyOptions = remember {
+                listOf(
+                    Utils.getStringResources(context = context, id = R.string.toman),
+                    Utils.getStringResources(context = context, id = R.string.rial),
+                )
+            }
+            var selectedCurrency by remember { mutableStateOf(currencyOptions.first()) }
+            var showCurrencySelectionModal by remember { mutableStateOf(false) }
+            if (showCurrencySelectionModal)
+                AppRadioSelectionBottomSheet(
+                    title = stringResource(id = R.string.currency),
+                    radioOptions = currencyOptions,
+                    selectedRadioButton = selectedCurrency,
+                    disabledIndex = 1,
+                    onRadioOptionSelected = { userSelectedCurrency ->
+                        selectedCurrency = userSelectedCurrency
+                    },
+                    onConfirmClicked = {
+                        showCurrencySelectionModal = false
+                        //TODO save user preferred currency
+                    },
+                    onDismissRequest = { showCurrencySelectionModal = false }
+                )
+
             AppSimpleListItem(
                 modifier = Modifier.padding(vertical = 8.dp),
                 title = stringResource(id = R.string.user_account_info),
@@ -246,6 +273,7 @@ private fun ProfileScreen(
 
             AppSimpleListItem(
                 modifier = Modifier.padding(vertical = 8.dp),
+                onClick = { showCurrencySelectionModal = true },
                 title = stringResource(id = R.string.currency),
                 startIcon = painterResource(id = R.drawable.money_currency)
             )

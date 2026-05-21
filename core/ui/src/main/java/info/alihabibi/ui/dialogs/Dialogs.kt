@@ -12,12 +12,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -25,8 +30,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,6 +46,8 @@ import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.ErrorExtraRedLight
 import info.alihabibi.designsystem.theme.ErrorRed
 import info.alihabibi.designsystem.theme.Gray1
+import info.alihabibi.designsystem.theme.Gray3
+import info.alihabibi.designsystem.theme.Gray6
 import info.alihabibi.designsystem.theme.Gray9
 import info.alihabibi.designsystem.theme.MoonRaker
 import info.alihabibi.designsystem.theme.Primary
@@ -99,6 +108,7 @@ fun AppSimpleBottomSheet(
                 .heightIn(200.dp)
                 .padding(horizontal = 24.dp)
         ) {
+
             Text(
                 modifier = Modifier.fillMaxWidth(),
                 text = title,
@@ -131,6 +141,87 @@ fun AppSimpleBottomSheet(
     }
 
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AppRadioSelectionBottomSheet(
+    title: String = "",
+    radioOptions: List<String>,
+    selectedRadioButton: String?,
+    disabledIndex: Int? = null,
+    onRadioOptionSelected: (String) -> Unit,
+    onConfirmClicked: () -> Unit,
+    onDismissRequest: () -> Unit
+) {
+
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+
+        ModalBottomSheet(
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+            onDismissRequest = onDismissRequest
+        ) {
+
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = title,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontSize = 16.sp,
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Bold
+                )
+            )
+
+            LazyColumn {
+
+                itemsIndexed(radioOptions) { index, item ->
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        RadioButton(
+                            selected = selectedRadioButton == item,
+                            onClick = { onRadioOptionSelected(item) },
+                            enabled = index != disabledIndex,
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = Primary,
+                                unselectedColor = Gray6
+                            )
+                        )
+
+                        Text(
+                            modifier = Modifier.alpha(alpha = if (index != disabledIndex) 1f else 0.45f),
+                            text = item,
+                            style = MaterialTheme.typography.labelLarge
+                        )
+
+                    }
+
+                    if (index != radioOptions.lastIndex) {
+                        HorizontalDivider(color = Gray3)
+                    }
+
+                }
+
+            }
+
+            AppButton(
+                modifier = Modifier.padding(horizontal = 24.dp),
+                onClick = onConfirmClicked,
+                color = MoonRaker,
+                contentColor = Primary,
+                text = stringResource(id = R.string.confirm)
+            )
+
+        }
+
+    }
+
+}
+
 
 @Composable
 private fun DialogContent(

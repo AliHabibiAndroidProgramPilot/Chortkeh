@@ -14,4 +14,6 @@ object Utils {
     fun getAppVersionName(context: Context): String =
         context.packageManager.getPackageInfo(context.packageName, 0).versionName.orEmpty()
 
+    fun getStringResources(context: Context, id: Int): String = context.getString(id)
+
 }
