@@ -91,6 +91,7 @@ private fun PrivacyAndPolicyScreen(
                 when {
                     shouldShowRational -> {
                         smsReceivePermissionState.launchPermissionRequest()
+                        smsReadPermissionState.launchPermissionRequest()
                     }
 
                     else -> {
