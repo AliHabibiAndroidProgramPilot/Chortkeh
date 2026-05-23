@@ -62,7 +62,10 @@ private fun PrivacyAndPolicyScreen(
     onBackPressed: () -> Unit
 ) {
 
-    val smsPermissionState = rememberPermissionState(permission = Manifest.permission.RECEIVE_SMS)
+    val smsReceivePermissionState = rememberPermissionState(permission = Manifest.permission.RECEIVE_SMS)
+    val smsReadPermissionState = rememberPermissionState(permission = Manifest.permission.READ_SMS)
+    val shouldShowRational =
+        smsReceivePermissionState.status.shouldShowRationale && smsReadPermissionState.status.shouldShowRationale
     val context = LocalContext.current
     var showSmsPermissionDialog by remember {
         mutableStateOf(false)
@@ -72,7 +75,7 @@ private fun PrivacyAndPolicyScreen(
         AppDialog(
             title = stringResource(id = R.string.sms_access),
             message =
-                if (!smsPermissionState.status.isGranted)
+                if (!smsReceivePermissionState.status.isGranted)
                     stringResource(id = R.string.grant_sms_permission)
                 else
                     stringResource(id = R.string.revoke_sms_permission_message),
@@ -86,8 +89,8 @@ private fun PrivacyAndPolicyScreen(
             },
             onConfirmClicked = {
                 when {
-                    smsPermissionState.status.shouldShowRationale -> {
-                        smsPermissionState.launchPermissionRequest()
+                    shouldShowRational -> {
+                        smsReceivePermissionState.launchPermissionRequest()
                     }
 
                     else -> {
@@ -134,7 +137,7 @@ private fun PrivacyAndPolicyScreen(
             ) {
 
                 Switch(
-                    checked = smsPermissionState.status.isGranted,
+                    checked = smsReceivePermissionState.status.isGranted,
                     onCheckedChange = {
                         showSmsPermissionDialog = true
                     },

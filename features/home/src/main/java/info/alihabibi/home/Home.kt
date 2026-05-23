@@ -133,11 +133,14 @@ private fun HomeScreen(
 
     val notificationPermissionState =
         rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
-    val smsPermissionState = rememberPermissionState(permission = Manifest.permission.RECEIVE_SMS)
+    val receiveSmsPermission = rememberPermissionState(permission = Manifest.permission.RECEIVE_SMS)
+    val readSmsPermission = rememberPermissionState(permission = Manifest.permission.READ_SMS)
+
+    val allGranted = receiveSmsPermission.status.isGranted && readSmsPermission.status.isGranted
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !notificationPermissionState.status.isGranted)
         RequestNotificationPermission()
-    if (uiState.isSmsModalShown == false && !smsPermissionState.status.isGranted) {
+    if (uiState.isSmsModalShown == false && !allGranted) {
         RequestSMSPermission(onSmsModalShown = onSmsModalShowed)
     }
 

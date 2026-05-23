@@ -58,10 +58,11 @@ fun RequestSMSPermission(
     shouldShowModalDescription: Boolean = true
 ) {
 
-    val permission = rememberPermissionState(permission = Manifest.permission.RECEIVE_SMS)
+    val permissionReceiveSms = rememberPermissionState(permission = Manifest.permission.RECEIVE_SMS)
+    val permissionReadSms = rememberPermissionState(permission = Manifest.permission.READ_SMS)
     var showModal by remember { mutableStateOf(true) }
     val shouldShowRationale =
-        (permission.status as? PermissionStatus.Denied)?.shouldShowRationale == true
+        (permissionReceiveSms.status as? PermissionStatus.Denied)?.shouldShowRationale == true
 
     LaunchedEffect(shouldShowRationale) {
         if (shouldShowRationale) showModal = true
@@ -78,7 +79,8 @@ fun RequestSMSPermission(
             },
             onConfirmClicked = {
                 showModal = false
-                permission.launchPermissionRequest()
+                permissionReceiveSms.launchPermissionRequest()
+                permissionReadSms.launchPermissionRequest()
                 onSmsModalShown()
             }
         )
