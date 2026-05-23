@@ -8,6 +8,7 @@ import info.alihabibi.announcements.AnnouncementsDestination
 import info.alihabibi.home.HomeDestination
 import info.alihabibi.onboarding.OnBoardingDestination
 import info.alihabibi.otp.OtpDestination
+import info.alihabibi.privacy_and_policy.PrivacyAndPolicyDestination
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -21,6 +22,9 @@ object Home
 
 @Serializable
 object Announcements
+
+@Serializable
+object PrivacyAndPolicy
 
 @Composable
 fun DemoNavHost(
@@ -56,12 +60,23 @@ fun DemoNavHost(
                     navController.navigate(OnBoarding) {
                         popUpTo(navController.graph.startDestinationId) { inclusive = true }
                     }
+                },
+                onPrivacyAndPolicy = {
+                    navController.navigate(PrivacyAndPolicy)
                 }
             )
         }
 
         composable<Announcements> {
             AnnouncementsDestination(
+                onBackPressed = {
+                    navController.navigateUp()
+                }
+            )
+        }
+
+        composable<PrivacyAndPolicy> {
+            PrivacyAndPolicyDestination(
                 onBackPressed = {
                     navController.navigateUp()
                 }

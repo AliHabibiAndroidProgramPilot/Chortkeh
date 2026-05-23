@@ -36,6 +36,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -158,6 +159,7 @@ fun AppRadioSelectionBottomSheet(
 
         ModalBottomSheet(
             sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+            containerColor = Gray1,
             onDismissRequest = onDismissRequest
         ) {
 
@@ -246,19 +248,9 @@ private fun DialogContent(
             color = White
         ) {
 
-            Box(modifier = Modifier.padding(20.dp)) {
-                IconButton(
-                    onClick = onDismissIconClick,
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .size(40.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.close_circle),
-                        tint = Gray9,
-                        contentDescription = null
-                    )
-                }
+            Box(
+                modifier = Modifier.padding(20.dp)
+            ) {
 
                 Column(
                     modifier = Modifier
@@ -266,10 +258,44 @@ private fun DialogContent(
                         .padding(top = 8.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+
+                            Text(
+                                text = title,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis,
+                                style = MaterialTheme.typography.bodyLarge.copy(
+                                    fontSize = 16.sp,
+                                    textAlign = TextAlign.Center,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            )
+
+                            IconButton(
+                                onClick = onDismissIconClick,
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .align(Alignment.CenterStart)
+                            ) {
+
+                                Icon(
+                                    painter = painterResource(id = R.drawable.close_circle),
+                                    tint = Gray9,
+                                    contentDescription = null
+                                )
+
+                            }
+                        }
+
+                    }
 
                     Spacer(modifier = Modifier.height(14.dp))
 

@@ -34,6 +34,9 @@ dependencies {
     // announcements
     implementation(projects.features.announcements)
 
+    // privacy and policy
+    implementation(projects.features.privacyAndPolicy)
+
     // ui
     implementation(projects.core.ui)
 

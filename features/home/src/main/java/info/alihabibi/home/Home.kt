@@ -25,6 +25,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,10 +61,11 @@ import org.koin.androidx.compose.koinViewModel
 fun HomeDestination(
     viewModel: HomeViewModel = koinViewModel(),
     onAnnouncements: () -> Unit = {},
-    onExitOfAccount: () -> Unit = {}
+    onExitOfAccount: () -> Unit = {},
+    onPrivacyAndPolicy: () -> Unit = {}
 ) {
 
-    var selectedBottomNavItem by remember { mutableStateOf(BottomNavItem.HOME.name) }
+    var selectedBottomNavItem by rememberSaveable { mutableStateOf(BottomNavItem.HOME.name) }
     val navItems = remember { BottomNavItem.entries.toList() }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -106,7 +108,8 @@ fun HomeDestination(
                 )
 
                 BottomNavItem.PROFILE.name -> ProfileScreen(
-                    onExitOfAccount = onExitOfAccount
+                    onExitOfAccount = onExitOfAccount,
+                    onPrivacyAndPolicy = onPrivacyAndPolicy
                 )
 
                 BottomNavItem.REPORTS.name -> ReportsScreen()
@@ -154,7 +157,8 @@ private fun HomeScreen(
 
 @Composable
 private fun ProfileScreen(
-    onExitOfAccount: () -> Unit = {}
+    onExitOfAccount: () -> Unit = {},
+    onPrivacyAndPolicy: () -> Unit = {}
 ) {
 
     Column(
@@ -243,6 +247,7 @@ private fun ProfileScreen(
             }
             var selectedCurrency by remember { mutableStateOf(currencyOptions.first()) }
             var showCurrencySelectionModal by remember { mutableStateOf(false) }
+
             if (showCurrencySelectionModal)
                 AppRadioSelectionBottomSheet(
                     title = stringResource(id = R.string.currency),
@@ -267,6 +272,7 @@ private fun ProfileScreen(
 
             AppSimpleListItem(
                 modifier = Modifier.padding(vertical = 8.dp),
+                onClick = onPrivacyAndPolicy,
                 title = stringResource(id = R.string.privacy_policy),
                 startIcon = painterResource(id = R.drawable.lock)
             )
@@ -282,7 +288,7 @@ private fun ProfileScreen(
                 modifier = Modifier.padding(vertical = 8.dp),
                 onClick = { showExitDialog = true },
                 title = stringResource(id = R.string.exit),
-                startIcon = painterResource(id = R.drawable.logout)
+                startIcon = painterResource(id = R.drawable.logout_red)
             )
 
         }
