@@ -1,5 +1,6 @@
 package info.alihabibi.domain.local.repositories
 
+import info.alihabibi.domain.models.Currencies
 import kotlinx.coroutines.flow.Flow
 
 interface DatastoreRepository {
@@ -9,5 +10,8 @@ interface DatastoreRepository {
 
     suspend fun saveSmsModalShownState(value: Boolean)
     val isSmsModalShown: Flow<Boolean>
+
+    suspend fun savePreferredCurrency(value: String)
+    val preferredCurrency: Flow<Currencies>
 
 }

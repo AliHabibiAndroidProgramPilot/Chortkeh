@@ -6,5 +6,6 @@ object Keys {
     const val APP_PREFERENCES = "APP_PREFERENCES"
     const val IS_FIRST_LAUNCH = "IS_FIRST_LAUNCH"
     const val SMS_MODAL_SHOWN = "SMS_MODAL_SHOWN"
+    const val PREFERRED_CURRENCY = "PREFERRED_CURRENCY"
 
 }

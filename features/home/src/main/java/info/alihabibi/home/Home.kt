@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,15 +40,20 @@ import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import info.alihabibi.common.Utils
+import info.alihabibi.common.Utils.loog
 import info.alihabibi.common_android.RequestNotificationPermission
 import info.alihabibi.common_android.RequestSMSPermission
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray7
+import info.alihabibi.domain.models.Currencies
 import info.alihabibi.ui.dialogs.AppDialog
 import info.alihabibi.ui.dialogs.AppRadioSelectionBottomSheet
 import info.alihabibi.ui.headrs.HomePageHeader
@@ -68,10 +75,14 @@ fun HomeDestination(
     var selectedBottomNavItem by rememberSaveable { mutableStateOf(BottomNavItem.HOME.name) }
     val navItems = remember { BottomNavItem.entries.toList() }
 
+    val lifecycleOwner = LocalLifecycleOwner.current
+
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        viewModel.onEvent(HomeUiIntent.FetchSmsPermissionModalShownState)
+    LaunchedEffect(lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.onEvent(HomeUiIntent.Init)
+        }
     }
 
     BaseScaffold(
@@ -108,8 +119,12 @@ fun HomeDestination(
                 )
 
                 BottomNavItem.PROFILE.name -> ProfileScreen(
+                    uiState = uiState,
                     onExitOfAccount = onExitOfAccount,
-                    onPrivacyAndPolicy = onPrivacyAndPolicy
+                    onPrivacyAndPolicy = onPrivacyAndPolicy,
+                    onPreferredCurrencySelection = { currency ->
+                        viewModel.onEvent(HomeUiIntent.SavePreferredCurrency(currency))
+                    }
                 )
 
                 BottomNavItem.REPORTS.name -> ReportsScreen()
@@ -160,11 +175,14 @@ private fun HomeScreen(
 
 @Composable
 private fun ProfileScreen(
+    uiState: HomeUiState,
     onExitOfAccount: () -> Unit = {},
-    onPrivacyAndPolicy: () -> Unit = {}
+    onPrivacyAndPolicy: () -> Unit = {},
+    onPreferredCurrencySelection: (currency: Currencies) -> Unit = {}
 ) {
 
     Column(
+        modifier = Modifier.verticalScroll(state = rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
@@ -241,28 +259,25 @@ private fun ProfileScreen(
                     onConfirmClicked = { showExitDialog = false }
                 )
 
-            val context = LocalContext.current
-            val currencyOptions = remember {
-                listOf(
-                    Utils.getStringResources(context = context, id = R.string.toman),
-                    Utils.getStringResources(context = context, id = R.string.rial),
-                )
-            }
-            var selectedCurrency by remember { mutableStateOf(currencyOptions.first()) }
             var showCurrencySelectionModal by remember { mutableStateOf(false) }
 
             if (showCurrencySelectionModal)
                 AppRadioSelectionBottomSheet(
                     title = stringResource(id = R.string.currency),
-                    radioOptions = currencyOptions,
-                    selectedRadioButton = selectedCurrency,
+                    radioOptions = Currencies.entries.toList(),
+                    selectedOption = uiState.currency,
                     disabledIndex = 1,
+                    optionLabel = { currency ->
+                        when (currency) {
+                            Currencies.TOMAN -> stringResource(R.string.toman)
+                            Currencies.RIAL -> stringResource(R.string.rial)
+                        }
+                    },
                     onRadioOptionSelected = { userSelectedCurrency ->
-                        selectedCurrency = userSelectedCurrency
+                        onPreferredCurrencySelection(userSelectedCurrency)
                     },
                     onConfirmClicked = {
                         showCurrencySelectionModal = false
-                        //TODO save user preferred currency
                     },
                     onDismissRequest = { showCurrencySelectionModal = false }
                 )
@@ -343,6 +358,8 @@ private fun ReminderScreen() {
 @Composable
 private fun HomeDestinationPreview() {
 
-    ProfileScreen()
+    ProfileScreen(
+        uiState = HomeUiState(),
+    )
 
 }

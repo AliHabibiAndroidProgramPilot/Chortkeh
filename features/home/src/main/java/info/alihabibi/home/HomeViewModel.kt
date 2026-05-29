@@ -2,7 +2,9 @@ package info.alihabibi.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import info.alihabibi.common.Utils.loog
 import info.alihabibi.domain.local.usecases.datastore.usecase.DatastoreUseCases
+import info.alihabibi.domain.models.Currencies
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,17 +22,27 @@ class HomeViewModel(
     fun onEvent(event: HomeUiIntent) {
         when (event) {
 
-            is HomeUiIntent.FetchSmsPermissionModalShownState -> fetchSmsPermissionModalShownState()
+            is HomeUiIntent.Init -> init()
 
-            is HomeUiIntent.SaveSmsPermissionModalShownState -> saveSmsPermissionModalShownState(event.value)
+            is HomeUiIntent.SaveSmsPermissionModalShownState ->
+                saveSmsPermissionModalShownState(event.value)
+
+            is HomeUiIntent.SavePreferredCurrency -> savePreferredCurrency(event.currency)
 
         }
     }
 
-    private fun fetchSmsPermissionModalShownState() {
+    private fun init() {
         viewModelScope.launch {
-            val state = dataStoreUseCases.getIsSmsModalShownUseCase.invoke().first()
-            _uiState.update { it.copy(isSmsModalShown = state) }
+            val smsModalShownState = dataStoreUseCases.getIsSmsModalShownUseCase.invoke().first()
+            val currency = dataStoreUseCases.getPreferredCurrency.invoke().first()
+            currency.name.loog()
+            _uiState.update {
+                it.copy(
+                    isSmsModalShown = smsModalShownState,
+                    currency = currency
+                )
+            }
         }
     }
 
@@ -41,16 +53,27 @@ class HomeViewModel(
         }
     }
 
+    private fun savePreferredCurrency(currency: Currencies) {
+        viewModelScope.launch {
+            currency.loog(param = "saved:")
+            _uiState.update { it.copy(currency = currency) }
+            dataStoreUseCases.savePreferredCurrency.invoke(currency)
+        }
+    }
+
 }
 
 sealed interface HomeUiIntent {
 
-    object FetchSmsPermissionModalShownState : HomeUiIntent
+    object Init : HomeUiIntent
 
     data class SaveSmsPermissionModalShownState(val value: Boolean) : HomeUiIntent
+
+    data class SavePreferredCurrency(val currency: Currencies) : HomeUiIntent
 
 }
 
 data class HomeUiState(
-    val isSmsModalShown: Boolean? = null
+    val isSmsModalShown: Boolean? = null,
+    val currency: Currencies = Currencies.TOMAN
 )

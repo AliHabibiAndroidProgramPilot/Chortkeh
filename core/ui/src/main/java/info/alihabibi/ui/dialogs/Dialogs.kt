@@ -145,14 +145,16 @@ fun AppSimpleBottomSheet(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppRadioSelectionBottomSheet(
+fun <T> AppRadioSelectionBottomSheet(
     title: String = "",
-    radioOptions: List<String>,
-    selectedRadioButton: String?,
+    radioOptions: List<T>,
+    selectedOption: T?,
     disabledIndex: Int? = null,
-    onRadioOptionSelected: (String) -> Unit,
-    onConfirmClicked: () -> Unit,
-    onDismissRequest: () -> Unit
+    optionLabel: @Composable (T) -> String,
+    onRadioOptionSelected: (T) -> Unit,
+    onConfirmClicked: () -> Unit = {},
+    onDismissRequest: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
@@ -185,7 +187,7 @@ fun AppRadioSelectionBottomSheet(
                     ) {
 
                         RadioButton(
-                            selected = selectedRadioButton == item,
+                            selected = selectedOption == item,
                             onClick = { onRadioOptionSelected(item) },
                             enabled = index != disabledIndex,
                             colors = RadioButtonDefaults.colors(
@@ -196,7 +198,7 @@ fun AppRadioSelectionBottomSheet(
 
                         Text(
                             modifier = Modifier.alpha(alpha = if (index != disabledIndex) 1f else 0.45f),
-                            text = item,
+                            text = optionLabel(item),
                             style = MaterialTheme.typography.labelLarge
                         )
 

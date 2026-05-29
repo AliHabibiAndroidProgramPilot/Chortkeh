@@ -4,9 +4,11 @@ import android.content.Context
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import info.alihabibi.domain.local.keys.Keys
 import info.alihabibi.domain.local.keys.Keys.APP_PREFERENCES
+import info.alihabibi.domain.models.Currencies
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -20,6 +22,7 @@ class DatastoreManager(private val context: Context) {
 
     private val firstLaunch = booleanPreferencesKey(Keys.IS_FIRST_LAUNCH)
     private val smsModalShown = booleanPreferencesKey(Keys.SMS_MODAL_SHOWN)
+    private val currency = stringPreferencesKey(Keys.PREFERRED_CURRENCY)
 
     suspend fun saveFirstLaunch(value: Boolean) = withContext(Dispatchers.IO) {
         context.datastore.edit { prefs ->
@@ -48,6 +51,23 @@ class DatastoreManager(private val context: Context) {
                 .catch { emptyPreferences() }
                 .map { prefs ->
                     prefs[smsModalShown] ?: false
+                }
+                .flowOn(Dispatchers.IO)
+
+    suspend fun savePreferredCurrency(value: String) = withContext(Dispatchers.IO) {
+        context.datastore.edit { pref ->
+            pref[currency] = value
+        }
+    }
+
+    val preferredCurrency: Flow<Currencies>
+        get() =
+            context.datastore.data
+                .catch { emptyPreferences() }
+                .map { pref ->
+                    Currencies.entries.firstOrNull {
+                        it.name == pref[currency].orEmpty()
+                    } ?: Currencies.TOMAN
                 }
                 .flowOn(Dispatchers.IO)
 
