@@ -65,7 +65,7 @@ class HomeViewModel(
 
 sealed interface HomeUiIntent {
 
-    object Init : HomeUiIntent
+    data object Init : HomeUiIntent
 
     data class SaveSmsPermissionModalShownState(val value: Boolean) : HomeUiIntent
 

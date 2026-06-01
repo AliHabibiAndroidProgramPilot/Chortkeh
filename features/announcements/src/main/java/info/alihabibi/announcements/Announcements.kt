@@ -3,16 +3,24 @@ package info.alihabibi.announcements
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -21,6 +29,7 @@ import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray8
 import info.alihabibi.ui.buttons.AppToggle
 import info.alihabibi.ui.headrs.AppHeader
+import info.alihabibi.ui.scaffolds.BaseScaffold
 
 @Composable
 fun AnnouncementsDestination(
@@ -31,31 +40,45 @@ fun AnnouncementsDestination(
         stringResource(id = R.string.inApp),
         stringResource(id = R.string.bank)
     )
-    AnnouncementsScreen(
-        toggleItems = toggleItems,
-        onBackPressed = onBackPressed
-    )
+
+    BaseScaffold { innerPadding ->
+
+        AnnouncementsScreen(
+            contentPadding = innerPadding,
+            toggleItems = toggleItems,
+            onBackPressed = onBackPressed
+        )
+
+    }
 
 }
 
 @Composable
 private fun AnnouncementsScreen(
+    announcements: List<String> = emptyList(),
+    contentPadding: PaddingValues = PaddingValues(),
     toggleItems: List<String>,
     onBackPressed: () -> Unit
 ) {
+    val layoutDirection = LocalLayoutDirection.current
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(
+                start = contentPadding.calculateStartPadding(layoutDirection),
+                end = contentPadding.calculateEndPadding(layoutDirection)
+            ),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
         AppHeader(
-            onNavigationClick = onBackPressed,
+            title = stringResource(id = R.string.announcements),
             isMenuAvailable = false,
-            title = stringResource(id = R.string.announcements)
+            onNavigationClick = onBackPressed
         )
 
-        Spacer(modifier = Modifier.padding(top = 12.dp))
+        Spacer(Modifier.height(8.dp))
 
         AppToggle(
             toggleItems = toggleItems,
@@ -63,27 +86,63 @@ private fun AnnouncementsScreen(
             onToggleSelectionChanged = {}
         )
 
-        Spacer(modifier = Modifier.padding(top = 130.dp))
+        Spacer(Modifier.height(8.dp))
 
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            contentPadding = PaddingValues(
+                start = contentPadding.calculateStartPadding(layoutDirection),
+                end = contentPadding.calculateEndPadding(layoutDirection),
+                bottom = contentPadding.calculateBottomPadding()
+            ),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            Image(
-                modifier = Modifier.size(180.dp),
-                painter = painterResource(id = R.drawable.empty_mailbox),
-                contentDescription = null,
-                alignment = Alignment.Center,
-                contentScale = ContentScale.Fit
-            )
-
-            Text(
-                text = stringResource(id = R.string.empty_mail_box_message),
-                style = MaterialTheme.typography.labelLarge.copy(color = Gray8)
-            )
+            if (announcements.isEmpty()) {
+                item {
+                    EmptyAnnouncementsPlaceholder()
+                }
+            } else {
+                items(
+                    items = announcements,
+                    key = { it }
+                ) { announcement ->
+                    // AnnouncementItem(announcement)
+                }
+            }
 
         }
+
+    }
+
+}
+
+@Composable
+private fun EmptyAnnouncementsPlaceholder() {
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 80.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+
+        Image(
+            modifier = Modifier.size(180.dp),
+            painter = painterResource(id = R.drawable.empty_mailbox),
+            contentDescription = null,
+            contentScale = ContentScale.Fit
+        )
+
+        Spacer(Modifier.height(12.dp))
+
+        Text(
+            text = stringResource(id = R.string.empty_mail_box_message),
+            style = MaterialTheme.typography.labelLarge.copy(color = Gray8)
+        )
 
     }
 

@@ -8,7 +8,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -21,13 +24,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -36,9 +40,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.isGranted
-import com.google.accompanist.permissions.rememberPermissionState
-import com.google.accompanist.permissions.shouldShowRationale
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray5
 import info.alihabibi.designsystem.theme.Gray9
@@ -46,28 +48,39 @@ import info.alihabibi.designsystem.theme.Primary
 import info.alihabibi.designsystem.theme.White
 import info.alihabibi.ui.dialogs.AppDialog
 import info.alihabibi.ui.headrs.AppHeader
+import info.alihabibi.ui.scaffolds.BaseScaffold
 
 @Composable
 fun PrivacyAndPolicyDestination(
     onBackPressed: () -> Unit
 ) {
 
-    PrivacyAndPolicyScreen(onBackPressed = onBackPressed)
+    BaseScaffold { innerPadding ->
+
+        PrivacyAndPolicyScreen(
+            contentPadding = innerPadding,
+            onBackPressed = onBackPressed
+        )
+
+    }
 
 }
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 private fun PrivacyAndPolicyScreen(
+    contentPadding: PaddingValues = PaddingValues(),
     onBackPressed: () -> Unit
 ) {
 
-    val smsReceivePermissionState = rememberPermissionState(permission = Manifest.permission.RECEIVE_SMS)
-    val smsReadPermissionState = rememberPermissionState(permission = Manifest.permission.READ_SMS)
-    val shouldShowRational =
-        smsReceivePermissionState.status.shouldShowRationale && smsReadPermissionState.status.shouldShowRationale
+    val smsPermissionsState = rememberMultiplePermissionsState(
+        permissions = listOf(
+            Manifest.permission.RECEIVE_SMS,
+            Manifest.permission.READ_SMS
+        )
+    )
     val context = LocalContext.current
-    var showSmsPermissionDialog by remember {
+    var showSmsPermissionDialog by rememberSaveable {
         mutableStateOf(false)
     }
 
@@ -75,7 +88,7 @@ private fun PrivacyAndPolicyScreen(
         AppDialog(
             title = stringResource(id = R.string.sms_access),
             message =
-                if (!smsReceivePermissionState.status.isGranted)
+                if (!smsPermissionsState.allPermissionsGranted)
                     stringResource(id = R.string.grant_sms_permission)
                 else
                     stringResource(id = R.string.revoke_sms_permission_message),
@@ -89,9 +102,8 @@ private fun PrivacyAndPolicyScreen(
             },
             onConfirmClicked = {
                 when {
-                    shouldShowRational -> {
-                        smsReceivePermissionState.launchPermissionRequest()
-                        smsReadPermissionState.launchPermissionRequest()
+                    smsPermissionsState.shouldShowRationale -> {
+                        smsPermissionsState.launchMultiplePermissionRequest()
                     }
 
                     else -> {
@@ -108,6 +120,11 @@ private fun PrivacyAndPolicyScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .padding(
+                start = contentPadding.calculateStartPadding(layoutDirection = LocalLayoutDirection.current),
+                end = contentPadding.calculateEndPadding(layoutDirection = LocalLayoutDirection.current),
+                bottom = contentPadding.calculateBottomPadding()
+            )
             .background(White),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -138,7 +155,7 @@ private fun PrivacyAndPolicyScreen(
             ) {
 
                 Switch(
-                    checked = smsReceivePermissionState.status.isGranted,
+                    checked = smsPermissionsState.allPermissionsGranted,
                     onCheckedChange = {
                         showSmsPermissionDialog = true
                     },

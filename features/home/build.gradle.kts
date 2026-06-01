@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "info.alihabibi.onboarding"
+    namespace = "info.alihabibi.home"
 }
 
 dependencies {

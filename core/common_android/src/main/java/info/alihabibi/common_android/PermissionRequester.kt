@@ -1,6 +1,5 @@
 package info.alihabibi.common_android
 
-import android.Manifest
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
@@ -11,9 +10,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.MultiplePermissionsState
+import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.isGranted
-import com.google.accompanist.permissions.rememberPermissionState
 import info.alihabibi.designsystem.R
 import info.alihabibi.ui.dialogs.AppDialog
 import info.alihabibi.ui.dialogs.AppSimpleBottomSheet
@@ -21,17 +21,18 @@ import info.alihabibi.ui.dialogs.AppSimpleBottomSheet
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun RequestNotificationPermission() {
+fun RequestNotificationPermission(
+    notificationPermission: PermissionState
+) {
 
-    val permission = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
-    LaunchedEffect(permission.status.isGranted) {
-        if (!permission.status.isGranted) {
-            permission.launchPermissionRequest()
+    LaunchedEffect(notificationPermission.status.isGranted) {
+        if (!notificationPermission.status.isGranted) {
+            notificationPermission.launchPermissionRequest()
         }
     }
     var showDialog by remember { mutableStateOf(true) }
     val shouldShowRationale =
-        (permission.status as? PermissionStatus.Denied)?.shouldShowRationale == true
+        (notificationPermission.status as? PermissionStatus.Denied)?.shouldShowRationale == true
     if (shouldShowRationale && showDialog) {
         AppDialog(
             title = stringResource(id = R.string.notification_access),
@@ -39,7 +40,7 @@ fun RequestNotificationPermission() {
             confirmButtonText = stringResource(id = R.string.I_give_permission),
             cancelButtonText = stringResource(id = R.string.dismiss),
             onConfirmClicked = {
-                permission.launchPermissionRequest()
+                notificationPermission.launchPermissionRequest()
                 showDialog = false
             },
             onDismissRequest = {
@@ -54,18 +55,15 @@ fun RequestNotificationPermission() {
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun RequestSMSPermission(
+    smsPermissions: MultiplePermissionsState,
     onSmsModalShown: () -> Unit = {},
     shouldShowModalDescription: Boolean = true
 ) {
 
-    val permissionReceiveSms = rememberPermissionState(permission = Manifest.permission.RECEIVE_SMS)
-    val permissionReadSms = rememberPermissionState(permission = Manifest.permission.READ_SMS)
     var showModal by remember { mutableStateOf(true) }
-    val shouldShowRationale =
-        (permissionReceiveSms.status as? PermissionStatus.Denied)?.shouldShowRationale == true
 
-    LaunchedEffect(shouldShowRationale) {
-        if (shouldShowRationale) showModal = true
+    LaunchedEffect(smsPermissions.shouldShowRationale) {
+        if (smsPermissions.shouldShowRationale) showModal = true
     }
 
     if (showModal && shouldShowModalDescription) {
@@ -75,12 +73,12 @@ fun RequestSMSPermission(
             confirmButtonText = stringResource(id = R.string.I_give_access_permission),
             onDismissRequest = {
                 showModal = false
+                smsPermissions.launchMultiplePermissionRequest()
                 onSmsModalShown()
             },
             onConfirmClicked = {
                 showModal = false
-                permissionReceiveSms.launchPermissionRequest()
-                permissionReadSms.launchPermissionRequest()
+                smsPermissions.launchMultiplePermissionRequest()
                 onSmsModalShown()
             }
         )
