@@ -4,23 +4,26 @@ import android.Manifest
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -66,7 +69,7 @@ fun PrivacyAndPolicyDestination(
 
 }
 
-@OptIn(ExperimentalPermissionsApi::class)
+@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun PrivacyAndPolicyScreen(
     contentPadding: PaddingValues = PaddingValues(),
@@ -124,13 +127,13 @@ private fun PrivacyAndPolicyScreen(
                 start = contentPadding.calculateStartPadding(layoutDirection = LocalLayoutDirection.current),
                 end = contentPadding.calculateEndPadding(layoutDirection = LocalLayoutDirection.current),
                 bottom = contentPadding.calculateBottomPadding()
-            )
-            .background(White),
+            ),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
         AppHeader(
             title = stringResource(id = R.string.privacy_policy),
+            windowInsets = TopAppBarDefaults.windowInsets.only(WindowInsetsSides.Top),
             isMenuAvailable = false,
             onNavigationClick = onBackPressed
         )

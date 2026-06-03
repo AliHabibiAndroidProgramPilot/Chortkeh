@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -13,36 +14,32 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Black
-import info.alihabibi.designsystem.theme.ChortkehTheme
 import info.alihabibi.designsystem.theme.ErrorRed
+import info.alihabibi.designsystem.theme.Gray11
 import info.alihabibi.designsystem.theme.Gray9
 import info.alihabibi.designsystem.theme.Primary
 
 @Composable
-fun PhoneNumberTextField(
+fun AppTitledTextField(
     modifier: Modifier = Modifier,
-    phone: String,
+    text: String,
     onValueChange: (newValue: String) -> Unit,
+    title: String = "",
     error: Boolean = false,
     placeHolderText: String = "",
-    enableLeadingIcon: Boolean = true,
-    enableTrailingIcon: Boolean = true,
-    errorMessage: String = stringResource(id = R.string.empty_phone_number_warning),
+    errorMessage: String = "",
     enabled: Boolean = true
 ) {
 
@@ -50,71 +47,61 @@ fun PhoneNumberTextField(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 2.dp),
-                text = stringResource(id = R.string.phone_number),
-                style = MaterialTheme.typography.labelLarge.copy(
-                    fontSize = 18.sp,
-                    textAlign = TextAlign.End
-                )
+        Text(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 2.dp),
+            text = title,
+            style = MaterialTheme.typography.labelLarge.copy(
+                fontSize = 16.sp,
+                textAlign = TextAlign.End
             )
+        )
 
-            OutlinedTextField(
-                modifier = modifier.then(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(start = 12.dp, end = 12.dp, top = 6.dp)
-                ),
-                value = phone,
-                onValueChange = onValueChange,
-                textStyle = MaterialTheme.typography.bodyLarge,
-                enabled = enabled,
-                keyboardOptions = KeyboardOptions(
-                    autoCorrectEnabled = false,
-                    keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Done,
-                    showKeyboardOnFocus = true
-                ),
-                isError = error,
-                singleLine = true,
-                leadingIcon = {
-                    if (enableLeadingIcon) MobileTextFieldIcons()
-                },
-                trailingIcon = {
-                    if (enableTrailingIcon) MobileTextFieldIcons()
-                },
-                placeholder = {
-                    if (placeHolderText.isNotEmpty())
-                        Text(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = placeHolderText,
-                            style = MaterialTheme.typography.labelLarge.copy(textAlign = TextAlign.End)
+        OutlinedTextField(
+            modifier = modifier
+                .fillMaxWidth()
+                .height(55.dp)
+                .padding(start = 12.dp, end = 12.dp, top = 6.dp),
+            value = text,
+            onValueChange = onValueChange,
+            textStyle = MaterialTheme.typography.labelLarge.copy(
+                textAlign = TextAlign.Right,
+                textDirection = TextDirection.Rtl
+            ),
+            enabled = enabled,
+            keyboardOptions = KeyboardOptions(
+                autoCorrectEnabled = false,
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Done,
+                showKeyboardOnFocus = true
+            ),
+            isError = error,
+            singleLine = true,
+            placeholder = {
+                if (placeHolderText.isNotEmpty())
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = placeHolderText,
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            textAlign = TextAlign.Right,
+                            textDirection = TextDirection.Rtl
                         )
-                },
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Primary,
-                    focusedLeadingIconColor = Black,
-                    focusedTrailingIconColor = Black,
-                    focusedTextColor = Black,
-                    cursorColor = Black,
-                    unfocusedBorderColor = Gray9,
-                    unfocusedLeadingIconColor = Gray9,
-                    unfocusedTrailingIconColor = Gray9,
-                    unfocusedPlaceholderColor = Gray9,
-                    unfocusedTextColor = Gray9,
-                    errorBorderColor = ErrorRed,
-                    errorLeadingIconColor = Black,
-                    errorTrailingIconColor = Black,
-                    errorTextColor = Black
-                )
+                    )
+            },
+            shape = RoundedCornerShape(size = 12.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Primary,
+                focusedTextColor = Black,
+                cursorColor = Primary,
+                unfocusedBorderColor = Gray11,
+                unfocusedPlaceholderColor = Gray11,
+                focusedPlaceholderColor = Gray9,
+                unfocusedTextColor = Gray11,
+                errorBorderColor = ErrorRed,
+                errorTextColor = Black
             )
-
-        }
+        )
 
         if (error)
             Row(
@@ -147,24 +134,116 @@ fun PhoneNumberTextField(
 }
 
 @Composable
-fun MobileTextFieldIcons() {
-    Icon(
-        painter = painterResource(id = R.drawable.mobile),
-        contentDescription = null
-    )
+fun AppTitledPhoneTextField(
+    modifier: Modifier = Modifier,
+    text: String,
+    onValueChange: (newValue: String) -> Unit,
+    title: String = "",
+    error: Boolean = false,
+    placeHolderText: String = "",
+    errorMessage: String = "",
+    enabled: Boolean = true
+) {
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        Text(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 2.dp),
+            text = title,
+            style = MaterialTheme.typography.labelLarge.copy(
+                fontSize = 16.sp,
+                textAlign = TextAlign.End
+            )
+        )
+
+        OutlinedTextField(
+            modifier = modifier
+                .fillMaxWidth()
+                .height(55.dp)
+                .padding(start = 12.dp, end = 12.dp, top = 6.dp),
+            value = text,
+            onValueChange = onValueChange,
+            textStyle = MaterialTheme.typography.labelLarge.copy(
+                textAlign = TextAlign.Left,
+                textDirection = TextDirection.Ltr
+            ),
+            enabled = enabled,
+            keyboardOptions = KeyboardOptions(
+                autoCorrectEnabled = false,
+                keyboardType = KeyboardType.Phone,
+                imeAction = ImeAction.Done,
+                showKeyboardOnFocus = true
+            ),
+            isError = error,
+            singleLine = true,
+            placeholder = {
+                if (placeHolderText.isNotEmpty())
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = placeHolderText,
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            textAlign = TextAlign.Left,
+                            textDirection = TextDirection.Ltr
+                        )
+                    )
+            },
+            shape = RoundedCornerShape(size = 12.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Primary,
+                focusedTextColor = Black,
+                cursorColor = Primary,
+                unfocusedBorderColor = Gray11,
+                unfocusedPlaceholderColor = Gray11,
+                focusedPlaceholderColor = Gray9,
+                unfocusedTextColor = Gray11,
+                errorBorderColor = ErrorRed,
+                errorTextColor = Black
+            ),
+            visualTransformation = PhoneVisualTransformation()
+        )
+
+        if (error)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 2.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.End
+            ) {
+
+                Text(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 2.dp),
+                    text = errorMessage,
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        textAlign = TextAlign.End,
+                        color = ErrorRed
+                    )
+                )
+
+                Icon(
+                    painter = painterResource(id = R.drawable.warning_red),
+                    tint = ErrorRed,
+                    contentDescription = null
+                )
+
+            }
+
+    }
+
 }
 
 @Preview
 @Composable
 fun InputTextFieldPreview() {
 
-    ChortkehTheme {
-
-        PhoneNumberTextField(
-            phone = "09214101822",
-            onValueChange = {}
-        )
-
-    }
+    AppTitledTextField(
+        title = "نام و نام خانوادگی",
+        text = "علی حبیبی",
+        onValueChange = {}
+    )
 
 }

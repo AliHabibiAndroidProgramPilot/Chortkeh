@@ -1,12 +1,12 @@
 package info.alihabibi.domain.local.usecases.datastore
 
 import info.alihabibi.domain.local.repositories.DatastoreRepository
-import info.alihabibi.domain.models.Currencies
+import info.alihabibi.domain.models.UserInfo
 
-class SavePreferredCurrency(
+class SaveUserAccountInfoUseCase(
     private val repository: DatastoreRepository
 ) {
 
-    suspend operator fun invoke(value: Currencies) = repository.savePreferredCurrency(value.name)
+    suspend operator fun invoke(userInfo: UserInfo) = repository.saveUserInfo(userInfo)
 
 }

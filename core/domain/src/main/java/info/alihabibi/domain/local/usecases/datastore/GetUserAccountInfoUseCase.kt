@@ -1,13 +1,13 @@
 package info.alihabibi.domain.local.usecases.datastore
 
 import info.alihabibi.domain.local.repositories.DatastoreRepository
-import info.alihabibi.domain.models.Currencies
+import info.alihabibi.domain.models.UserInfo
 import kotlinx.coroutines.flow.Flow
 
-class GetPreferredCurrency(
+class GetUserAccountInfoUseCase(
     private val repository: DatastoreRepository
 ) {
 
-    operator fun invoke(): Flow<Currencies> = repository.preferredCurrency
+    operator fun invoke(): Flow<UserInfo> = repository.userAccountInfo
 
 }

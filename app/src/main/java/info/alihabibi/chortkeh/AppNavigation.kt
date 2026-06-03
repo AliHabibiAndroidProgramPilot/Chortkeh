@@ -1,14 +1,18 @@
 package info.alihabibi.chortkeh
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import info.alihabibi.announcements.AnnouncementsDestination
+import info.alihabibi.domain.local.keys.Keys
 import info.alihabibi.home.HomeDestination
 import info.alihabibi.onboarding.OnBoardingDestination
 import info.alihabibi.otp.OtpDestination
 import info.alihabibi.privacy_and_policy.PrivacyAndPolicyDestination
+import info.alihabibi.user_account_info.UserAccountInfoDestination
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -25,6 +29,9 @@ object Announcements
 
 @Serializable
 object PrivacyAndPolicy
+
+@Serializable
+object UserAccountInfo
 
 @Composable
 fun DemoNavHost(
@@ -51,8 +58,15 @@ fun DemoNavHost(
             OtpDestination()
         }
 
-        composable<Home> {
+        composable<Home> { backStackEntry ->
+            val userAccountInfoSaved by backStackEntry.savedStateHandle
+                .getStateFlow(Keys.USER_SAVED_ACCOUNT_INFO, false)
+                .collectAsStateWithLifecycle()
             HomeDestination(
+                shouldShowSuccessfulDataSaved = userAccountInfoSaved,
+                onUserInfoSavedConsumed = {
+                    backStackEntry.savedStateHandle.remove<Boolean>(Keys.USER_SAVED_ACCOUNT_INFO)
+                },
                 onAnnouncements = {
                     navController.navigate(Announcements)
                 },
@@ -63,6 +77,9 @@ fun DemoNavHost(
                 },
                 onPrivacyAndPolicy = {
                     navController.navigate(PrivacyAndPolicy)
+                },
+                onUserAccountInfo = {
+                    navController.navigate(UserAccountInfo)
                 }
             )
         }
@@ -78,6 +95,17 @@ fun DemoNavHost(
         composable<PrivacyAndPolicy> {
             PrivacyAndPolicyDestination(
                 onBackPressed = {
+                    navController.navigateUp()
+                }
+            )
+        }
+
+        composable<UserAccountInfo> {
+            UserAccountInfoDestination(
+                onBackPressed = { userSavedData ->
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set(Keys.USER_SAVED_ACCOUNT_INFO, userSavedData)
                     navController.navigateUp()
                 }
             )

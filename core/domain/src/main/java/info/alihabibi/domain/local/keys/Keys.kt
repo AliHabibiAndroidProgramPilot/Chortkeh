@@ -7,5 +7,9 @@ object Keys {
     const val IS_FIRST_LAUNCH = "IS_FIRST_LAUNCH"
     const val SMS_MODAL_SHOWN = "SMS_MODAL_SHOWN"
     const val PREFERRED_CURRENCY = "PREFERRED_CURRENCY"
+    const val USER_FULL_NAME = "USER_FULL_NAME"
+    const val USER_PHONE = "USER_PHONE"
+    const val USER_GENDER = "USER_GENDER"
+    const val USER_SAVED_ACCOUNT_INFO = "USER_SAVED_ACCOUNT_INFO"
 
 }

@@ -2,9 +2,9 @@ package info.alihabibi.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import info.alihabibi.common.Utils.loog
 import info.alihabibi.domain.local.usecases.datastore.usecase.DatastoreUseCases
 import info.alihabibi.domain.models.Currencies
+import info.alihabibi.domain.models.UserInfo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -35,12 +35,13 @@ class HomeViewModel(
     private fun init() {
         viewModelScope.launch {
             val smsModalShownState = dataStoreUseCases.getIsSmsModalShownUseCase.invoke().first()
-            val currency = dataStoreUseCases.getPreferredCurrency.invoke().first()
-            currency.name.loog()
+            val currency = dataStoreUseCases.getPreferredCurrencyUseCase.invoke().first()
+            val userAccountInfo = dataStoreUseCases.getUserAccountInfoUseCase.invoke().first()
             _uiState.update {
                 it.copy(
                     isSmsModalShown = smsModalShownState,
-                    currency = currency
+                    currency = currency,
+                    userAccountInfo = userAccountInfo
                 )
             }
         }
@@ -55,9 +56,8 @@ class HomeViewModel(
 
     private fun savePreferredCurrency(currency: Currencies) {
         viewModelScope.launch {
-            currency.loog(param = "saved:")
             _uiState.update { it.copy(currency = currency) }
-            dataStoreUseCases.savePreferredCurrency.invoke(currency)
+            dataStoreUseCases.savePreferredCurrencyUseCase.invoke(currency)
         }
     }
 
@@ -75,5 +75,6 @@ sealed interface HomeUiIntent {
 
 data class HomeUiState(
     val isSmsModalShown: Boolean? = null,
-    val currency: Currencies = Currencies.TOMAN
+    val currency: Currencies = Currencies.TOMAN,
+    val userAccountInfo: UserInfo? = null
 )

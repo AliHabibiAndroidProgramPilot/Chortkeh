@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -16,6 +17,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,7 +29,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import info.alihabibi.designsystem.R
-import info.alihabibi.designsystem.theme.ChortkehTheme
 import info.alihabibi.designsystem.theme.Primary
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,7 +57,9 @@ fun HomePageHeader(
                 }
                 if (isBadgeAvailable) {
                     Box(
-                        modifier = Modifier.size(26.dp).zIndex(10f),
+                        modifier = Modifier
+                            .size(26.dp)
+                            .zIndex(10f),
                         contentAlignment = Alignment.TopEnd
                     ) {
                         Box(
@@ -84,17 +87,17 @@ fun HomePageHeader(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppHeader(
-    modifier: Modifier= Modifier,
+    modifier: Modifier = Modifier,
     title: String,
+    windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
     isMenuAvailable: Boolean = true,
     onMenuClick: () -> Unit = {},
     onNavigationClick: () -> Unit = {}
 ) {
 
     CenterAlignedTopAppBar(
-        modifier = Modifier
-            .fillMaxWidth()
-            .then(modifier),
+        modifier = modifier.fillMaxWidth(),
+        windowInsets = windowInsets,
         title = {
             Text(
                 text = title,
@@ -130,17 +133,13 @@ fun AppHeader(
 @Composable
 fun HeadersPreview() {
 
-    ChortkehTheme {
+    Column {
 
-        Column {
+        HomePageHeader(isBadgeAvailable = true)
 
-            HomePageHeader(isBadgeAvailable = true)
+        Spacer(modifier = Modifier.height(30.dp))
 
-            Spacer(modifier = Modifier.height(30.dp))
-
-            AppHeader(title = "خرید موبایل")
-
-        }
+        AppHeader(title = "خرید موبایل")
 
     }
 

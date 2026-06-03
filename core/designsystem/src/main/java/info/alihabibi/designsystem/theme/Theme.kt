@@ -32,9 +32,9 @@ private val LightColorScheme = lightColorScheme(
 )
 
 /**
- * @author AliHabibi
+ * @author Ali Habibi
  * @param content Whole app content wrapped inside theme
- * App has no dark schema!
+ * App has no dark schema yet!
  * Chortkeh Theme
  */
 @Composable

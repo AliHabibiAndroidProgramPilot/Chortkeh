@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -62,6 +63,7 @@ import info.alihabibi.common_android.RequestSMSPermission
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray7
 import info.alihabibi.domain.models.Currencies
+import info.alihabibi.domain.models.Genders
 import info.alihabibi.ui.dialogs.AppDialog
 import info.alihabibi.ui.dialogs.AppRadioSelectionBottomSheet
 import info.alihabibi.ui.headrs.HomePageHeader
@@ -75,9 +77,12 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun HomeDestination(
     viewModel: HomeViewModel = koinViewModel(),
+    shouldShowSuccessfulDataSaved: Boolean = false,
+    onUserInfoSavedConsumed: () -> Unit = {},
     onAnnouncements: () -> Unit = {},
     onExitOfAccount: () -> Unit = {},
-    onPrivacyAndPolicy: () -> Unit = {}
+    onPrivacyAndPolicy: () -> Unit = {},
+    onUserAccountInfo: () -> Unit = {}
 ) {
 
     var selectedBottomNavItem by rememberSaveable { mutableStateOf(BottomNavItem.HOME.name) }
@@ -87,6 +92,15 @@ fun HomeDestination(
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    val snackBarHostState = remember { SnackbarHostState() }
+    val savedMessage = stringResource(id = R.string.successful_save_data)
+    LaunchedEffect(shouldShowSuccessfulDataSaved) {
+        if (shouldShowSuccessfulDataSaved) {
+            snackBarHostState.showSnackbar(savedMessage)
+            onUserInfoSavedConsumed()
+        }
+    }
+
     LaunchedEffect(lifecycleOwner) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.onEvent(HomeUiIntent.Init)
@@ -95,6 +109,7 @@ fun HomeDestination(
 
     BaseScaffold(
         contentWindowInsets = WindowInsets.safeDrawing.only(sides = WindowInsetsSides.Horizontal),
+        snackBarHostState = snackBarHostState,
         bottomBar = {
             AppBottomNavigation(
                 navItems = navItems,
@@ -134,6 +149,7 @@ fun HomeDestination(
                     contentPadding = innerPadding,
                     onExitOfAccount = onExitOfAccount,
                     onPrivacyAndPolicy = onPrivacyAndPolicy,
+                    onUserAccountInfo = onUserAccountInfo,
                     onPreferredCurrencySelection = { currency ->
                         viewModel.onEvent(HomeUiIntent.SavePreferredCurrency(currency))
                     }
@@ -142,6 +158,7 @@ fun HomeDestination(
                 BottomNavItem.REPORTS.name -> ReportsScreen(
                     contentPadding = innerPadding
                 )
+
                 BottomNavItem.REMINDER.name -> ReminderScreen(
                     contentPadding = innerPadding
                 )
@@ -206,6 +223,7 @@ private fun ProfileScreen(
     contentPadding: PaddingValues = PaddingValues(),
     onExitOfAccount: () -> Unit = {},
     onPrivacyAndPolicy: () -> Unit = {},
+    onUserAccountInfo: () -> Unit = {},
     onPreferredCurrencySelection: (currency: Currencies) -> Unit = {}
 ) {
 
@@ -256,20 +274,28 @@ private fun ProfileScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Image(
-                    painter = painterResource(id = R.drawable.men_profile),
+                    painter = painterResource(
+                        id = when (uiState.userAccountInfo?.gender) {
+                            Genders.MEN -> R.drawable.men_profile
+                            Genders.WOMAN -> R.drawable.women_profile
+                            else -> R.drawable.unknown_gender_profile
+                        }
+                    ),
                     contentDescription = null
                 )
 
                 Text(
                     modifier = Modifier.padding(top = 8.dp, bottom = 4.dp),
-                    text = "علی حبیبی",
+                    text = if (uiState.userAccountInfo?.fullName.isNullOrEmpty())
+                        stringResource(id = R.string.chortkeh_user) else uiState.userAccountInfo.fullName,
                     style = MaterialTheme.typography.labelMedium
                 )
 
-                Text(
-                    text = "09924025474".chunked(4).joinToString(" "),
-                    style = MaterialTheme.typography.labelSmall.copy(color = Gray7)
-                )
+                if (!uiState.userAccountInfo?.phone.isNullOrEmpty())
+                    Text(
+                        text = uiState.userAccountInfo.phone,
+                        style = MaterialTheme.typography.labelSmall.copy(color = Gray7)
+                    )
 
             }
 
@@ -304,8 +330,8 @@ private fun ProfileScreen(
                     disabledIndex = 1,
                     optionLabel = { currency ->
                         when (currency) {
-                            Currencies.TOMAN -> stringResource(R.string.toman)
-                            Currencies.RIAL -> stringResource(R.string.rial)
+                            Currencies.TOMAN -> stringResource(id = R.string.toman)
+                            Currencies.RIAL -> stringResource(id = R.string.rial)
                         }
                     },
                     onRadioOptionSelected = { userSelectedCurrency ->
@@ -319,6 +345,7 @@ private fun ProfileScreen(
 
             AppSimpleListItem(
                 modifier = Modifier.padding(vertical = 8.dp),
+                onClick = onUserAccountInfo,
                 title = stringResource(id = R.string.user_account_info),
                 startIcon = painterResource(id = R.drawable.profile)
             )
