@@ -9,26 +9,66 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.permissions.rememberPermissionState
+import info.alihabibi.common.Utils
 import info.alihabibi.common_android.RequestNotificationPermission
 import info.alihabibi.common_android.RequestSMSPermission
+import info.alihabibi.designsystem.R
+import info.alihabibi.designsystem.theme.Gray7
+import info.alihabibi.domain.models.Currencies
+import info.alihabibi.domain.models.Genders
+import info.alihabibi.ui.dialogs.AppDialog
+import info.alihabibi.ui.dialogs.AppRadioSelectionBottomSheet
 import info.alihabibi.ui.headrs.HomePageHeader
+import info.alihabibi.ui.items.AppDangerousListItem
+import info.alihabibi.ui.items.AppSimpleListItem
 import info.alihabibi.ui.navigation.AppBottomNavigation
 import info.alihabibi.ui.navigation.BottomNavItem
 import info.alihabibi.ui.scaffolds.BaseScaffold
@@ -37,19 +77,39 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun HomeDestination(
     viewModel: HomeViewModel = koinViewModel(),
-    onAnnouncements: () -> Unit = {}
+    shouldShowSuccessfulDataSaved: Boolean = false,
+    onUserInfoSavedConsumed: () -> Unit = {},
+    onAnnouncements: () -> Unit = {},
+    onExitOfAccount: () -> Unit = {},
+    onPrivacyAndPolicy: () -> Unit = {},
+    onUserAccountInfo: () -> Unit = {}
 ) {
 
-    var selectedBottomNavItem by remember { mutableStateOf(BottomNavItem.HOME.name) }
-    val navItems = BottomNavItem.entries.toList()
+    var selectedBottomNavItem by rememberSaveable { mutableStateOf(BottomNavItem.HOME.name) }
+    val navItems = remember { BottomNavItem.entries.toList() }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        viewModel.onEvent(HomeUiIntent.FetchSmsPermissionModalShownState)
+    val snackBarHostState = remember { SnackbarHostState() }
+    val savedMessage = stringResource(id = R.string.successful_save_data)
+    LaunchedEffect(shouldShowSuccessfulDataSaved) {
+        if (shouldShowSuccessfulDataSaved) {
+            snackBarHostState.showSnackbar(savedMessage)
+            onUserInfoSavedConsumed()
+        }
+    }
+
+    LaunchedEffect(lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.onEvent(HomeUiIntent.Init)
+        }
     }
 
     BaseScaffold(
+        contentWindowInsets = WindowInsets.safeDrawing.only(sides = WindowInsetsSides.Horizontal),
+        snackBarHostState = snackBarHostState,
         bottomBar = {
             AppBottomNavigation(
                 navItems = navItems,
@@ -58,9 +118,10 @@ fun HomeDestination(
                 onNavItemClicked = { item -> selectedBottomNavItem = item.name }
             )
         }
-    ) { _ ->
+    ) { innerPadding ->
 
         AnimatedContent(
+            modifier = Modifier.fillMaxSize(),
             targetState = selectedBottomNavItem,
             transitionSpec = {
                 fadeIn(
@@ -76,15 +137,31 @@ fun HomeDestination(
             when (bottomNavItem) {
                 BottomNavItem.HOME.name -> HomeScreen(
                     uiState = uiState,
+                    contentPadding = innerPadding,
                     onSmsModalShowed = {
                         viewModel.onEvent(HomeUiIntent.SaveSmsPermissionModalShownState(value = true))
                     },
                     onAnnouncements = onAnnouncements
                 )
 
-                BottomNavItem.PROFILE.name -> ProfileScreen()
-                BottomNavItem.REPORTS.name -> ReportsScreen()
-                BottomNavItem.REMINDER.name -> ReminderScreen()
+                BottomNavItem.PROFILE.name -> ProfileScreen(
+                    uiState = uiState,
+                    contentPadding = innerPadding,
+                    onExitOfAccount = onExitOfAccount,
+                    onPrivacyAndPolicy = onPrivacyAndPolicy,
+                    onUserAccountInfo = onUserAccountInfo,
+                    onPreferredCurrencySelection = { currency ->
+                        viewModel.onEvent(HomeUiIntent.SavePreferredCurrency(currency))
+                    }
+                )
+
+                BottomNavItem.REPORTS.name -> ReportsScreen(
+                    contentPadding = innerPadding
+                )
+
+                BottomNavItem.REMINDER.name -> ReminderScreen(
+                    contentPadding = innerPadding
+                )
             }
 
         }
@@ -98,21 +175,36 @@ fun HomeDestination(
 @Composable
 private fun HomeScreen(
     uiState: HomeUiState,
+    contentPadding: PaddingValues = PaddingValues(),
     onSmsModalShowed: () -> Unit = {},
     onAnnouncements: () -> Unit
 ) {
 
-    val notificationPermissionState = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
-    val smsPermissionState = rememberPermissionState(permission = Manifest.permission.RECEIVE_SMS)
+    val notificationPermission =
+        rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
+    val smsPermissions = rememberMultiplePermissionsState(
+        permissions = listOf(
+            Manifest.permission.RECEIVE_SMS,
+            Manifest.permission.READ_SMS
+        )
+    )
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !notificationPermissionState.status.isGranted)
-        RequestNotificationPermission()
-    if (uiState.isSmsModalShown == false && !smsPermissionState.status.isGranted) {
-        RequestSMSPermission(onSmsModalShown = onSmsModalShowed)
-    }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !notificationPermission.status.isGranted)
+        RequestNotificationPermission(notificationPermission = notificationPermission)
+    if (uiState.isSmsModalShown == false && !smsPermissions.allPermissionsGranted)
+        RequestSMSPermission(
+            smsPermissions = smsPermissions,
+            onSmsModalShown = onSmsModalShowed
+        )
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(
+                start = contentPadding.calculateStartPadding(layoutDirection = LocalLayoutDirection.current),
+                end = contentPadding.calculateEndPadding(layoutDirection = LocalLayoutDirection.current),
+                bottom = contentPadding.calculateBottomPadding()
+            ),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
@@ -126,15 +218,192 @@ private fun HomeScreen(
 }
 
 @Composable
-private fun ProfileScreen() {
+private fun ProfileScreen(
+    uiState: HomeUiState,
+    contentPadding: PaddingValues = PaddingValues(),
+    onExitOfAccount: () -> Unit = {},
+    onPrivacyAndPolicy: () -> Unit = {},
+    onUserAccountInfo: () -> Unit = {},
+    onPreferredCurrencySelection: (currency: Currencies) -> Unit = {}
+) {
 
-    //TODO(give window insets padding from Modifier for content)
-    Text(text = "profile", fontSize = 32.sp)
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(state = rememberScrollState())
+            .padding(
+                start = contentPadding.calculateStartPadding(layoutDirection = LocalLayoutDirection.current),
+                end = contentPadding.calculateEndPadding(layoutDirection = LocalLayoutDirection.current),
+                bottom = contentPadding.calculateBottomPadding()
+            ),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(220.dp),
+            contentAlignment = Alignment.TopCenter
+        ) {
+
+            Image(
+                modifier = Modifier.fillMaxWidth(),
+                painter = painterResource(id = R.drawable.profile_header_background),
+                contentDescription = null,
+                contentScale = ContentScale.FillBounds
+            )
+
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+                Spacer(modifier = Modifier.padding(top = 10.dp))
+
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 24.dp),
+                    text = stringResource(id = R.string.profile),
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        textAlign = TextAlign.Center,
+                        fontSize = 16.sp
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Image(
+                    painter = painterResource(
+                        id = when (uiState.userAccountInfo?.gender) {
+                            Genders.MEN -> R.drawable.men_profile
+                            Genders.WOMAN -> R.drawable.women_profile
+                            else -> R.drawable.unknown_gender_profile
+                        }
+                    ),
+                    contentDescription = null
+                )
+
+                Text(
+                    modifier = Modifier.padding(top = 8.dp, bottom = 4.dp),
+                    text = if (uiState.userAccountInfo?.fullName.isNullOrEmpty())
+                        stringResource(id = R.string.chortkeh_user) else uiState.userAccountInfo.fullName,
+                    style = MaterialTheme.typography.labelMedium
+                )
+
+                if (!uiState.userAccountInfo?.phone.isNullOrEmpty())
+                    Text(
+                        text = uiState.userAccountInfo.phone,
+                        style = MaterialTheme.typography.labelSmall.copy(color = Gray7)
+                    )
+
+            }
+
+        }
+
+        Column(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+
+            var showExitDialog by remember { mutableStateOf(false) }
+            if (showExitDialog)
+                AppDialog(
+                    title = stringResource(id = R.string.exit_from_account),
+                    message = stringResource(id = R.string.exit_from_account_description),
+                    confirmButtonText = stringResource(id = R.string.dismiss),
+                    cancelButtonText = stringResource(id = R.string.exit),
+                    onDismissRequest = { showExitDialog = false },
+                    onCancelClicked = {
+                        showExitDialog = false
+                        onExitOfAccount()
+                    },
+                    onConfirmClicked = { showExitDialog = false }
+                )
+
+            var showCurrencySelectionModal by remember { mutableStateOf(false) }
+
+            if (showCurrencySelectionModal)
+                AppRadioSelectionBottomSheet(
+                    title = stringResource(id = R.string.currency),
+                    radioOptions = Currencies.entries.toList(),
+                    selectedOption = uiState.currency,
+                    disabledIndex = 1,
+                    optionLabel = { currency ->
+                        when (currency) {
+                            Currencies.TOMAN -> stringResource(id = R.string.toman)
+                            Currencies.RIAL -> stringResource(id = R.string.rial)
+                        }
+                    },
+                    onRadioOptionSelected = { userSelectedCurrency ->
+                        onPreferredCurrencySelection(userSelectedCurrency)
+                    },
+                    onConfirmClicked = {
+                        showCurrencySelectionModal = false
+                    },
+                    onDismissRequest = { showCurrencySelectionModal = false }
+                )
+
+            AppSimpleListItem(
+                modifier = Modifier.padding(vertical = 8.dp),
+                onClick = onUserAccountInfo,
+                title = stringResource(id = R.string.user_account_info),
+                startIcon = painterResource(id = R.drawable.profile)
+            )
+
+            AppSimpleListItem(
+                modifier = Modifier.padding(vertical = 8.dp),
+                onClick = onPrivacyAndPolicy,
+                title = stringResource(id = R.string.privacy_policy),
+                startIcon = painterResource(id = R.drawable.lock)
+            )
+
+            AppSimpleListItem(
+                modifier = Modifier.padding(vertical = 8.dp),
+                onClick = { showCurrencySelectionModal = true },
+                title = stringResource(id = R.string.currency),
+                startIcon = painterResource(id = R.drawable.money_currency)
+            )
+
+            AppDangerousListItem(
+                modifier = Modifier.padding(vertical = 8.dp),
+                onClick = { showExitDialog = true },
+                title = stringResource(id = R.string.exit),
+                startIcon = painterResource(id = R.drawable.logout_red)
+            )
+
+        }
+
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(bottom = 50.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+
+            val context = LocalContext.current
+            val version = remember { Utils.getAppVersionName(context) }
+
+            Text(
+                text = "Version $version",
+                style = MaterialTheme.typography.bodyMedium
+            )
+
+            Text(
+                text = stringResource(id = R.string.made_with_love),
+                style = MaterialTheme.typography.bodySmall.copy(textDirection = TextDirection.Ltr)
+            )
+
+        }
+
+    }
 
 }
 
 @Composable
-private fun ReportsScreen() {
+private fun ReportsScreen(
+    contentPadding: PaddingValues = PaddingValues(),
+) {
 
     //TODO(give window insets padding from Modifier for content)
     Text(text = "Report", fontSize = 32.sp)
@@ -142,7 +411,9 @@ private fun ReportsScreen() {
 }
 
 @Composable
-private fun ReminderScreen() {
+private fun ReminderScreen(
+    contentPadding: PaddingValues = PaddingValues(),
+) {
 
     //TODO(give window insets padding from Modifier for content)
     Text(text = "reminder", fontSize = 32.sp)
@@ -153,6 +424,8 @@ private fun ReminderScreen() {
 @Composable
 private fun HomeDestinationPreview() {
 
-    HomeDestination()
+    ProfileScreen(
+        uiState = HomeUiState(),
+    )
 
 }

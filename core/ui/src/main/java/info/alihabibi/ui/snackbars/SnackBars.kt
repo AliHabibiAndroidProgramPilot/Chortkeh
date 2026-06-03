@@ -25,40 +25,48 @@ import info.alihabibi.designsystem.theme.White
 @Composable
 fun AppSnackBar(
     description: String,
+    isUndoAvailable: Boolean = true,
     onUndo: () -> Unit = {}
 ) {
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
 
         Snackbar(
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(all = 8.dp),
             actionContentColor = White,
             contentColor = White,
             action = {
-                Row(
-                    modifier = Modifier
-                        .clickable { onUndo() },
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    Icon(
-                        modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
-                        painter = painterResource(id = R.drawable.undo),
-                        contentDescription = null,
-                    )
-                    Spacer(modifier = Modifier.padding(2.dp))
-                    Text(
-                        modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
-                        text = stringResource(id = R.string.undo),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+                if (isUndoAvailable) {
+                    Row(
+                        modifier = Modifier
+                            .clickable { onUndo() },
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+
+                        Icon(
+                            modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
+                            painter = painterResource(id = R.drawable.undo),
+                            contentDescription = null,
+                        )
+
+                        Spacer(modifier = Modifier.padding(all = 2.dp))
+
+                        Text(
+                            modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
+                            text = stringResource(id = R.string.undo),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
                 }
             }
         ) {
+
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodyMedium
             )
+
         }
 
     }

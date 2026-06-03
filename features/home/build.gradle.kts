@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "info.alihabibi.onboarding"
+    namespace = "info.alihabibi.home"
 }
 
 dependencies {
@@ -17,6 +17,9 @@ dependencies {
 
     // common-android
     implementation(projects.core.commonAndroid)
+
+    // common
+    implementation(projects.core.common)
 
     // domain
     implementation(projects.core.domain)

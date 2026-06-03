@@ -33,7 +33,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import info.alihabibi.designsystem.R
-import info.alihabibi.designsystem.theme.ChortkehTheme
 import info.alihabibi.designsystem.theme.Gray10
 import info.alihabibi.designsystem.theme.Primary
 import info.alihabibi.designsystem.theme.White
@@ -108,13 +107,13 @@ private fun NavBar(
             }
         }
         FloatingActionButton(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .offset(y = (-28).dp),
             onClick = onFabClick,
             containerColor = Primary,
             contentColor = Color.White,
-            shape = CircleShape,
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .offset(y = (-28).dp)
+            shape = CircleShape
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.plus),
@@ -163,13 +162,11 @@ private fun NavItem(
 @Composable
 fun AppBottomNavigationPreview() {
 
-    ChortkehTheme {
-        NavBar(
-            navItems = emptyList(),
-            selectedNavItem = "",
-            onFabClick = {},
-            onNavItemClicked = {}
-        )
-    }
+    NavBar(
+        navItems = emptyList(),
+        selectedNavItem = "",
+        onFabClick = {},
+        onNavItemClicked = {}
+    )
 
 }

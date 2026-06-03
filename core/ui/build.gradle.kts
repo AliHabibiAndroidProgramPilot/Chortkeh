@@ -8,6 +8,8 @@ android {
 }
 
 dependencies {
+
     // design system
     implementation(projects.core.designsystem)
+
 }

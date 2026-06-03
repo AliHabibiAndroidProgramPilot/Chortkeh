@@ -3,6 +3,8 @@ package info.alihabibi.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import info.alihabibi.domain.local.usecases.datastore.usecase.DatastoreUseCases
+import info.alihabibi.domain.models.Currencies
+import info.alihabibi.domain.models.UserInfo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,17 +22,28 @@ class HomeViewModel(
     fun onEvent(event: HomeUiIntent) {
         when (event) {
 
-            is HomeUiIntent.FetchSmsPermissionModalShownState -> fetchSmsPermissionModalShownState()
+            is HomeUiIntent.Init -> init()
 
-            is HomeUiIntent.SaveSmsPermissionModalShownState -> saveSmsPermissionModalShownState(event.value)
+            is HomeUiIntent.SaveSmsPermissionModalShownState ->
+                saveSmsPermissionModalShownState(event.value)
+
+            is HomeUiIntent.SavePreferredCurrency -> savePreferredCurrency(event.currency)
 
         }
     }
 
-    private fun fetchSmsPermissionModalShownState() {
+    private fun init() {
         viewModelScope.launch {
-            val state = dataStoreUseCases.getIsSmsModalShownUseCase.invoke().first()
-            _uiState.update { it.copy(isSmsModalShown = state) }
+            val smsModalShownState = dataStoreUseCases.getIsSmsModalShownUseCase.invoke().first()
+            val currency = dataStoreUseCases.getPreferredCurrencyUseCase.invoke().first()
+            val userAccountInfo = dataStoreUseCases.getUserAccountInfoUseCase.invoke().first()
+            _uiState.update {
+                it.copy(
+                    isSmsModalShown = smsModalShownState,
+                    currency = currency,
+                    userAccountInfo = userAccountInfo
+                )
+            }
         }
     }
 
@@ -41,16 +54,27 @@ class HomeViewModel(
         }
     }
 
+    private fun savePreferredCurrency(currency: Currencies) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(currency = currency) }
+            dataStoreUseCases.savePreferredCurrencyUseCase.invoke(currency)
+        }
+    }
+
 }
 
 sealed interface HomeUiIntent {
 
-    object FetchSmsPermissionModalShownState : HomeUiIntent
+    data object Init : HomeUiIntent
 
     data class SaveSmsPermissionModalShownState(val value: Boolean) : HomeUiIntent
+
+    data class SavePreferredCurrency(val currency: Currencies) : HomeUiIntent
 
 }
 
 data class HomeUiState(
-    val isSmsModalShown: Boolean? = null
+    val isSmsModalShown: Boolean? = null,
+    val currency: Currencies = Currencies.TOMAN,
+    val userAccountInfo: UserInfo? = null
 )

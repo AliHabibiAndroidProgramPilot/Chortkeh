@@ -15,7 +15,7 @@ class MainActivityViewModel(datastoreUseCase: DatastoreUseCases) : ViewModel() {
         datastoreUseCase.getIsAppFirstLaunchUseCase.invoke().map {
             MainActivityUiState.Success(it)
         }
-            .catch { throw Exception("DATA STORE CAN NOT PROVIDE FIRST LAUNCH FLAG") }
+            .catch { emit(MainActivityUiState.Success(isFirstLaunch = true)) }
             .stateIn(
                 scope = viewModelScope,
                 initialValue = MainActivityUiState.Loading,

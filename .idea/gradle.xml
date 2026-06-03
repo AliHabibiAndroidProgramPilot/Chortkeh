@@ -19,7 +19,7 @@
         <option name="testRunner" value="CHOOSE_PER_TEST" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="gradleHome" value="C:\Gradle" />
-        <option name="gradleJvm" value="jbr-17" />
+        <option name="gradleJvm" value="jbr-21" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
@@ -38,6 +38,8 @@
             <option value="$PROJECT_DIR$/features/home" />
             <option value="$PROJECT_DIR$/features/onboarding" />
             <option value="$PROJECT_DIR$/features/otp" />
+            <option value="$PROJECT_DIR$/features/privacy-and-policy" />
+            <option value="$PROJECT_DIR$/features/user_account_info" />
           </set>
         </option>
       </GradleProjectSettings>

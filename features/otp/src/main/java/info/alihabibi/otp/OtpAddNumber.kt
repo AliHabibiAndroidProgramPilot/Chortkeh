@@ -20,7 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import info.alihabibi.designsystem.R
-import info.alihabibi.ui.inputs.PhoneNumberTextField
+import info.alihabibi.ui.inputs.AppTitledTextField
 
 @Composable
 fun OtpAddNumberScreen() {
@@ -51,12 +51,10 @@ fun OtpAddNumberScreen() {
 
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
 
-                PhoneNumberTextField(
-                    phone = "",
+                AppTitledTextField(
+                    text = "",
                     onValueChange = {},
-                    placeHolderText = "09*********",
-                    enableTrailingIcon = false,
-                    enableLeadingIcon = false
+                    placeHolderText = "09*********"
                 )
 
             }
