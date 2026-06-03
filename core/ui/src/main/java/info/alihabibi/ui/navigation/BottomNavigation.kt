@@ -84,7 +84,7 @@ private fun NavBar(
                 ) {
                     for (index in navItems.subList(0, 2))
                         NavItem(
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier.weight(weight = 1f),
                             navItem = index,
                             selected = (selected == index.name),
                             onClick = {
@@ -95,7 +95,7 @@ private fun NavBar(
                     Spacer(Modifier.width(72.dp))
                     for (index in navItems.subList(2, 4))
                         NavItem(
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier.weight(weight = 1f),
                             navItem = index,
                             selected = (selected == index.name),
                             onClick = {
@@ -132,6 +132,8 @@ private fun NavItem(
     onClick: () -> Unit
 ) {
     val color = if (selected) Primary else Gray10
+    val icon =
+        if (selected) painterResource(id = navItem.enabeldIconResId) else painterResource(id = navItem.iconResId)
     Column(
         modifier = modifier
             .fillMaxHeight()
@@ -146,7 +148,7 @@ private fun NavItem(
         )
         Spacer(Modifier.height(10.dp))
         Icon(
-            painter = painterResource(id = navItem.iconResId),
+            painter = icon,
             contentDescription = null,
             tint = color
         )
