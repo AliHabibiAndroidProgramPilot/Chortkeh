@@ -4,11 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import info.alihabibi.domain.local.usecases.datastore.usecase.DatastoreUseCases
 import info.alihabibi.domain.models.Currencies
-import info.alihabibi.domain.models.UserInfo
+import info.alihabibi.home.mapper.toUiModel
+import info.alihabibi.home.ui_model.UserAccountInfoUiModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -36,7 +38,9 @@ class HomeViewModel(
         viewModelScope.launch {
             val smsModalShownState = dataStoreUseCases.getIsSmsModalShownUseCase.invoke().first()
             val currency = dataStoreUseCases.getPreferredCurrencyUseCase.invoke().first()
-            val userAccountInfo = dataStoreUseCases.getUserAccountInfoUseCase.invoke().first()
+            val userAccountInfo = dataStoreUseCases.getUserAccountInfoUseCase.invoke()
+                .map { it.toUiModel() }
+                .first()
             _uiState.update {
                 it.copy(
                     isSmsModalShown = smsModalShownState,
@@ -74,7 +78,7 @@ sealed interface HomeUiIntent {
 }
 
 data class HomeUiState(
-    val isSmsModalShown: Boolean? = null,
+    val isSmsModalShown: Boolean = false,
     val currency: Currencies = Currencies.TOMAN,
-    val userAccountInfo: UserInfo? = null
+    val userAccountInfo: UserAccountInfoUiModel = UserAccountInfoUiModel()
 )

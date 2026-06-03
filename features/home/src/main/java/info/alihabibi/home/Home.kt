@@ -63,7 +63,6 @@ import info.alihabibi.common_android.RequestSMSPermission
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray7
 import info.alihabibi.domain.models.Currencies
-import info.alihabibi.domain.models.Genders
 import info.alihabibi.ui.dialogs.AppDialog
 import info.alihabibi.ui.dialogs.AppRadioSelectionBottomSheet
 import info.alihabibi.ui.headrs.HomePageHeader
@@ -274,13 +273,7 @@ private fun ProfileScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Image(
-                    painter = painterResource(
-                        id = when (uiState.userAccountInfo?.gender) {
-                            Genders.MEN -> R.drawable.men_profile
-                            Genders.WOMAN -> R.drawable.women_profile
-                            else -> R.drawable.unknown_gender_profile
-                        }
-                    ),
+                    painter = painterResource(id = uiState.userAccountInfo.profileImageRes),
                     contentDescription = null
                 )
 
