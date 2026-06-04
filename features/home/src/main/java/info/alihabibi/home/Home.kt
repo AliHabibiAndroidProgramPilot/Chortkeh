@@ -46,6 +46,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -241,7 +242,7 @@ private fun ProfileScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(220.dp),
+                .height(height = 230.dp),
             contentAlignment = Alignment.TopCenter
         ) {
 
@@ -262,7 +263,7 @@ private fun ProfileScreen(
                 Text(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 24.dp),
+                        .padding(top = 32.dp),
                     text = stringResource(id = R.string.profile),
                     style = MaterialTheme.typography.bodyMedium.copy(
                         textAlign = TextAlign.Center,
@@ -270,7 +271,7 @@ private fun ProfileScreen(
                     )
                 )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(26.dp))
 
                 Image(
                     painter = painterResource(id = uiState.userAccountInfo.profileImageRes),
@@ -278,15 +279,22 @@ private fun ProfileScreen(
                 )
 
                 Text(
-                    modifier = Modifier.padding(top = 8.dp, bottom = 4.dp),
+                    modifier = Modifier.padding(top = 8.dp, bottom = 4.dp, start = 4.dp, end = 4.dp),
                     text = uiState.userAccountInfo.fullName.ifEmpty { stringResource(id = R.string.chortkeh_user) },
-                    style = MaterialTheme.typography.labelMedium
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.labelLarge.copy(
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Center,
+                        textDirection = TextDirection.ContentOrRtl
+                    )
                 )
 
                 if (uiState.userAccountInfo.phone.isNotEmpty())
                     Text(
+                        modifier = Modifier.padding(bottom = 4.dp),
                         text = uiState.userAccountInfo.phone,
-                        style = MaterialTheme.typography.labelSmall.copy(color = Gray7)
+                        style = MaterialTheme.typography.labelMedium.copy(color = Gray7)
                     )
 
             }

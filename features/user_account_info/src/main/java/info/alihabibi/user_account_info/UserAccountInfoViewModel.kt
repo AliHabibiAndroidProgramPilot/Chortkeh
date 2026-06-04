@@ -46,7 +46,7 @@ class UserAccountInfoViewModel(
             _uiState.update {
                 it.copy(
                     fullName = userAccountInfo.fullName,
-                    userPhone = userAccountInfo.phone.chunked(4).joinToString(" "),
+                    userPhone = userAccountInfo.phone,
                     userGender = userAccountInfo.gender
                 )
             }
