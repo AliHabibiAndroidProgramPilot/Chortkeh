@@ -10,7 +10,7 @@ import info.alihabibi.domain.local.keys.Keys
 import info.alihabibi.domain.local.keys.Keys.APP_PREFERENCES
 import info.alihabibi.domain.models.Currencies
 import info.alihabibi.domain.models.Genders
-import info.alihabibi.domain.models.UserInfo
+import info.alihabibi.domain.models.UserAccountInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -76,7 +76,7 @@ class DatastoreManager(private val context: Context) {
                 }
                 .flowOn(Dispatchers.IO)
 
-    suspend fun saveUserAccountInfo(userInfo: UserInfo) {
+    suspend fun saveUserAccountInfo(userInfo: UserAccountInfo) {
         context.datastore.edit { pref ->
             pref[userFullName] = userInfo.fullName
             pref[userPhone] = userInfo.phone
@@ -84,16 +84,15 @@ class DatastoreManager(private val context: Context) {
         }
     }
 
-    val userAccountInfo: Flow<UserInfo>
+    val userAccountInfo: Flow<UserAccountInfo>
         get() =
             context.datastore.data
-                .catch { UserInfo(fullName = "", phone = "", gender = Genders.UNKNOW) }
+                .catch { UserAccountInfo(fullName = "", phone = "", gender = Genders.UNKNOWN) }
                 .map { pref ->
-                    //TODO fix data store formatting decision for ui
-                    UserInfo(
+                    UserAccountInfo(
                         fullName = pref[userFullName].orEmpty(),
-                        phone = pref[userPhone].orEmpty().chunked(4).joinToString(" "),
-                        gender = pref[userGender]?.let { enumValueOf<Genders>(it) } ?: Genders.UNKNOW
+                        phone = pref[userPhone].orEmpty(),
+                        gender = pref[userGender]?.let { enumValueOf<Genders>(it) } ?: Genders.UNKNOWN
                     )
                 }
                 .flowOn(Dispatchers.IO)

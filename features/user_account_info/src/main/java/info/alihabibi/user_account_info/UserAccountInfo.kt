@@ -42,7 +42,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray11
 import info.alihabibi.designsystem.theme.Gray8
-import info.alihabibi.domain.models.Genders
+import info.alihabibi.model.ui_model.GenderOptionUiModel
 import info.alihabibi.ui.buttons.AppButton
 import info.alihabibi.ui.dialogs.AppRadioSelectionBottomSheet
 import info.alihabibi.ui.headrs.AppHeader
@@ -95,7 +95,7 @@ private fun UserAccountInfoScreen(
     contentPadding: PaddingValues = PaddingValues(),
     onFullNameChanged: (fullName: String) -> Unit = {},
     onPhoneChanged: (phone: String) -> Unit = {},
-    onGenderChanged: (gender: Genders) -> Unit = {},
+    onGenderChanged: (gender: GenderOptionUiModel) -> Unit = {},
     onSaveUserInfo: () -> Unit = {},
     onBackPressed: () -> Unit
 ) {
@@ -106,15 +106,9 @@ private fun UserAccountInfoScreen(
     if (showGenderSelectionModal)
         AppRadioSelectionBottomSheet(
             title = stringResource(id = R.string.gender),
-            radioOptions = Genders.entries.toList(),
+            radioOptions = GenderOptionUiModel.entries.toList(),
             selectedOption = uiState.userGender,
-            optionLabel = { gender ->
-                when (gender) {
-                    Genders.MEN -> stringResource(id = R.string.men)
-                    Genders.WOMAN -> stringResource(id = R.string.women)
-                    Genders.UNKNOW -> stringResource(id = R.string.unknow)
-                }
-            },
+            optionLabel = { gender -> stringResource(id = gender.labelRes) },
             onRadioOptionSelected = { selectedGender ->
                 onGenderChanged(selectedGender)
             },
@@ -192,11 +186,7 @@ private fun UserAccountInfoScreen(
 
                 Text(
                     modifier = Modifier.padding(horizontal = 12.dp),
-                    text = when (uiState.userGender) {
-                        Genders.MEN -> stringResource(id = R.string.men)
-                        Genders.WOMAN -> stringResource(id = R.string.women)
-                        Genders.UNKNOW -> stringResource(id = R.string.unknow)
-                    },
+                    text = stringResource(id = uiState.userGender.labelRes),
                     style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp)
                 )
 
