@@ -3,9 +3,11 @@ package info.alihabibi.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import info.alihabibi.domain.local.usecases.datastore.usecase.DatastoreUseCases
-import info.alihabibi.domain.models.Currencies
-import info.alihabibi.home.mapper.toUiModel
-import info.alihabibi.home.ui_model.UserAccountInfoUiModel
+import info.alihabibi.model.mapper.toDomain
+import info.alihabibi.model.mapper.toUiModel
+import info.alihabibi.model.mapper.toUiOption
+import info.alihabibi.model.ui_model.CurrenciesOptionUiModel
+import info.alihabibi.model.ui_model.UserAccountInfoUiModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -37,7 +39,9 @@ class HomeViewModel(
     private fun init() {
         viewModelScope.launch {
             val smsModalShownState = dataStoreUseCases.getIsSmsModalShownUseCase.invoke().first()
-            val currency = dataStoreUseCases.getPreferredCurrencyUseCase.invoke().first()
+            val currency = dataStoreUseCases.getPreferredCurrencyUseCase.invoke()
+                .map { it.toUiOption() }
+                .first()
             val userAccountInfo = dataStoreUseCases.getUserAccountInfoUseCase.invoke()
                 .map { it.toUiModel() }
                 .first()
@@ -58,10 +62,11 @@ class HomeViewModel(
         }
     }
 
-    private fun savePreferredCurrency(currency: Currencies) {
+    private fun savePreferredCurrency(currency: CurrenciesOptionUiModel) {
         viewModelScope.launch {
             _uiState.update { it.copy(currency = currency) }
-            dataStoreUseCases.savePreferredCurrencyUseCase.invoke(currency)
+            val domainCurrency = currency.toDomain()
+            dataStoreUseCases.savePreferredCurrencyUseCase.invoke(domainCurrency)
         }
     }
 
@@ -73,12 +78,12 @@ sealed interface HomeUiIntent {
 
     data class SaveSmsPermissionModalShownState(val value: Boolean) : HomeUiIntent
 
-    data class SavePreferredCurrency(val currency: Currencies) : HomeUiIntent
+    data class SavePreferredCurrency(val currency: CurrenciesOptionUiModel) : HomeUiIntent
 
 }
 
 data class HomeUiState(
     val isSmsModalShown: Boolean = false,
-    val currency: Currencies = Currencies.TOMAN,
+    val currency: CurrenciesOptionUiModel = CurrenciesOptionUiModel.TOMAN,
     val userAccountInfo: UserAccountInfoUiModel = UserAccountInfoUiModel()
 )

@@ -27,4 +27,7 @@ dependencies {
     // accompanist
     implementation(libs.accompanist.permissions)
 
+    // model
+    implementation(projects.core.model)
+
 }

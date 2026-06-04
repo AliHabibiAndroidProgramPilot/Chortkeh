@@ -2,7 +2,7 @@ package info.alihabibi.datastore
 
 import info.alihabibi.domain.local.repositories.DatastoreRepository
 import info.alihabibi.domain.models.Currencies
-import info.alihabibi.domain.models.UserInfo
+import info.alihabibi.domain.models.UserAccountInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -35,11 +35,11 @@ class DatastoreRepositoryImpl(
         get() = datastore.preferredCurrency
             .flowOn(Dispatchers.IO)
 
-    override suspend fun saveUserInfo(userInfo: UserInfo) {
-        datastore.saveUserAccountInfo(userInfo)
+    override suspend fun saveUserInfo(userAccountInfo: UserAccountInfo) {
+        datastore.saveUserAccountInfo(userAccountInfo)
     }
 
-    override val userAccountInfo: Flow<UserInfo>
+    override val userAccountInfo: Flow<UserAccountInfo>
         get() = datastore.userAccountInfo
             .flowOn(Dispatchers.IO)
 

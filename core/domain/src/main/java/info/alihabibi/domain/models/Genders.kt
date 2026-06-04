@@ -1,3 +1,3 @@
 package info.alihabibi.domain.models
 
-enum class Genders { MEN, WOMAN, UNKNOW }
+enum class Genders { MEN, WOMAN, UNKNOWN }

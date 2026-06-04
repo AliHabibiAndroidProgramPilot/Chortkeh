@@ -3,12 +3,15 @@ package info.alihabibi.user_account_info
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import info.alihabibi.domain.local.usecases.datastore.usecase.DatastoreUseCases
-import info.alihabibi.domain.models.Genders
-import info.alihabibi.domain.models.UserInfo
+import info.alihabibi.model.mapper.toDomain
+import info.alihabibi.model.mapper.toUiModel
+import info.alihabibi.model.ui_model.GenderOptionUiModel
+import info.alihabibi.model.ui_model.UserAccountInfoUiModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -37,11 +40,13 @@ class UserAccountInfoViewModel(
 
     private fun init() {
         viewModelScope.launch {
-            val userAccountInfo = dataStoreUseCases.getUserAccountInfoUseCase.invoke().first()
+            val userAccountInfo = dataStoreUseCases.getUserAccountInfoUseCase.invoke()
+                .map { it.toUiModel() }
+                .first()
             _uiState.update {
                 it.copy(
                     fullName = userAccountInfo.fullName,
-                    userPhone = userAccountInfo.phone,
+                    userPhone = userAccountInfo.phone.chunked(4).joinToString(" "),
                     userGender = userAccountInfo.gender
                 )
             }
@@ -50,11 +55,12 @@ class UserAccountInfoViewModel(
 
     private fun saveUserAccountInfo() {
         viewModelScope.launch {
-            val userInfo = UserInfo(
+            val userInfo = UserAccountInfoUiModel(
                 fullName = _uiState.value.fullName,
                 phone = _uiState.value.userPhone,
-                gender = _uiState.value.userGender
-            )
+                gender = _uiState.value.userGender,
+                profileImageRes = 0
+            ).toDomain()
             dataStoreUseCases.saveUserAccountInfoUseCase.invoke(userInfo)
         }
     }
@@ -70,7 +76,7 @@ class UserAccountInfoViewModel(
         _uiState.update { it.copy(userPhone = digits) }
     }
 
-    private fun changeGender(gender: Genders) {
+    private fun changeGender(gender: GenderOptionUiModel) {
         _uiState.update { it.copy(userGender = gender) }
     }
 
@@ -84,7 +90,7 @@ sealed interface UserAccountInfoUiIntent {
 
     data class OnPhoneChanged(val phone: String) : UserAccountInfoUiIntent
 
-    data class OnGenderChanged(val gender: Genders) : UserAccountInfoUiIntent
+    data class OnGenderChanged(val gender: GenderOptionUiModel) : UserAccountInfoUiIntent
 
     data object OnSaveValues : UserAccountInfoUiIntent
 
@@ -93,5 +99,5 @@ sealed interface UserAccountInfoUiIntent {
 data class UserAccountInfoUiState(
     val fullName: String = "",
     val userPhone: String = "",
-    val userGender: Genders = Genders.UNKNOW
+    val userGender: GenderOptionUiModel = GenderOptionUiModel.UNKNOWN
 )
