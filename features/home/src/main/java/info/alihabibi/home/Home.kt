@@ -46,6 +46,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -62,8 +63,7 @@ import info.alihabibi.common_android.RequestNotificationPermission
 import info.alihabibi.common_android.RequestSMSPermission
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray7
-import info.alihabibi.domain.models.Currencies
-import info.alihabibi.domain.models.Genders
+import info.alihabibi.model.ui_model.CurrenciesOptionUiModel
 import info.alihabibi.ui.dialogs.AppDialog
 import info.alihabibi.ui.dialogs.AppRadioSelectionBottomSheet
 import info.alihabibi.ui.headrs.HomePageHeader
@@ -224,7 +224,7 @@ private fun ProfileScreen(
     onExitOfAccount: () -> Unit = {},
     onPrivacyAndPolicy: () -> Unit = {},
     onUserAccountInfo: () -> Unit = {},
-    onPreferredCurrencySelection: (currency: Currencies) -> Unit = {}
+    onPreferredCurrencySelection: (currency: CurrenciesOptionUiModel) -> Unit = {}
 ) {
 
     Column(
@@ -242,7 +242,7 @@ private fun ProfileScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(220.dp),
+                .height(height = 230.dp),
             contentAlignment = Alignment.TopCenter
         ) {
 
@@ -263,7 +263,7 @@ private fun ProfileScreen(
                 Text(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 24.dp),
+                        .padding(top = 32.dp),
                     text = stringResource(id = R.string.profile),
                     style = MaterialTheme.typography.bodyMedium.copy(
                         textAlign = TextAlign.Center,
@@ -271,30 +271,30 @@ private fun ProfileScreen(
                     )
                 )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(26.dp))
 
                 Image(
-                    painter = painterResource(
-                        id = when (uiState.userAccountInfo?.gender) {
-                            Genders.MEN -> R.drawable.men_profile
-                            Genders.WOMAN -> R.drawable.women_profile
-                            else -> R.drawable.unknown_gender_profile
-                        }
-                    ),
+                    painter = painterResource(id = uiState.userAccountInfo.profileImageRes),
                     contentDescription = null
                 )
 
                 Text(
-                    modifier = Modifier.padding(top = 8.dp, bottom = 4.dp),
-                    text = if (uiState.userAccountInfo?.fullName.isNullOrEmpty())
-                        stringResource(id = R.string.chortkeh_user) else uiState.userAccountInfo.fullName,
-                    style = MaterialTheme.typography.labelMedium
+                    modifier = Modifier.padding(top = 8.dp, bottom = 4.dp, start = 4.dp, end = 4.dp),
+                    text = uiState.userAccountInfo.fullName.ifEmpty { stringResource(id = R.string.chortkeh_user) },
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.labelLarge.copy(
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Center,
+                        textDirection = TextDirection.ContentOrRtl
+                    )
                 )
 
-                if (!uiState.userAccountInfo?.phone.isNullOrEmpty())
+                if (uiState.userAccountInfo.phone.isNotEmpty())
                     Text(
+                        modifier = Modifier.padding(bottom = 4.dp),
                         text = uiState.userAccountInfo.phone,
-                        style = MaterialTheme.typography.labelSmall.copy(color = Gray7)
+                        style = MaterialTheme.typography.labelMedium.copy(color = Gray7)
                     )
 
             }
@@ -325,15 +325,10 @@ private fun ProfileScreen(
             if (showCurrencySelectionModal)
                 AppRadioSelectionBottomSheet(
                     title = stringResource(id = R.string.currency),
-                    radioOptions = Currencies.entries.toList(),
+                    radioOptions = CurrenciesOptionUiModel.entries.toList(),
                     selectedOption = uiState.currency,
                     disabledIndex = 1,
-                    optionLabel = { currency ->
-                        when (currency) {
-                            Currencies.TOMAN -> stringResource(id = R.string.toman)
-                            Currencies.RIAL -> stringResource(id = R.string.rial)
-                        }
-                    },
+                    optionLabel = { currency -> stringResource(id = currency.labelRes) },
                     onRadioOptionSelected = { userSelectedCurrency ->
                         onPreferredCurrencySelection(userSelectedCurrency)
                     },

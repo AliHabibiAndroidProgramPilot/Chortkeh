@@ -24,4 +24,7 @@ dependencies {
     // common
     implementation(projects.core.common)
 
+    // model
+    implementation(projects.core.model)
+
 }
