@@ -32,6 +32,7 @@ class AndroidComposeConventionPlugin : Plugin<Project> {
         androidExtension.apply {
             buildFeatures {
                 compose = true
+                buildConfig = true
             }
         }
 
