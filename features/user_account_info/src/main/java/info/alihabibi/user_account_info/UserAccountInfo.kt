@@ -177,7 +177,7 @@ private fun UserAccountInfoScreen(
 
                 Icon(
                     modifier = Modifier.padding(start = 18.dp),
-                    painter = painterResource(R.drawable.short_arrow_down),
+                    painter = painterResource(id = R.drawable.short_arrow_down),
                     contentDescription = null,
                     tint = Gray8
                 )

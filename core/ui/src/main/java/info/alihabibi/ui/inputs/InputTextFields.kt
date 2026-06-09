@@ -174,7 +174,7 @@ fun AppTitledPriceTextField(
             keyboardOptions = KeyboardOptions(
                 autoCorrectEnabled = false,
                 keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Next,
+                imeAction = ImeAction.Done,
                 showKeyboardOnFocus = true
             ),
             singleLine = true,

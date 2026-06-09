@@ -39,7 +39,7 @@ fun BaseScaffold(
             ) { data ->
                 AppSnackBar(
                     description = data.visuals.message,
-                    isUndoAvailable = false
+                    isUndoAvailable = data.visuals.withDismissAction
                 )
             }
         }

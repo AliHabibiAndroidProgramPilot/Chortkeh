@@ -66,10 +66,15 @@ fun DemoNavHost(
             val userAccountInfoSaved by backStackEntry.savedStateHandle
                 .getStateFlow(Keys.USER_SAVED_ACCOUNT_INFO, false)
                 .collectAsStateWithLifecycle()
+            val userSavedTransaction by backStackEntry.savedStateHandle
+                .getStateFlow(Keys.USER_SAVED_TRANSACTION, false)
+                .collectAsStateWithLifecycle()
             HomeDestination(
                 shouldShowSuccessfulDataSaved = userAccountInfoSaved,
-                onUserInfoSavedConsumed = {
+                shouldShowSuccessfulTransactionSaved = userSavedTransaction,
+                onSnackBarValueConsumed = {
                     backStackEntry.savedStateHandle.remove<Boolean>(Keys.USER_SAVED_ACCOUNT_INFO)
+                    backStackEntry.savedStateHandle.remove<Boolean>(Keys.USER_SAVED_TRANSACTION)
                 },
                 onAnnouncements = {
                     navController.navigate(Announcements)
@@ -120,7 +125,10 @@ fun DemoNavHost(
 
         composable<NewTransaction> {
             NewTransactionDestination(
-                onBackPressed = {
+                onBackPressed = { userSavedTransaction ->
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set(Keys.USER_SAVED_TRANSACTION, userSavedTransaction)
                     navController.navigateUp()
                 }
             )

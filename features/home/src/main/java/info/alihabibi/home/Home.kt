@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -78,7 +79,8 @@ import org.koin.androidx.compose.koinViewModel
 fun HomeDestination(
     viewModel: HomeViewModel = koinViewModel(),
     shouldShowSuccessfulDataSaved: Boolean = false,
-    onUserInfoSavedConsumed: () -> Unit = {},
+    shouldShowSuccessfulTransactionSaved: Boolean = false,
+    onSnackBarValueConsumed: () -> Unit = {},
     onAnnouncements: () -> Unit = {},
     onExitOfAccount: () -> Unit = {},
     onPrivacyAndPolicy: () -> Unit = {},
@@ -94,11 +96,20 @@ fun HomeDestination(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val snackBarHostState = remember { SnackbarHostState() }
-    val savedMessage = stringResource(id = R.string.successful_save_data)
-    LaunchedEffect(shouldShowSuccessfulDataSaved) {
+    val successfulUserAccountInfoSavedMessage = stringResource(id = R.string.successful_save_data)
+    val successfulTransactionSavedMessage = stringResource(id = R.string.transaction_saved)
+    LaunchedEffect(shouldShowSuccessfulDataSaved, shouldShowSuccessfulTransactionSaved) {
         if (shouldShowSuccessfulDataSaved) {
-            snackBarHostState.showSnackbar(savedMessage)
-            onUserInfoSavedConsumed()
+            snackBarHostState.showSnackbar(message = successfulUserAccountInfoSavedMessage)
+            onSnackBarValueConsumed()
+        }
+        if (shouldShowSuccessfulTransactionSaved) {
+            snackBarHostState.showSnackbar(
+                message = successfulTransactionSavedMessage,
+                duration = SnackbarDuration.Short,
+                withDismissAction = true
+            )
+            onSnackBarValueConsumed()
         }
     }
 

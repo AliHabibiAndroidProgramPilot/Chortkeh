@@ -11,5 +11,6 @@ object Keys {
     const val USER_PHONE = "USER_PHONE"
     const val USER_GENDER = "USER_GENDER"
     const val USER_SAVED_ACCOUNT_INFO = "USER_SAVED_ACCOUNT_INFO"
+    const val USER_SAVED_TRANSACTION = "USER_SAVED_TRANSACTION"
 
 }

@@ -3,6 +3,7 @@
 
     // Components
     <string name="undo">برگردون</string>
+    <string name="transaction_saved">تراکنش ثبت شد</string>
     <string name="phone_number">شماره موبایل</string>
     <string name="empty_phone_number_warning">شماره موبایل نمیتواند خالی باشد</string>
     <string name="notification_access">دسترسی نوتیفیکیشن</string>
@@ -71,10 +72,17 @@
 
     // New Transaction
     <string name="register_transaction">ثبت تراکنش</string>
+    <string name="register_income_transaction">ثبت درآمد</string>
+    <string name="register_outcome_transaction">ثبت هزینه</string>
     <string name="price">مبلغ</string>
     <string name="price_income">مبلغ درآمد</string>
     <string name="price_outcome">مبلغ هزینه</string>
     <string name="income">دریافت</string>
     <string name="outcome">پرداخت</string>
+    <string name="withdraw_from">برداشت از</string>
+    <string name="deposit_to">انتقال به</string>
+    <string name="category">دسته بندی</string>
+    <string name="date">تاریخ</string>
+    <string name="clock">ساعت</string>
 
 </resources>
