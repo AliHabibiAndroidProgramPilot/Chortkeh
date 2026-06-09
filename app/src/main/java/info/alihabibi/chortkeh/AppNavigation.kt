@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import info.alihabibi.announcements.AnnouncementsDestination
 import info.alihabibi.domain.local.keys.Keys
 import info.alihabibi.home.HomeDestination
+import info.alihabibi.new_transaction.NewTransactionDestination
 import info.alihabibi.onboarding.OnBoardingDestination
 import info.alihabibi.otp.OtpDestination
 import info.alihabibi.privacy_and_policy.PrivacyAndPolicyDestination
@@ -32,6 +33,9 @@ object PrivacyAndPolicy
 
 @Serializable
 object UserAccountInfo
+
+@Serializable
+object NewTransaction
 
 @Composable
 fun DemoNavHost(
@@ -80,6 +84,9 @@ fun DemoNavHost(
                 },
                 onUserAccountInfo = {
                     navController.navigate(UserAccountInfo)
+                },
+                onNewTransaction = {
+                    navController.navigate(NewTransaction)
                 }
             )
         }
@@ -106,6 +113,14 @@ fun DemoNavHost(
                     navController.previousBackStackEntry
                         ?.savedStateHandle
                         ?.set(Keys.USER_SAVED_ACCOUNT_INFO, userSavedData)
+                    navController.navigateUp()
+                }
+            )
+        }
+
+        composable<NewTransaction> {
+            NewTransactionDestination(
+                onBackPressed = {
                     navController.navigateUp()
                 }
             )

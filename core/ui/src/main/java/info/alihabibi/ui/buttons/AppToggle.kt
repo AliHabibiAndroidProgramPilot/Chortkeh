@@ -35,7 +35,7 @@ import info.alihabibi.designsystem.theme.White
 @Composable
 fun <T> AppToggle(
     toggleItems: List<T>,
-    itemTitle: (T) -> String,
+    itemTitle: @Composable (T) -> String,
     onToggleSelectionChanged: (item: T) -> Unit
 ) {
 

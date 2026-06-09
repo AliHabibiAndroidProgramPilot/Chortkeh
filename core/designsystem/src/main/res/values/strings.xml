@@ -69,4 +69,12 @@
     <string name="save_data">ثبت اطلاعات</string>
     <string name="successful_save_data">ثبت اطلاعات با موفقیت انجام شد</string>
 
+    // New Transaction
+    <string name="register_transaction">ثبت تراکنش</string>
+    <string name="price">مبلغ</string>
+    <string name="price_income">مبلغ درآمد</string>
+    <string name="price_outcome">مبلغ هزینه</string>
+    <string name="income">دریافت</string>
+    <string name="outcome">پرداخت</string>
+
 </resources>

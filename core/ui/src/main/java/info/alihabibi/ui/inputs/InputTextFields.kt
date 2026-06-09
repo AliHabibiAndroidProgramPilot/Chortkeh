@@ -134,6 +134,90 @@ fun AppTitledTextField(
 }
 
 @Composable
+fun AppTitledPriceTextField(
+    modifier: Modifier = Modifier,
+    text: String,
+    onValueChange: (newValue: String) -> Unit,
+    title: String = "",
+    placeHolderText: String = "",
+    enabled: Boolean = true
+) {
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        Text(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 2.dp),
+            text = title,
+            style = MaterialTheme.typography.labelLarge.copy(
+                fontSize = 16.sp,
+                textAlign = TextAlign.End
+            )
+        )
+
+        OutlinedTextField(
+            modifier = modifier
+                .fillMaxWidth()
+                .height(55.dp)
+                .padding(start = 12.dp, end = 12.dp, top = 6.dp),
+            value = text,
+            onValueChange = onValueChange,
+            textStyle = MaterialTheme.typography.labelLarge.copy(
+                textAlign = TextAlign.Left,
+                textDirection = TextDirection.Ltr
+            ),
+            enabled = enabled,
+            keyboardOptions = KeyboardOptions(
+                autoCorrectEnabled = false,
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Next,
+                showKeyboardOnFocus = true
+            ),
+            singleLine = true,
+            placeholder = {
+                if (placeHolderText.isNotEmpty())
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = placeHolderText,
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            textAlign = TextAlign.Right,
+                            textDirection = TextDirection.Rtl
+                        )
+                    )
+            },
+            shape = RoundedCornerShape(size = 12.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Primary,
+                focusedTextColor = Black,
+                cursorColor = Primary,
+                unfocusedBorderColor = Gray11,
+                unfocusedPlaceholderColor = Gray11,
+                focusedPlaceholderColor = Gray9,
+                unfocusedTextColor = Gray11,
+                errorBorderColor = ErrorRed,
+                errorTextColor = Black
+            ),
+            prefix = if (text.isNotEmpty()) {
+                {
+                    Text(
+                        text = "تومان",
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            color = Gray11
+                        )
+                    )
+                }
+            } else null,
+            visualTransformation = PriceVisualTransformation()
+        )
+
+    }
+
+}
+
+@Composable
 fun AppTitledPhoneTextField(
     modifier: Modifier = Modifier,
     text: String,

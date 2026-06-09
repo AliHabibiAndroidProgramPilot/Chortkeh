@@ -82,7 +82,8 @@ fun HomeDestination(
     onAnnouncements: () -> Unit = {},
     onExitOfAccount: () -> Unit = {},
     onPrivacyAndPolicy: () -> Unit = {},
-    onUserAccountInfo: () -> Unit = {}
+    onUserAccountInfo: () -> Unit = {},
+    onNewTransaction: () -> Unit = {},
 ) {
 
     var selectedBottomNavItem by rememberSaveable { mutableStateOf(BottomNavItem.HOME.name) }
@@ -114,7 +115,7 @@ fun HomeDestination(
             AppBottomNavigation(
                 navItems = navItems,
                 selectedNavItem = selectedBottomNavItem,
-                onFabClick = { /*TODO(botton sheet)*/ },
+                onFabClick = onNewTransaction,
                 onNavItemClicked = { item -> selectedBottomNavItem = item.name }
             )
         }
@@ -363,7 +364,8 @@ private fun ProfileScreen(
                 modifier = Modifier.padding(vertical = 8.dp),
                 onClick = { showExitDialog = true },
                 title = stringResource(id = R.string.exit),
-                startIcon = painterResource(id = R.drawable.logout_red)
+                startIcon = painterResource(id = R.drawable.logout_red),
+                isEnabled = false
             )
 
         }

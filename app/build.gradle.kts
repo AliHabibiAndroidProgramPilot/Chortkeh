@@ -28,6 +28,9 @@ dependencies {
     // otp
     implementation(projects.features.otp)
 
+    // new transaction
+    implementation(projects.features.newTransaction)
+
     // home
     implementation(projects.features.home)
 

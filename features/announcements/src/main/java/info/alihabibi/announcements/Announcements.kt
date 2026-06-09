@@ -65,6 +65,7 @@ private fun AnnouncementsScreen(
     toggleItems: List<String>,
     onBackPressed: () -> Unit
 ) {
+
     val layoutDirection = LocalLayoutDirection.current
 
     Column(
@@ -79,12 +80,12 @@ private fun AnnouncementsScreen(
 
         AppHeader(
             title = stringResource(id = R.string.announcements),
-            windowInsets = TopAppBarDefaults.windowInsets.only(WindowInsetsSides.Top),
+            windowInsets = TopAppBarDefaults.windowInsets.only(sides = WindowInsetsSides.Top),
             isMenuAvailable = false,
             onNavigationClick = onBackPressed
         )
 
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(height = 8.dp))
 
         AppToggle(
             toggleItems = toggleItems,
@@ -92,7 +93,7 @@ private fun AnnouncementsScreen(
             onToggleSelectionChanged = {}
         )
 
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(height = 8.dp))
 
         LazyColumn(
             modifier = Modifier
