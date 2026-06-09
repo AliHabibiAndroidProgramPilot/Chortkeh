@@ -15,6 +15,7 @@ import org.koin.core.context.startKoin
 class ChortkehApp : Application() {
 
     override fun onCreate() {
+        super.onCreate()
         startKoin {
             androidContext(androidContext = this@ChortkehApp)
             modules(
@@ -29,7 +30,6 @@ class ChortkehApp : Application() {
                 )
             )
         }
-        super.onCreate()
         if (BuildConfig.DEBUG) {
             StrictMode.setThreadPolicy(
                 StrictMode.ThreadPolicy.Builder()

@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -203,10 +204,9 @@ fun AppTitledPriceTextField(
             prefix = if (text.isNotEmpty()) {
                 {
                     Text(
-                        text = "تومان",
-                        style = MaterialTheme.typography.labelLarge.copy(
-                            color = Gray11
-                        )
+                        modifier = Modifier.padding(horizontal = 4.dp),
+                        text = stringResource(id = R.string.toman),
+                        style = MaterialTheme.typography.labelLarge.copy(color = Gray11)
                     )
                 }
             } else null,
