@@ -50,11 +50,16 @@ class ProfileViewModel(
             val userAccountInfo = dataStoreUseCases.getUserAccountInfoUseCase.invoke()
                 .map { it.toUiModel() }
                 .first()
-                .let { it.copy(phone = it.phone.chunked(4).joinToString(" "))}
+            val chunkedPhone = userAccountInfo.phone.chunked(4).joinToString(" ")
             _uiState.update {
                 it.copy(
                     currency = currency,
-                    userAccountInfo = userAccountInfo
+                    // UserAccountInfo destination is using this data
+                    fullName = userAccountInfo.fullName,
+                    userPhone = userAccountInfo.phone,
+                    userGender = userAccountInfo.gender,
+                    // profile destination is using this data
+                    userAccountInfo = userAccountInfo.copy(phone = chunkedPhone)
                 )
             }
         }

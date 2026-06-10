@@ -44,8 +44,7 @@ class MainActivity : ComponentActivity() {
 
                 when (val state = uiState.value) {
 
-                    is MainActivityUiState.Loading -> { /* still showing splash screen */
-                    }
+                    is MainActivityUiState.Loading -> { /* still showing splash screen */ }
 
                     is MainActivityUiState.Success -> {
                         val startDestination = when (state.isFirstLaunch) {

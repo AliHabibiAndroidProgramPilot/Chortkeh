@@ -42,11 +42,10 @@ import info.alihabibi.ui.dialogs.AppRadioSelectionBottomSheet
 import info.alihabibi.ui.headrs.AppHeader
 import info.alihabibi.ui.inputs.AppTitledPhoneTextField
 import info.alihabibi.ui.inputs.AppTitledTextField
-import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun UserAccountInfoDestination(
-    viewModel: ProfileViewModel = koinViewModel(),
+    viewModel: ProfileViewModel,
     onBackPressed: () -> Unit
 ) {
 

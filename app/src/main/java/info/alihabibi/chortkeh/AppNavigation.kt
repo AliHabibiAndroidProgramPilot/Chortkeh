@@ -51,9 +51,7 @@ fun DemoNavHost(
         composable<Home> {
             HomeDestination(
                 onAnnouncements = {
-                    navController.navigate(Announcements)
-                },
-                onProfile = {
+//                    navController.navigate(Announcements)
                     navController.navigate(ProfileGraphRoute)
                 }
             )
