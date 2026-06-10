@@ -21,4 +21,7 @@ dependencies {
     // model
     implementation(projects.core.model)
 
+    // common android
+    implementation(projects.core.commonAndroid)
+
 }

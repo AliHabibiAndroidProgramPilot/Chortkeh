@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.collectAsState
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
@@ -38,6 +39,7 @@ class MainActivity : ComponentActivity() {
             ChortkehTheme {
                 val navController = rememberNavController()
                 val uiState = viewModel.uiState.collectAsState()
+
                 when (val state = uiState.value) {
 
                     is MainActivityUiState.Loading -> { /* still showing splash screen */ }
@@ -48,12 +50,14 @@ class MainActivity : ComponentActivity() {
                             false -> Home
                         }
 
-                        DemoNavHost(
-                            navController = navController,
-                            startDestination = startDestination
-                        )
+                        Scaffold { innerPadding ->
+                            DemoNavHost(
+                                navController = navController,
+                                startDestination = startDestination,
+                                contentPadding = innerPadding
+                            )
+                        }
                     }
-
                 }
             }
         }

@@ -7,11 +7,8 @@ import android.provider.Settings
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.only
@@ -34,7 +31,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -51,28 +47,19 @@ import info.alihabibi.designsystem.theme.Primary
 import info.alihabibi.designsystem.theme.White
 import info.alihabibi.ui.dialogs.AppDialog
 import info.alihabibi.ui.headrs.AppHeader
-import info.alihabibi.ui.scaffolds.BaseScaffold
 
 @Composable
 fun PrivacyAndPolicyDestination(
     onBackPressed: () -> Unit
 ) {
 
-    BaseScaffold { innerPadding ->
-
-        PrivacyAndPolicyScreen(
-            contentPadding = innerPadding,
-            onBackPressed = onBackPressed
-        )
-
-    }
+    PrivacyAndPolicyScreen(onBackPressed = onBackPressed)
 
 }
 
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun PrivacyAndPolicyScreen(
-    contentPadding: PaddingValues = PaddingValues(),
     onBackPressed: () -> Unit
 ) {
 
@@ -121,13 +108,7 @@ private fun PrivacyAndPolicyScreen(
         )
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(
-                start = contentPadding.calculateStartPadding(layoutDirection = LocalLayoutDirection.current),
-                end = contentPadding.calculateEndPadding(layoutDirection = LocalLayoutDirection.current),
-                bottom = contentPadding.calculateBottomPadding()
-            ),
+        modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 

@@ -64,6 +64,7 @@ class HomeViewModel(
         }
     }
 
+    // profile
     private fun savePreferredCurrency(currency: CurrenciesOptionUiModel) {
         viewModelScope.launch {
             _uiState.update { it.copy(currency = currency) }
@@ -80,12 +81,14 @@ sealed interface HomeUiIntent {
 
     data class SaveSmsPermissionModalShownState(val value: Boolean) : HomeUiIntent
 
+    //profile
     data class SavePreferredCurrency(val currency: CurrenciesOptionUiModel) : HomeUiIntent
 
 }
 
 data class HomeUiState(
     val isSmsModalShown: Boolean = false,
+    // profile
     val currency: CurrenciesOptionUiModel = CurrenciesOptionUiModel.TOMAN,
     val userAccountInfo: UserAccountInfoUiModel = UserAccountInfoUiModel()
 )

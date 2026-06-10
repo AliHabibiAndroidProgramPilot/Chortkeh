@@ -3,26 +3,19 @@ package info.alihabibi.user_account_info
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -32,7 +25,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -48,13 +40,12 @@ import info.alihabibi.ui.dialogs.AppRadioSelectionBottomSheet
 import info.alihabibi.ui.headrs.AppHeader
 import info.alihabibi.ui.inputs.AppTitledPhoneTextField
 import info.alihabibi.ui.inputs.AppTitledTextField
-import info.alihabibi.ui.scaffolds.BaseScaffold
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun UserAccountInfoDestination(
     viewModel: UserAccountInfoViewModel = koinViewModel(),
-    onBackPressed: (userSavedData: Boolean) -> Unit
+    onBackPressed: () -> Unit
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -63,11 +54,8 @@ fun UserAccountInfoDestination(
         viewModel.onEvent(UserAccountInfoUiIntent.Init)
     }
 
-    BaseScaffold { innerPadding ->
-
         UserAccountInfoScreen(
             uiState = uiState,
-            contentPadding = innerPadding,
             onFullNameChanged = { newValue ->
                 viewModel.onEvent(UserAccountInfoUiIntent.OnFullNameChanged(newValue))
             },
@@ -79,28 +67,22 @@ fun UserAccountInfoDestination(
             },
             onSaveUserInfo = {
                 viewModel.onEvent(UserAccountInfoUiIntent.OnSaveValues)
-                onBackPressed(true)
+                onBackPressed()
             },
-            onBackPressed = { onBackPressed(false) }
+            onBackPressed = onBackPressed
         )
-
-    }
 
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun UserAccountInfoScreen(
     uiState: UserAccountInfoUiState,
-    contentPadding: PaddingValues = PaddingValues(),
     onFullNameChanged: (fullName: String) -> Unit = {},
     onPhoneChanged: (phone: String) -> Unit = {},
     onGenderChanged: (gender: GenderOptionUiModel) -> Unit = {},
     onSaveUserInfo: () -> Unit = {},
     onBackPressed: () -> Unit
 ) {
-
-    val layoutDirection = LocalLayoutDirection.current
 
     var showGenderSelectionModal by remember { mutableStateOf(false) }
     if (showGenderSelectionModal)
@@ -119,11 +101,6 @@ private fun UserAccountInfoScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(
-                start = contentPadding.calculateStartPadding(layoutDirection),
-                end = contentPadding.calculateEndPadding(layoutDirection),
-                bottom = contentPadding.calculateBottomPadding()
-            )
             .imePadding(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -137,7 +114,6 @@ private fun UserAccountInfoScreen(
 
             AppHeader(
                 title = stringResource(id = R.string.user_account_info),
-                windowInsets = TopAppBarDefaults.windowInsets.only(WindowInsetsSides.Top),
                 isMenuAvailable = false,
                 onNavigationClick = onBackPressed
             )

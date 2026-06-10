@@ -3,46 +3,29 @@ package info.alihabibi.home
 import android.Manifest
 import android.annotation.SuppressLint
 import android.os.Build
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -70,48 +53,16 @@ import info.alihabibi.ui.dialogs.AppRadioSelectionBottomSheet
 import info.alihabibi.ui.headrs.HomePageHeader
 import info.alihabibi.ui.items.AppDangerousListItem
 import info.alihabibi.ui.items.AppSimpleListItem
-import info.alihabibi.ui.navigation.AppBottomNavigation
-import info.alihabibi.ui.navigation.BottomNavItem
-import info.alihabibi.ui.scaffolds.BaseScaffold
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun HomeDestination(
     viewModel: HomeViewModel = koinViewModel(),
-    shouldShowSuccessfulDataSaved: Boolean = false,
-    shouldShowSuccessfulTransactionSaved: Boolean = false,
-    onSnackBarValueConsumed: () -> Unit = {},
     onAnnouncements: () -> Unit = {},
-    onExitOfAccount: () -> Unit = {},
-    onPrivacyAndPolicy: () -> Unit = {},
-    onUserAccountInfo: () -> Unit = {},
-    onNewTransaction: () -> Unit = {},
 ) {
 
-    var selectedBottomNavItem by rememberSaveable { mutableStateOf(BottomNavItem.HOME.name) }
-    val navItems = remember { BottomNavItem.entries.toList() }
-
     val lifecycleOwner = LocalLifecycleOwner.current
-
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    val snackBarHostState = remember { SnackbarHostState() }
-    val successfulUserAccountInfoSavedMessage = stringResource(id = R.string.successful_save_data)
-    val successfulTransactionSavedMessage = stringResource(id = R.string.transaction_saved)
-    LaunchedEffect(shouldShowSuccessfulDataSaved, shouldShowSuccessfulTransactionSaved) {
-        if (shouldShowSuccessfulDataSaved) {
-            snackBarHostState.showSnackbar(message = successfulUserAccountInfoSavedMessage)
-            onSnackBarValueConsumed()
-        }
-        if (shouldShowSuccessfulTransactionSaved) {
-            snackBarHostState.showSnackbar(
-                message = successfulTransactionSavedMessage,
-                duration = SnackbarDuration.Short,
-                withDismissAction = true
-            )
-            onSnackBarValueConsumed()
-        }
-    }
 
     LaunchedEffect(lifecycleOwner) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -119,66 +70,13 @@ fun HomeDestination(
         }
     }
 
-    BaseScaffold(
-        contentWindowInsets = WindowInsets.safeDrawing.only(sides = WindowInsetsSides.Horizontal),
-        snackBarHostState = snackBarHostState,
-        bottomBar = {
-            AppBottomNavigation(
-                navItems = navItems,
-                selectedNavItem = selectedBottomNavItem,
-                onFabClick = onNewTransaction,
-                onNavItemClicked = { item -> selectedBottomNavItem = item.name }
-            )
-        }
-    ) { innerPadding ->
-
-        AnimatedContent(
-            modifier = Modifier.fillMaxSize(),
-            targetState = selectedBottomNavItem,
-            transitionSpec = {
-                fadeIn(
-                    animationSpec = tween(220, delayMillis = 90)
-                ) + scaleIn(
-                    initialScale = 0.98f,
-                    animationSpec = tween(220, delayMillis = 90)
-                ) togetherWith
-                        fadeOut(animationSpec = tween(90))
-            }
-        ) { bottomNavItem ->
-
-            when (bottomNavItem) {
-                BottomNavItem.HOME.name -> HomeScreen(
-                    uiState = uiState,
-                    contentPadding = innerPadding,
-                    onSmsModalShowed = {
-                        viewModel.onEvent(HomeUiIntent.SaveSmsPermissionModalShownState(value = true))
-                    },
-                    onAnnouncements = onAnnouncements
-                )
-
-                BottomNavItem.PROFILE.name -> ProfileScreen(
-                    uiState = uiState,
-                    contentPadding = innerPadding,
-                    onExitOfAccount = onExitOfAccount,
-                    onPrivacyAndPolicy = onPrivacyAndPolicy,
-                    onUserAccountInfo = onUserAccountInfo,
-                    onPreferredCurrencySelection = { currency ->
-                        viewModel.onEvent(HomeUiIntent.SavePreferredCurrency(currency))
-                    }
-                )
-
-                BottomNavItem.REPORTS.name -> ReportsScreen(
-                    contentPadding = innerPadding
-                )
-
-                BottomNavItem.REMINDER.name -> ReminderScreen(
-                    contentPadding = innerPadding
-                )
-            }
-
-        }
-
-    }
+    HomeScreen(
+        uiState = uiState,
+        onSmsModalShowed = {
+            viewModel.onEvent(HomeUiIntent.SaveSmsPermissionModalShownState(value = true))
+        },
+        onAnnouncements = onAnnouncements
+    )
 
 }
 
@@ -187,9 +85,8 @@ fun HomeDestination(
 @Composable
 private fun HomeScreen(
     uiState: HomeUiState,
-    contentPadding: PaddingValues = PaddingValues(),
     onSmsModalShowed: () -> Unit = {},
-    onAnnouncements: () -> Unit
+    onAnnouncements: () -> Unit = {}
 ) {
 
     val notificationPermission =
@@ -203,20 +100,14 @@ private fun HomeScreen(
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !notificationPermission.status.isGranted)
         RequestNotificationPermission(notificationPermission = notificationPermission)
-    if (uiState.isSmsModalShown == false && !smsPermissions.allPermissionsGranted)
+    if (!uiState.isSmsModalShown && !smsPermissions.allPermissionsGranted)
         RequestSMSPermission(
             smsPermissions = smsPermissions,
             onSmsModalShown = onSmsModalShowed
         )
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(
-                start = contentPadding.calculateStartPadding(layoutDirection = LocalLayoutDirection.current),
-                end = contentPadding.calculateEndPadding(layoutDirection = LocalLayoutDirection.current),
-                bottom = contentPadding.calculateBottomPadding()
-            ),
+        modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
@@ -232,7 +123,6 @@ private fun HomeScreen(
 @Composable
 private fun ProfileScreen(
     uiState: HomeUiState,
-    contentPadding: PaddingValues = PaddingValues(),
     onExitOfAccount: () -> Unit = {},
     onPrivacyAndPolicy: () -> Unit = {},
     onUserAccountInfo: () -> Unit = {},
@@ -242,12 +132,7 @@ private fun ProfileScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(state = rememberScrollState())
-            .padding(
-                start = contentPadding.calculateStartPadding(layoutDirection = LocalLayoutDirection.current),
-                end = contentPadding.calculateEndPadding(layoutDirection = LocalLayoutDirection.current),
-                bottom = contentPadding.calculateBottomPadding()
-            ),
+            .verticalScroll(state = rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
@@ -291,7 +176,12 @@ private fun ProfileScreen(
                 )
 
                 Text(
-                    modifier = Modifier.padding(top = 8.dp, bottom = 4.dp, start = 4.dp, end = 4.dp),
+                    modifier = Modifier.padding(
+                        top = 8.dp,
+                        bottom = 4.dp,
+                        start = 4.dp,
+                        end = 4.dp
+                    ),
                     text = uiState.userAccountInfo.fullName.ifEmpty { stringResource(id = R.string.chortkeh_user) },
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
@@ -408,32 +298,10 @@ private fun ProfileScreen(
 
 }
 
-@Composable
-private fun ReportsScreen(
-    contentPadding: PaddingValues = PaddingValues(),
-) {
-
-    //TODO(give window insets padding from Modifier for content)
-    Text(text = "Report", fontSize = 32.sp)
-
-}
-
-@Composable
-private fun ReminderScreen(
-    contentPadding: PaddingValues = PaddingValues(),
-) {
-
-    //TODO(give window insets padding from Modifier for content)
-    Text(text = "reminder", fontSize = 32.sp)
-
-}
-
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun HomeDestinationPreview() {
 
-    ProfileScreen(
-        uiState = HomeUiState(),
-    )
+    HomeScreen(uiState = HomeUiState())
 
 }

@@ -1,13 +1,10 @@
 package info.alihabibi.chortkeh
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import info.alihabibi.announcements.AnnouncementsDestination
-import info.alihabibi.domain.local.keys.Keys
 import info.alihabibi.home.HomeDestination
 import info.alihabibi.new_transaction.NewTransactionDestination
 import info.alihabibi.onboarding.OnBoardingDestination
@@ -62,36 +59,10 @@ fun DemoNavHost(
             OtpDestination()
         }
 
-        composable<Home> { backStackEntry ->
-            val userAccountInfoSaved by backStackEntry.savedStateHandle
-                .getStateFlow(Keys.USER_SAVED_ACCOUNT_INFO, false)
-                .collectAsStateWithLifecycle()
-            val userSavedTransaction by backStackEntry.savedStateHandle
-                .getStateFlow(Keys.USER_SAVED_TRANSACTION, false)
-                .collectAsStateWithLifecycle()
+        composable<Home> {
             HomeDestination(
-                shouldShowSuccessfulDataSaved = userAccountInfoSaved,
-                shouldShowSuccessfulTransactionSaved = userSavedTransaction,
-                onSnackBarValueConsumed = {
-                    backStackEntry.savedStateHandle.remove<Boolean>(Keys.USER_SAVED_ACCOUNT_INFO)
-                    backStackEntry.savedStateHandle.remove<Boolean>(Keys.USER_SAVED_TRANSACTION)
-                },
                 onAnnouncements = {
                     navController.navigate(Announcements)
-                },
-                onExitOfAccount = {
-                    navController.navigate(OnBoarding) {
-                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
-                    }
-                },
-                onPrivacyAndPolicy = {
-                    navController.navigate(PrivacyAndPolicy)
-                },
-                onUserAccountInfo = {
-                    navController.navigate(UserAccountInfo)
-                },
-                onNewTransaction = {
-                    navController.navigate(NewTransaction)
                 }
             )
         }
@@ -114,10 +85,7 @@ fun DemoNavHost(
 
         composable<UserAccountInfo> {
             UserAccountInfoDestination(
-                onBackPressed = { userSavedData ->
-                    navController.previousBackStackEntry
-                        ?.savedStateHandle
-                        ?.set(Keys.USER_SAVED_ACCOUNT_INFO, userSavedData)
+                onBackPressed = {
                     navController.navigateUp()
                 }
             )
@@ -125,10 +93,7 @@ fun DemoNavHost(
 
         composable<NewTransaction> {
             NewTransactionDestination(
-                onBackPressed = { userSavedTransaction ->
-                    navController.previousBackStackEntry
-                        ?.savedStateHandle
-                        ?.set(Keys.USER_SAVED_TRANSACTION, userSavedTransaction)
+                onBackPressed = {
                     navController.navigateUp()
                 }
             )

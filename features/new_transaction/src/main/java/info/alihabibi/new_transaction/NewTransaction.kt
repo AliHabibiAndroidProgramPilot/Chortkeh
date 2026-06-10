@@ -3,12 +3,9 @@ package info.alihabibi.new_transaction
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -28,7 +25,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,36 +39,30 @@ import info.alihabibi.ui.buttons.AppButton
 import info.alihabibi.ui.buttons.AppToggle
 import info.alihabibi.ui.headrs.AppHeader
 import info.alihabibi.ui.inputs.AppTitledPriceTextField
-import info.alihabibi.ui.scaffolds.BaseScaffold
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun NewTransactionDestination(
     viewModel: NewTransactionViewModel = koinViewModel(),
-    onBackPressed: (userSavedTransaction: Boolean) -> Unit
+    onBackPressed: () -> Unit
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    BaseScaffold { innerPadding ->
-
-        NewTransactionScreen(
-            uiState = uiState,
-            contentPadding = innerPadding,
-            onPriceChanged = { price ->
-                viewModel.onEvent(NewTransactionUiIntent.OnPriceChanged(price))
-            },
-            onSaveTransaction = {
-                // TODO save transaction | call view model here, then navigate back
-                onBackPressed(true)
-            },
-            onTransactionTypeChanged = { type ->
-                viewModel.onEvent(NewTransactionUiIntent.OnTransactionTypeChanged(type))
-            },
-            onBackPressed = { onBackPressed(false) }
-        )
-
-    }
+    NewTransactionScreen(
+        uiState = uiState,
+        onPriceChanged = { price ->
+            viewModel.onEvent(NewTransactionUiIntent.OnPriceChanged(price))
+        },
+        onSaveTransaction = {
+            // TODO save transaction | call view model here, then navigate back
+            onBackPressed()
+        },
+        onTransactionTypeChanged = { type ->
+            viewModel.onEvent(NewTransactionUiIntent.OnTransactionTypeChanged(type))
+        },
+        onBackPressed = onBackPressed
+    )
 
 }
 
@@ -80,23 +70,15 @@ fun NewTransactionDestination(
 @Composable
 private fun NewTransactionScreen(
     uiState: NewTransactionUiState,
-    contentPadding: PaddingValues = PaddingValues(),
     onPriceChanged: (price: String) -> Unit = {},
     onSaveTransaction: () -> Unit = {},
     onTransactionTypeChanged: (type: TransactionTypeOptionUiModel) -> Unit = {},
     onBackPressed: () -> Unit
 ) {
 
-    val layoutDirection = LocalLayoutDirection.current
-
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(
-                start = contentPadding.calculateStartPadding(layoutDirection),
-                end = contentPadding.calculateEndPadding(layoutDirection),
-                bottom = contentPadding.calculateBottomPadding()
-            )
             .imePadding(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -269,7 +251,7 @@ private fun NewTransactionScreen(
                 .fillMaxWidth()
                 .padding(end = 24.dp, start = 24.dp),
             onClick = onSaveTransaction,
-            text = when(uiState.transactionType) {
+            text = when (uiState.transactionType) {
                 TransactionTypeOptionUiModel.OUTCOME -> stringResource(id = R.string.register_outcome_transaction)
                 TransactionTypeOptionUiModel.INCOME -> stringResource(id = R.string.register_income_transaction)
             }
