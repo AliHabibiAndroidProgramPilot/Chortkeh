@@ -39,20 +39,8 @@ class HomeViewModel(
     private fun init() {
         viewModelScope.launch {
             val smsModalShownState = dataStoreUseCases.getIsSmsModalShownUseCase.invoke().first()
-            val currency = dataStoreUseCases.getPreferredCurrencyUseCase.invoke()
-                .map { it.toUiOption() }
-                .first()
-            val userAccountInfo = dataStoreUseCases.getUserAccountInfoUseCase.invoke()
-                .map { it.toUiModel() }
-                .first()
-                .let { it.copy(phone = it.phone.chunked(4).joinToString(" "))}
-
             _uiState.update {
-                it.copy(
-                    isSmsModalShown = smsModalShownState,
-                    currency = currency,
-                    userAccountInfo = userAccountInfo
-                )
+                it.copy(isSmsModalShown = smsModalShownState)
             }
         }
     }
@@ -64,15 +52,6 @@ class HomeViewModel(
         }
     }
 
-    // profile
-    private fun savePreferredCurrency(currency: CurrenciesOptionUiModel) {
-        viewModelScope.launch {
-            _uiState.update { it.copy(currency = currency) }
-            val domainCurrency = currency.toDomain()
-            dataStoreUseCases.savePreferredCurrencyUseCase.invoke(domainCurrency)
-        }
-    }
-
 }
 
 sealed interface HomeUiIntent {
@@ -81,14 +60,8 @@ sealed interface HomeUiIntent {
 
     data class SaveSmsPermissionModalShownState(val value: Boolean) : HomeUiIntent
 
-    //profile
-    data class SavePreferredCurrency(val currency: CurrenciesOptionUiModel) : HomeUiIntent
-
 }
 
 data class HomeUiState(
-    val isSmsModalShown: Boolean = false,
-    // profile
-    val currency: CurrenciesOptionUiModel = CurrenciesOptionUiModel.TOMAN,
-    val userAccountInfo: UserAccountInfoUiModel = UserAccountInfoUiModel()
+    val isSmsModalShown: Boolean = false
 )

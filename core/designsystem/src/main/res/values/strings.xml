@@ -53,8 +53,6 @@
     <string name="chortkeh_user">کاربر چرتکه</string>
     <string name="toman">تومان</string>
     <string name="rial">ریال</string>
-
-    // Privacy And Policy
     <string name="enter_with_biometrics">ورود با اثر انگشت</string>
     <string name="grant_sms_permission">با فعال کردن دسترسی به پیامک های بانکی تراکنش ها میتونن خودکار ثبت بشن!</string>
     <string name="revoke_sms_permission_message">از قسمت تنظیمات میتوانید دسترسی پیامک های بانکی را غیرفعال کنید در این صورت تراکنش های خود را باید به طور دستی وارد کنید</string>

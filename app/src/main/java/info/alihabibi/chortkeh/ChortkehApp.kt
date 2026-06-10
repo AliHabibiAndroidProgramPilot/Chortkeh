@@ -8,7 +8,7 @@ import info.alihabibi.domain.local.di.domainModule
 import info.alihabibi.home.di.homeModule
 import info.alihabibi.new_transaction.di.newTransactionModule
 import info.alihabibi.onboarding.di.onBoardingModule
-import info.alihabibi.user_account_info.di.userAccountInfoModule
+import info.alihabibi.profile.viewmodel.profileModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
@@ -25,8 +25,8 @@ class ChortkehApp : Application() {
                     datastoreModule,
                     onBoardingModule,
                     homeModule,
-                    userAccountInfoModule,
-                    newTransactionModule
+                    newTransactionModule,
+                    profileModule
                 )
             )
         }

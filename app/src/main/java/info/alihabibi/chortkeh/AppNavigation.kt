@@ -10,8 +10,6 @@ import info.alihabibi.home.HomeDestination
 import info.alihabibi.new_transaction.NewTransactionDestination
 import info.alihabibi.onboarding.OnBoardingDestination
 import info.alihabibi.otp.OtpDestination
-import info.alihabibi.privacy_and_policy.PrivacyAndPolicyDestination
-import info.alihabibi.user_account_info.UserAccountInfoDestination
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -27,10 +25,7 @@ object Home
 object Announcements
 
 @Serializable
-object PrivacyAndPolicy
-
-@Serializable
-object UserAccountInfo
+object ProfileGraphRoute
 
 @Serializable
 object NewTransaction
@@ -66,28 +61,15 @@ fun DemoNavHost(
             HomeDestination(
                 onAnnouncements = {
                     navController.navigate(Announcements)
+                },
+                onProfile = {
+                    navController.navigate(ProfileGraphRoute)
                 }
             )
         }
 
         composable<Announcements> {
             AnnouncementsDestination(
-                onBackPressed = {
-                    navController.navigateUp()
-                }
-            )
-        }
-
-        composable<PrivacyAndPolicy> {
-            PrivacyAndPolicyDestination(
-                onBackPressed = {
-                    navController.navigateUp()
-                }
-            )
-        }
-
-        composable<UserAccountInfo> {
-            UserAccountInfoDestination(
                 onBackPressed = {
                     navController.navigateUp()
                 }
