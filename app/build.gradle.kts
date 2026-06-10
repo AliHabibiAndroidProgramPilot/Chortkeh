@@ -25,9 +25,6 @@ dependencies {
     // onboarding
     implementation(projects.features.onboarding)
 
-    // otp
-    implementation(projects.features.otp)
-
     // new transaction
     implementation(projects.features.newTransaction)
 

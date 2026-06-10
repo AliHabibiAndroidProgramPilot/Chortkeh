@@ -1,6 +1,5 @@
 package info.alihabibi.profile
 
-import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -11,6 +10,9 @@ import info.alihabibi.profile.screens.UserAccountInfoDestination
 import kotlinx.serialization.Serializable
 
 @Serializable
+object ProfileGraphRoute
+
+@Serializable
 object Profile
 
 @Serializable
@@ -19,7 +21,7 @@ object PrivacyAndPolicy
 @Serializable
 object UserAccountInfo
 
-@Composable
+
 fun NavGraphBuilder.profileGraph(navController: NavController) {
 
    navigation<ProfileGraphRoute>(startDestination = Profile) {

@@ -12,6 +12,9 @@ dependencies {
     // common android
     implementation(projects.core.commonAndroid)
 
+    // common
+    implementation(projects.core.common)
+
     // data store
     implementation(projects.core.datastore)
 

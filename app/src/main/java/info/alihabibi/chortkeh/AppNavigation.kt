@@ -9,23 +9,18 @@ import info.alihabibi.announcements.AnnouncementsDestination
 import info.alihabibi.home.HomeDestination
 import info.alihabibi.new_transaction.NewTransactionDestination
 import info.alihabibi.onboarding.OnBoardingDestination
-import info.alihabibi.otp.OtpDestination
+import info.alihabibi.profile.ProfileGraphRoute
+import info.alihabibi.profile.profileGraph
 import kotlinx.serialization.Serializable
 
 @Serializable
 object OnBoarding
 
 @Serializable
-object Otp
-
-@Serializable
 object Home
 
 @Serializable
 object Announcements
-
-@Serializable
-object ProfileGraphRoute
 
 @Serializable
 object NewTransaction
@@ -51,10 +46,6 @@ fun DemoNavHost(
                     }
                 }
             )
-        }
-
-        composable<Otp> {
-            OtpDestination()
         }
 
         composable<Home> {
@@ -83,6 +74,8 @@ fun DemoNavHost(
                 }
             )
         }
+
+        profileGraph(navController = navController)
 
     }
 

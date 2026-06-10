@@ -3,16 +3,10 @@ package info.alihabibi.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import info.alihabibi.domain.local.usecases.datastore.usecase.DatastoreUseCases
-import info.alihabibi.model.mapper.toDomain
-import info.alihabibi.model.mapper.toUiModel
-import info.alihabibi.model.mapper.toUiOption
-import info.alihabibi.model.ui_model.CurrenciesOptionUiModel
-import info.alihabibi.model.ui_model.UserAccountInfoUiModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -30,8 +24,6 @@ class HomeViewModel(
 
             is HomeUiIntent.SaveSmsPermissionModalShownState ->
                 saveSmsPermissionModalShownState(event.value)
-
-            is HomeUiIntent.SavePreferredCurrency -> savePreferredCurrency(event.currency)
 
         }
     }
