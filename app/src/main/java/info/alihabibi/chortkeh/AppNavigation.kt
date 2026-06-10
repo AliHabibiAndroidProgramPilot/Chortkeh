@@ -1,6 +1,7 @@
 package info.alihabibi.chortkeh
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -37,11 +38,13 @@ object NewTransaction
 @Composable
 fun DemoNavHost(
     navController: NavHostController,
+    modifier: Modifier = Modifier,
     startDestination: Any = OnBoarding
 ) {
 
     NavHost(
         navController = navController,
+        modifier = modifier,
         startDestination = startDestination
     ) {
 

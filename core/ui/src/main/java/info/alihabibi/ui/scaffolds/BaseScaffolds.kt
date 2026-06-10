@@ -13,21 +13,19 @@ import androidx.compose.ui.Modifier
 @Composable
 fun BaseScaffold(
     modifier: Modifier = Modifier,
-    topBar: (@Composable () -> Unit)? = null,
     bottomBar: (@Composable () -> Unit)? = null,
-    floatingActionButton: (@Composable () -> Unit)? = null,
-    fabPosition: FabPosition = FabPosition.End,
+    snackBarHost: @Composable () -> Unit = {},
     contentWindowInsets: WindowInsets = ScaffoldDefaults.contentWindowInsets,
     content: @Composable (innerPadding: PaddingValues) -> Unit
 ) {
+
     Scaffold(
         modifier = modifier,
-        topBar = { topBar?.invoke() },
         bottomBar = { bottomBar?.invoke() },
-        floatingActionButton = { floatingActionButton?.invoke() },
-        floatingActionButtonPosition = fabPosition,
+        snackbarHost = snackBarHost,
         contentWindowInsets = contentWindowInsets
     ) { innerPadding ->
         content(innerPadding)
     }
+
 }

@@ -5,14 +5,16 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
 import info.alihabibi.chortkeh.DemoNavHost
 import info.alihabibi.chortkeh.Home
 import info.alihabibi.chortkeh.OnBoarding
 import info.alihabibi.designsystem.theme.ChortkehTheme
+import info.alihabibi.ui.scaffolds.BaseScaffold
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
@@ -42,7 +44,8 @@ class MainActivity : ComponentActivity() {
 
                 when (val state = uiState.value) {
 
-                    is MainActivityUiState.Loading -> { /* still showing splash screen */ }
+                    is MainActivityUiState.Loading -> { /* still showing splash screen */
+                    }
 
                     is MainActivityUiState.Success -> {
                         val startDestination = when (state.isFirstLaunch) {
@@ -50,13 +53,16 @@ class MainActivity : ComponentActivity() {
                             false -> Home
                         }
 
-                        Scaffold { innerPadding ->
+                        BaseScaffold(
+                            bottomBar = {},
+                        ) { innerPadding ->
                             DemoNavHost(
                                 navController = navController,
-                                startDestination = startDestination,
-                                contentPadding = innerPadding
+                                modifier = Modifier.padding(paddingValues = innerPadding),
+                                startDestination = startDestination
                             )
                         }
+
                     }
                 }
             }
