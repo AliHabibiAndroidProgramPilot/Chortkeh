@@ -1,5 +1,6 @@
-package info.alihabibi.chortkeh
+package info.alihabibi.chortkeh.navigation
 
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -9,7 +10,7 @@ import info.alihabibi.announcements.AnnouncementsDestination
 import info.alihabibi.home.HomeDestination
 import info.alihabibi.new_transaction.NewTransactionDestination
 import info.alihabibi.onboarding.OnBoardingDestination
-import info.alihabibi.profile.ProfileGraphRoute
+import info.alihabibi.profile.Profile
 import info.alihabibi.profile.profileGraph
 import kotlinx.serialization.Serializable
 
@@ -25,6 +26,16 @@ object Announcements
 @Serializable
 object NewTransaction
 
+/** non usable here, should be in its own module with a sub graph here! currently using it as help for Bottom nav bar implementation */
+@Serializable
+object Report
+
+/** non usable here, should be in its own module with a sub graph here! currently using it as help for Bottom nav bar implementation */
+@Serializable
+object Reminder
+
+val topLevelDestinations = setOfNotNull(Home, Profile, Report, Reminder)
+
 @Composable
 fun DemoNavHost(
     navController: NavHostController,
@@ -35,7 +46,11 @@ fun DemoNavHost(
     NavHost(
         navController = navController,
         modifier = modifier,
-        startDestination = startDestination
+        startDestination = startDestination,
+        enterTransition = { if (isBottomNavTransition()) bottomNavEnter() else pushEnter() },
+        exitTransition = { if (isBottomNavTransition()) bottomNavExit() else pushExit() },
+        popEnterTransition = { popEnter() },
+        popExitTransition = { popExit() }
     ) {
 
         composable<OnBoarding> {
@@ -51,8 +66,7 @@ fun DemoNavHost(
         composable<Home> {
             HomeDestination(
                 onAnnouncements = {
-//                    navController.navigate(Announcements)
-                    navController.navigate(ProfileGraphRoute)
+                    navController.navigate(Announcements)
                 }
             )
         }
@@ -71,6 +85,14 @@ fun DemoNavHost(
                     navController.navigateUp()
                 }
             )
+        }
+
+        composable<Report> {
+            Text("REPORTS")
+        }
+
+        composable<Reminder> {
+            Text("REminder")
         }
 
         profileGraph(navController = navController)
