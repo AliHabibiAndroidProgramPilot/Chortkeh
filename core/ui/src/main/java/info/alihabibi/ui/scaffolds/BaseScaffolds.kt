@@ -2,20 +2,21 @@ package info.alihabibi.ui.scaffolds
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FabPosition
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BaseScaffold(
     modifier: Modifier = Modifier,
     bottomBar: (@Composable () -> Unit)? = null,
     snackBarHost: @Composable () -> Unit = {},
-    contentWindowInsets: WindowInsets = ScaffoldDefaults.contentWindowInsets,
+    contentWindowInsets: WindowInsets = WindowInsets.systemBars.only(
+        sides = WindowInsetsSides.Bottom + WindowInsetsSides.Start + WindowInsetsSides.End
+    ),
     content: @Composable (innerPadding: PaddingValues) -> Unit
 ) {
 

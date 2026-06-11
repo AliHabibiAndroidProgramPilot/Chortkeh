@@ -32,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import info.alihabibi.common.Utils
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray7
 import info.alihabibi.model.ui_model.CurrenciesOptionUiModel
@@ -42,11 +43,10 @@ import info.alihabibi.ui.dialogs.AppDialog
 import info.alihabibi.ui.dialogs.AppRadioSelectionBottomSheet
 import info.alihabibi.ui.items.AppDangerousListItem
 import info.alihabibi.ui.items.AppSimpleListItem
-import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ProfileDestination(
-    viewModel: ProfileViewModel = koinViewModel(),
+    viewModel: ProfileViewModel,
     onPrivacyAndPolicy: () -> Unit = {},
     onExitOfAccount: () -> Unit = {},
     onUserAccountInfo: () -> Unit = {}
