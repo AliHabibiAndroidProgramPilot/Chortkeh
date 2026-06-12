@@ -20,16 +20,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import info.alihabibi.common.Utils
+import info.alihabibi.common_android.snackbar.SnackBarController
+import info.alihabibi.common_android.snackbar.SnackBarEvent
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray11
 import info.alihabibi.designsystem.theme.Gray8
@@ -42,6 +47,7 @@ import info.alihabibi.ui.dialogs.AppRadioSelectionBottomSheet
 import info.alihabibi.ui.headrs.AppHeader
 import info.alihabibi.ui.inputs.AppTitledPhoneTextField
 import info.alihabibi.ui.inputs.AppTitledTextField
+import kotlinx.coroutines.launch
 
 @Composable
 fun UserAccountInfoDestination(
@@ -50,6 +56,8 @@ fun UserAccountInfoDestination(
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     UserAccountInfoScreen(
         uiState = uiState,
@@ -64,6 +72,11 @@ fun UserAccountInfoDestination(
         },
         onSaveUserInfo = {
             viewModel.onEvent(ProfileUiIntent.OnSaveValues)
+            scope.launch {
+                SnackBarController.sendEvent(
+                    SnackBarEvent(message = Utils.getStringResources(context, R.string.successful_save_data))
+                )
+            }
             onBackPressed()
         },
         onBackPressed = onBackPressed

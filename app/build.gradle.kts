@@ -19,8 +19,11 @@ dependencies {
     // Splash Screen
     implementation(libs.core.splashscreen)
 
-    //design system
+    // design system
     implementation(projects.core.designsystem)
+
+    // common android
+    implementation(projects.core.commonAndroid)
 
     // onboarding
     implementation(projects.features.onboarding)
