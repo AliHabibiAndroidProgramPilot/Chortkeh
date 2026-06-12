@@ -3,28 +3,20 @@ package info.alihabibi.announcements
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,7 +25,6 @@ import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray8
 import info.alihabibi.ui.buttons.AppToggle
 import info.alihabibi.ui.headrs.AppHeader
-import info.alihabibi.ui.scaffolds.BaseScaffold
 
 @Composable
 fun AnnouncementsDestination(
@@ -45,46 +36,32 @@ fun AnnouncementsDestination(
         stringResource(id = R.string.bank)
     )
 
-    BaseScaffold { innerPadding ->
-
         AnnouncementsScreen(
-            contentPadding = innerPadding,
             toggleItems = toggleItems,
             onBackPressed = onBackPressed
         )
 
-    }
-
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AnnouncementsScreen(
     announcements: List<String> = emptyList(),
-    contentPadding: PaddingValues = PaddingValues(),
     toggleItems: List<String>,
     onBackPressed: () -> Unit
 ) {
-    val layoutDirection = LocalLayoutDirection.current
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(
-                start = contentPadding.calculateStartPadding(layoutDirection),
-                end = contentPadding.calculateEndPadding(layoutDirection)
-            ),
+        modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
         AppHeader(
             title = stringResource(id = R.string.announcements),
-            windowInsets = TopAppBarDefaults.windowInsets.only(WindowInsetsSides.Top),
             isMenuAvailable = false,
             onNavigationClick = onBackPressed
         )
 
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(height = 8.dp))
 
         AppToggle(
             toggleItems = toggleItems,
@@ -92,17 +69,12 @@ private fun AnnouncementsScreen(
             onToggleSelectionChanged = {}
         )
 
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(height = 8.dp))
 
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),
-            contentPadding = PaddingValues(
-                start = contentPadding.calculateStartPadding(layoutDirection),
-                end = contentPadding.calculateEndPadding(layoutDirection),
-                bottom = contentPadding.calculateBottomPadding()
-            ),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 

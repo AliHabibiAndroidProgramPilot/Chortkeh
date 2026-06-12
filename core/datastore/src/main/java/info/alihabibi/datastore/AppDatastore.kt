@@ -53,7 +53,7 @@ class DatastoreManager(private val context: Context) {
     val isSmsModalShown: Flow<Boolean>
         get() =
             context.datastore.data
-                .catch { emptyPreferences() }
+                .catch { emit(emptyPreferences()) }
                 .map { prefs ->
                     prefs[smsModalShown] ?: false
                 }
@@ -68,7 +68,7 @@ class DatastoreManager(private val context: Context) {
     val preferredCurrency: Flow<Currencies>
         get() =
             context.datastore.data
-                .catch { emptyPreferences() }
+                .catch { emit(emptyPreferences()) }
                 .map { pref ->
                     Currencies.entries.firstOrNull {
                         it.name == pref[currency].orEmpty()
@@ -87,7 +87,7 @@ class DatastoreManager(private val context: Context) {
     val userAccountInfo: Flow<UserAccountInfo>
         get() =
             context.datastore.data
-                .catch { UserAccountInfo(fullName = "", phone = "", gender = Genders.UNKNOWN) }
+                .catch { emit(emptyPreferences()) }
                 .map { pref ->
                     UserAccountInfo(
                         fullName = pref[userFullName].orEmpty(),

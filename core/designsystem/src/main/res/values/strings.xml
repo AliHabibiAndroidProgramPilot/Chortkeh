@@ -3,6 +3,7 @@
 
     // Components
     <string name="undo">برگردون</string>
+    <string name="transaction_saved">تراکنش ثبت شد</string>
     <string name="phone_number">شماره موبایل</string>
     <string name="empty_phone_number_warning">شماره موبایل نمیتواند خالی باشد</string>
     <string name="notification_access">دسترسی نوتیفیکیشن</string>
@@ -52,8 +53,6 @@
     <string name="chortkeh_user">کاربر چرتکه</string>
     <string name="toman">تومان</string>
     <string name="rial">ریال</string>
-
-    // Privacy And Policy
     <string name="enter_with_biometrics">ورود با اثر انگشت</string>
     <string name="grant_sms_permission">با فعال کردن دسترسی به پیامک های بانکی تراکنش ها میتونن خودکار ثبت بشن!</string>
     <string name="revoke_sms_permission_message">از قسمت تنظیمات میتوانید دسترسی پیامک های بانکی را غیرفعال کنید در این صورت تراکنش های خود را باید به طور دستی وارد کنید</string>
@@ -68,5 +67,20 @@
     <string name="unknow">نامشخص</string>
     <string name="save_data">ثبت اطلاعات</string>
     <string name="successful_save_data">ثبت اطلاعات با موفقیت انجام شد</string>
+
+    // New Transaction
+    <string name="register_transaction">ثبت تراکنش</string>
+    <string name="register_income_transaction">ثبت درآمد</string>
+    <string name="register_outcome_transaction">ثبت هزینه</string>
+    <string name="price">مبلغ</string>
+    <string name="price_income">مبلغ درآمد</string>
+    <string name="price_outcome">مبلغ هزینه</string>
+    <string name="income">دریافت</string>
+    <string name="outcome">پرداخت</string>
+    <string name="withdraw_from">برداشت از</string>
+    <string name="deposit_to">انتقال به</string>
+    <string name="category">دسته بندی</string>
+    <string name="date">تاریخ</string>
+    <string name="clock">ساعت</string>
 
 </resources>

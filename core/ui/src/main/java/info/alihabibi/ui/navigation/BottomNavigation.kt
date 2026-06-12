@@ -21,10 +21,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,6 +28,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavDestination
+import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.NavDestination.Companion.hierarchy
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray10
 import info.alihabibi.designsystem.theme.Primary
@@ -39,16 +38,16 @@ import info.alihabibi.designsystem.theme.White
 
 @Composable
 fun AppBottomNavigation(
-    onNavItemClicked: (BottomNavItem) -> Unit,
-    navItems: List<BottomNavItem>,
-    selectedNavItem: String,
-    onFabClick: () -> Unit
+    currentDestination: NavDestination?,
+    onFabClick: () -> Unit,
+    items: List<BottomNavItemData>,
+    onNavItemClicked: (BottomNavItemData) -> Unit,
 ) {
 
     NavBar(
-        navItems = navItems,
+        currentDestination = currentDestination,
+        navItems = items,
         onFabClick = onFabClick,
-        selectedNavItem = selectedNavItem,
         onNavItemClicked = { onNavItemClicked(it) }
     )
 
@@ -56,13 +55,11 @@ fun AppBottomNavigation(
 
 @Composable
 private fun NavBar(
-    navItems: List<BottomNavItem>,
-    selectedNavItem: String,
-    onNavItemClicked: (BottomNavItem) -> Unit,
+    currentDestination: NavDestination?,
+    navItems: List<BottomNavItemData>,
+    onNavItemClicked: (BottomNavItemData) -> Unit,
     onFabClick: () -> Unit,
 ) {
-
-    var selected by rememberSaveable { mutableStateOf(selectedNavItem) }
 
     Box(
         modifier = Modifier
@@ -86,22 +83,20 @@ private fun NavBar(
                         NavItem(
                             modifier = Modifier.weight(weight = 1f),
                             navItem = index,
-                            selected = (selected == index.name),
-                            onClick = {
-                                selected = index.name
-                                onNavItemClicked(index)
-                            }
+                            selected = currentDestination
+                                ?.hierarchy
+                                ?.any { it.hasRoute(index.route::class) } == true,
+                            onClick = { onNavItemClicked(index) }
                         )
                     Spacer(Modifier.width(72.dp))
                     for (index in navItems.subList(2, 4))
                         NavItem(
                             modifier = Modifier.weight(weight = 1f),
                             navItem = index,
-                            selected = (selected == index.name),
-                            onClick = {
-                                selected = index.name
-                                onNavItemClicked(index)
-                            }
+                            selected = currentDestination
+                                ?.hierarchy
+                                ?.any { it.hasRoute(index.route::class) } == true,
+                            onClick = { onNavItemClicked(index) }
                         )
                 }
             }
@@ -127,13 +122,13 @@ private fun NavBar(
 @Composable
 private fun NavItem(
     modifier: Modifier = Modifier,
-    navItem: BottomNavItem,
+    navItem: BottomNavItemData,
     selected: Boolean,
     onClick: () -> Unit
 ) {
     val color = if (selected) Primary else Gray10
     val icon =
-        if (selected) painterResource(id = navItem.enabeldIconResId) else painterResource(id = navItem.iconResId)
+        if (selected) painterResource(id = navItem.enabledIconResId) else painterResource(id = navItem.iconResId)
     Column(
         modifier = modifier
             .fillMaxHeight()
@@ -165,8 +160,8 @@ private fun NavItem(
 fun AppBottomNavigationPreview() {
 
     NavBar(
+        currentDestination = null,
         navItems = emptyList(),
-        selectedNavItem = "",
         onFabClick = {},
         onNavItemClicked = {}
     )

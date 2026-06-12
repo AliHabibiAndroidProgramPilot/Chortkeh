@@ -1,17 +1,27 @@
 package info.alihabibi.chortkeh.activity
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import info.alihabibi.chortkeh.DemoNavHost
-import info.alihabibi.chortkeh.Home
-import info.alihabibi.chortkeh.OnBoarding
+import info.alihabibi.chortkeh.navigation.BottomNavItems
+import info.alihabibi.chortkeh.navigation.DemoNavHost
+import info.alihabibi.chortkeh.navigation.Home
+import info.alihabibi.chortkeh.navigation.OnBoarding
+import info.alihabibi.chortkeh.navigation.topLevelDestinations
 import info.alihabibi.designsystem.theme.ChortkehTheme
+import info.alihabibi.ui.navigation.AppBottomNavigation
+import info.alihabibi.ui.scaffolds.BaseScaffold
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
@@ -38,9 +48,16 @@ class MainActivity : ComponentActivity() {
             ChortkehTheme {
                 val navController = rememberNavController()
                 val uiState = viewModel.uiState.collectAsState()
+
+                val currentDestination by navController.currentBackStackEntryAsState()
+                val shouldShowBottomBar = topLevelDestinations.any {
+                    currentDestination?.destination?.hasRoute(it::class) == true
+                }
+
                 when (val state = uiState.value) {
 
-                    is MainActivityUiState.Loading -> { /* still showing splash screen */ }
+                    is MainActivityUiState.Loading -> { /* still showing splash screen */
+                    }
 
                     is MainActivityUiState.Success -> {
                         val startDestination = when (state.isFirstLaunch) {
@@ -48,12 +65,30 @@ class MainActivity : ComponentActivity() {
                             false -> Home
                         }
 
-                        DemoNavHost(
-                            navController = navController,
-                            startDestination = startDestination
-                        )
+                        BaseScaffold(
+                            bottomBar = {
+                                if (shouldShowBottomBar)
+                                    AppBottomNavigation(
+                                        currentDestination = currentDestination?.destination,
+                                        items = BottomNavItems.entries.map { it.toUiData() },
+                                        onFabClick = {  },
+                                        onNavItemClicked = { navItem ->
+                                            navController.navigate(navItem.route) {
+                                                popUpTo(Home) { saveState = true }
+                                                launchSingleTop = true
+                                                restoreState = true
+                                            }
+                                        }
+                                    )
+                            }
+                        ) { innerPadding ->
+                            DemoNavHost(
+                                navController = navController,
+                                modifier = Modifier.padding(paddingValues = innerPadding),
+                                startDestination = startDestination
+                            )
+                        }
                     }
-
                 }
             }
         }
