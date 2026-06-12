@@ -16,26 +16,26 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import info.alihabibi.profile.ProfileGraphRoute
 import kotlin.reflect.KClass
 
-private val tabRoutes: List<KClass<*>> = listOf(
+private val topLevelRoutes: List<KClass<*>> = listOf(
     Home::class,
     ProfileGraphRoute::class,
     Reminder::class,
     Report::class
 )
 
-private fun NavDestination.tabIndex(): Int =
-    tabRoutes.indexOfFirst { routeClass ->
+private fun NavDestination.bottomNavItemIndex(): Int =
+    topLevelRoutes.indexOfFirst { routeClass ->
         hierarchy.any { it.hasRoute(routeClass) }
     }
 
 private fun AnimatedContentTransitionScope<NavBackStackEntry>.bottomNavSlideDirection(): SlideDirection {
-    val from = initialState.destination.tabIndex()
-    val to = targetState.destination.tabIndex()
+    val from = initialState.destination.bottomNavItemIndex()
+    val to = targetState.destination.bottomNavItemIndex()
     return if (to > from) SlideDirection.Left else SlideDirection.Right
 }
 
 fun AnimatedContentTransitionScope<NavBackStackEntry>.isBottomNavTransition(): Boolean =
-    initialState.destination.tabIndex() != -1 && targetState.destination.tabIndex() != -1
+    initialState.destination.bottomNavItemIndex() != -1 && targetState.destination.bottomNavItemIndex() != -1
 
 
 val bottomNavEnter: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition = {
