@@ -12,4 +12,7 @@ dependencies {
     // design system
     implementation(projects.core.designsystem)
 
+    // Persian Date Picker
+    implementation(libs.composedatepicker)
+
 }
