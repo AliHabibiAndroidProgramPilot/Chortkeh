@@ -22,6 +22,7 @@ import androidx.navigation.compose.rememberNavController
 import info.alihabibi.chortkeh.navigation.BottomNavItems
 import info.alihabibi.chortkeh.navigation.DemoNavHost
 import info.alihabibi.chortkeh.navigation.Home
+import info.alihabibi.chortkeh.navigation.NewTransaction
 import info.alihabibi.chortkeh.navigation.OnBoarding
 import info.alihabibi.chortkeh.navigation.topLevelDestinations
 import info.alihabibi.common_android.ObserveAsEvents
@@ -103,7 +104,7 @@ class MainActivity : ComponentActivity() {
                                     AppBottomNavigation(
                                         currentDestination = currentDestination?.destination,
                                         items = BottomNavItems.entries.map { it.toUiData() },
-                                        onFabClick = { },
+                                        onFabClick = { navController.navigate(NewTransaction) },
                                         onNavItemClicked = { navItem ->
                                             navController.navigate(navItem.route) {
                                                 popUpTo(Home) { saveState = true }
