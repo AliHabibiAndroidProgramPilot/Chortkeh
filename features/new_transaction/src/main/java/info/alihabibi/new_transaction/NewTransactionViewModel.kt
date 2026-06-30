@@ -29,7 +29,7 @@ class NewTransactionViewModel : ViewModel() {
     }.stateIn(
         scope = viewModelScope,
         initialValue = "",
-        started = SharingStarted.WhileSubscribed(5000)
+        started = SharingStarted.WhileSubscribed(3_000)
     )
 
     fun onEvent(event: NewTransactionUiIntent) {

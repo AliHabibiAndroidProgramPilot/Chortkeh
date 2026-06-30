@@ -34,6 +34,25 @@ import info.alihabibi.designsystem.theme.Gray11
 import info.alihabibi.designsystem.theme.Gray12
 import info.alihabibi.ui.buttons.AppButton
 
+/**
+ * Bottom sheet time picker with "staged" state management.
+ *
+ * State flow:
+ * - `pickerValue`      -> last confirmed time value.
+ * - `tmpPickerValue`   -> currently selected value inside the picker.
+ *
+ * User interactions:
+ * - While scrolling the picker, only `tmpPickerValue` is updated and
+ *   `onTimeValueChange()` is invoked for live updates.
+ * - Pressing Confirm copies `tmpPickerValue` into `pickerValue` and
+ *   returns the selected time through `onSubmitClick()`.
+ * - Pressing Cancel ignores any unconfirmed picker changes and returns
+ *   the last confirmed value through `onDismissRequest()`.
+ *
+ * This separation prevents accidental persistence of picker changes
+ * until the user explicitly confirms the selection.
+ */
+
 @Composable
 fun TimePickerBottomSheetContent(
     initialTime: Pair<Int, Int> = Pair(18, 30),
@@ -42,6 +61,7 @@ fun TimePickerBottomSheetContent(
     onDismissRequest: (confirmedHour: Int, confirmedMinute: Int) -> Unit,
 ) {
 
+    // Last confirmed value (restored when user cancels)
     var pickerValue by remember {
         mutableStateOf<Hours>(
             FullHours(initialTime.first, initialTime.second)
