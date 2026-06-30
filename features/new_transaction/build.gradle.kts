@@ -24,4 +24,10 @@ dependencies {
     // common android
     implementation(projects.core.commonAndroid)
 
+    // common
+    implementation(projects.core.common)
+
+    // Persian Date Picker
+    implementation(libs.composedatepicker)
+
 }
