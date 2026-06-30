@@ -33,11 +33,13 @@ class NewTransactionViewModel : ViewModel() {
     )
 
     fun onEvent(event: NewTransactionUiIntent) {
-        when(event) {
+        when (event) {
 
             is NewTransactionUiIntent.OnPriceChanged -> changePrice(event.price)
 
             is NewTransactionUiIntent.OnDateChanged -> changeDate(event.year, event.month, event.day)
+
+            is NewTransactionUiIntent.OnTimeChanged -> changeTime(event.hour, event.minute)
 
             is NewTransactionUiIntent.OnTransactionTypeChanged -> changeTransactionType(event.type)
 
@@ -54,8 +56,25 @@ class NewTransactionViewModel : ViewModel() {
         }
     }
 
+    private fun changeTime(hour: Int, minute: Int) {
+        val formattedTime = "$hour : $minute"
+        _uiState.update {
+            it.copy(
+                formattedTransactionTime = formattedTime,
+                transactionHour = hour,
+                transactionMinute = minute
+            )
+        }
+    }
+
     private fun changeDate(year: Int, month: Int, day: Int) {
-        _uiState.update { it.copy(transactionYear = year, transactionMonth = month, transactionDay = day) }
+        _uiState.update {
+            it.copy(
+                transactionYear = year,
+                transactionMonth = month,
+                transactionDay = day
+            )
+        }
     }
 
     private fun changeTransactionType(type: TransactionTypeOptionUiModel) {
@@ -72,13 +91,19 @@ sealed interface NewTransactionUiIntent {
 
     data class OnDateChanged(val year: Int, val month: Int, val day: Int) : NewTransactionUiIntent
 
-    data class OnTransactionTypeChanged(val type: TransactionTypeOptionUiModel) : NewTransactionUiIntent
+    data class OnTimeChanged(val hour: Int, val minute: Int) : NewTransactionUiIntent
+
+    data class OnTransactionTypeChanged(val type: TransactionTypeOptionUiModel) :
+        NewTransactionUiIntent
 
 }
 
 data class NewTransactionUiState(
     val transactionType: TransactionTypeOptionUiModel = TransactionTypeOptionUiModel.INCOME,
     val transactionPrice: String = "",
+    val formattedTransactionTime: String = "",
+    val transactionHour: Int? = null,
+    val transactionMinute: Int? = null,
     val transactionYear: Int? = null,
     val transactionMonth: Int? = null,
     val transactionDay: Int? = null,
