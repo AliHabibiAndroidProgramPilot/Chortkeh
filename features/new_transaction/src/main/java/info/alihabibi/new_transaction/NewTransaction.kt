@@ -25,8 +25,10 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,6 +50,7 @@ import info.alihabibi.designsystem.theme.White
 import info.alihabibi.model.ui_model.TransactionTypeOptionUiModel
 import info.alihabibi.ui.buttons.AppButton
 import info.alihabibi.ui.buttons.AppToggle
+import info.alihabibi.ui.dialogs.ListedBottomSheet
 import info.alihabibi.ui.dialogs.TimePickerBottomSheetContent
 import info.alihabibi.ui.headrs.AppHeader
 import info.alihabibi.ui.inputs.AppTitledPriceTextField
@@ -172,6 +175,17 @@ private fun NewTransactionScreen(
             }
         )
 
+    var showCategoryBottomSheet by remember { mutableStateOf(false) }
+    if (showCategoryBottomSheet)
+        ListedBottomSheet(
+            items = emptyList<Int>(),
+            itemTitle = { "" },
+            itemIcon = { R.drawable.header_app_logo },
+            itemKey = { 0 },
+            onSelectItem = {},
+            onDismissRequest = { showCategoryBottomSheet = false },
+        )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -260,7 +274,7 @@ private fun NewTransactionScreen(
                     .padding(horizontal = 16.dp)
                     .border(width = 1.dp, color = Gray11, shape = RoundedCornerShape(12.dp))
                     .clip(shape = RoundedCornerShape(size = 12.dp))
-                    .clickable {},
+                    .clickable { showCategoryBottomSheet = true },
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
