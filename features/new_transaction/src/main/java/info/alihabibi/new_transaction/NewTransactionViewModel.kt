@@ -91,8 +91,9 @@ class NewTransactionViewModel : ViewModel() {
         }
     }
 
-    private fun changeTime(hour: Int, minute: Int) {
-        val formattedTime = "$hour : $minute"
+    private fun changeTime(hour: Int?, minute: Int?) {
+        val formattedTime =
+            if (hour != null && minute != null) "$hour : $minute" else ""
         _uiState.update {
             it.copy(
                 formattedTransactionTime = formattedTime,
@@ -128,7 +129,7 @@ sealed interface NewTransactionUiIntent {
 
     data class OnDateChanged(val year: Int, val month: Int, val day: Int) : NewTransactionUiIntent
 
-    data class OnTimeChanged(val hour: Int, val minute: Int) : NewTransactionUiIntent
+    data class OnTimeChanged(val hour: Int?, val minute: Int?) : NewTransactionUiIntent
 
     data class OnTransactionTypeChanged(val type: TransactionTypeOptionUiModel) :
         NewTransactionUiIntent

@@ -48,7 +48,7 @@ import info.alihabibi.ui.buttons.AppButton
  * - Pressing Confirm copies `tmpPickerValue` into `pickerValue` and
  *   returns the selected time through `onSubmitClick()`.
  * - Pressing Cancel ignores any unconfirmed picker changes and returns
- *   the last confirmed value through `onDismissRequest()`.
+ *   the last confirmed value through `onDismissRequest()` only if `tmpPickerValue` and `pickerValue` don't equal.
  *
  * This separation prevents accidental persistence of picker changes
  * until the user explicitly confirms the selection.
@@ -59,7 +59,7 @@ fun TimePickerBottomSheetContent(
     initialTime: Pair<Int, Int> = Pair(18, 30),
     onSubmitClick: (hour: Int, minute: Int) -> Unit,
     onTimeValueChange: (hour: Int, minute: Int) -> Unit,
-    onDismissRequest: (confirmedHour: Int, confirmedMinute: Int) -> Unit,
+    onDismissRequest: (confirmedHour: Int?, confirmedMinute: Int?) -> Unit,
 ) {
 
     // Last confirmed value (restored when user cancels)
@@ -136,7 +136,7 @@ fun TimePickerBottomSheetContent(
                 TextButton(
                     colors = ButtonDefaults.textButtonColors(contentColor = Gray11),
                     onClick = {
-                        onDismissRequest(pickerValue.hours, pickerValue.minutes)
+                        onDismissRequest(null, null)
                     },
                     shape = RectangleShape,
                     content = {

@@ -114,7 +114,7 @@ private fun NewTransactionScreen(
     formattedTransactionDate: String = "",
     onPriceChanged: (price: String) -> Unit = {},
     onDateChanged: (year: Int, month: Int, day: Int) -> Unit = { _, _, _ -> },
-    onTimeChange: (hour: Int, minute: Int) -> Unit = { _, _ -> },
+    onTimeChange: (hour: Int?, minute: Int?) -> Unit = { _, _ -> },
     onSaveTransaction: () -> Unit = {},
     onTransactionTypeChanged: (type: TransactionTypeOptionUiModel) -> Unit = {},
     onBackPressed: () -> Unit
