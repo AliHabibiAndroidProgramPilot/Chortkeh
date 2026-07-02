@@ -3,7 +3,9 @@ package info.alihabibi.new_transaction
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import info.alihabibi.common.PersianDateFormatter
+import info.alihabibi.designsystem.R
 import info.alihabibi.model.ui_model.TransactionTypeOptionUiModel
+import info.alihabibi.model.ui_model.category.CategoryUiModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -35,14 +37,47 @@ class NewTransactionViewModel : ViewModel() {
     fun onEvent(event: NewTransactionUiIntent) {
         when (event) {
 
+            is NewTransactionUiIntent.Init -> init()
+
             is NewTransactionUiIntent.OnPriceChanged -> changePrice(event.price)
 
-            is NewTransactionUiIntent.OnDateChanged -> changeDate(event.year, event.month, event.day)
+            is NewTransactionUiIntent.OnDateChanged -> changeDate(
+                event.year,
+                event.month,
+                event.day
+            )
 
             is NewTransactionUiIntent.OnTimeChanged -> changeTime(event.hour, event.minute)
 
             is NewTransactionUiIntent.OnTransactionTypeChanged -> changeTransactionType(event.type)
 
+        }
+    }
+
+    private fun init() {
+        // currently mocking categories
+        val categories = listOf(
+            CategoryUiModel(id = 1, title = "خوردنی", iconResId = R.drawable.header_app_logo),
+            CategoryUiModel(id = 2, title = "خوشگذرونی", iconResId = R.drawable.header_app_logo),
+            CategoryUiModel(id = 3, title = "خونه", iconResId = R.drawable.header_app_logo),
+            CategoryUiModel(id = 4, title = "ماشین", iconResId = R.drawable.header_app_logo),
+            CategoryUiModel(id = 5, title = "ماشین", iconResId = R.drawable.header_app_logo),
+            CategoryUiModel(id = 6, title = "ماشین", iconResId = R.drawable.header_app_logo),
+            CategoryUiModel(id = 7, title = "ماشین", iconResId = R.drawable.header_app_logo),
+            CategoryUiModel(id = 8, title = "ماشین", iconResId = R.drawable.header_app_logo),
+            CategoryUiModel(id = 9, title = "ماشین", iconResId = R.drawable.header_app_logo),
+            CategoryUiModel(id = 10, title = "ماشین", iconResId = R.drawable.header_app_logo),
+            CategoryUiModel(id = 11, title = "ماشین", iconResId = R.drawable.header_app_logo),
+            CategoryUiModel(id = 12, title = "ماشین", iconResId = R.drawable.header_app_logo),
+            CategoryUiModel(id = 13, title = "ماشین", iconResId = R.drawable.header_app_logo),
+            CategoryUiModel(id = 14, title = "ماشین", iconResId = R.drawable.header_app_logo),
+            CategoryUiModel(id = 15, title = "ماشین", iconResId = R.drawable.header_app_logo),
+            CategoryUiModel(id = 16, title = "ماشین", iconResId = R.drawable.header_app_logo),
+            CategoryUiModel(id = 17, title = "ماشین", iconResId = R.drawable.header_app_logo),
+            CategoryUiModel(id = 18, title = "ماشین", iconResId = R.drawable.header_app_logo),
+        )
+        _uiState.update {
+            it.copy(categories = categories)
         }
     }
 
@@ -87,6 +122,8 @@ class NewTransactionViewModel : ViewModel() {
 
 sealed interface NewTransactionUiIntent {
 
+    data object Init : NewTransactionUiIntent
+
     data class OnPriceChanged(val price: String) : NewTransactionUiIntent
 
     data class OnDateChanged(val year: Int, val month: Int, val day: Int) : NewTransactionUiIntent
@@ -107,4 +144,5 @@ data class NewTransactionUiState(
     val transactionYear: Int? = null,
     val transactionMonth: Int? = null,
     val transactionDay: Int? = null,
+    val categories: List<CategoryUiModel> = emptyList()
 )

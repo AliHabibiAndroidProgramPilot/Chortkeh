@@ -15,8 +15,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import info.alihabibi.designsystem.theme.White
 import info.alihabibi.ui.items.ListedBottomSheetItem
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -32,7 +34,10 @@ fun <T> ListedBottomSheet(
     onSelectItem: (item: T) -> Unit
 ) {
 
-    ModalBottomSheet(onDismissRequest = onDismissRequest) {
+    ModalBottomSheet(
+        containerColor = White,
+        onDismissRequest = onDismissRequest
+    ) {
 
         Surface(modifier = Modifier.fillMaxWidth()) {
 
@@ -41,10 +46,13 @@ fun <T> ListedBottomSheet(
                 Text(
                     modifier = Modifier.fillMaxWidth(),
                     text = bottomSheetTitle,
-                    style = MaterialTheme.typography.labelLarge.copy(textAlign = TextAlign.Center)
+                    style = MaterialTheme.typography.labelLarge.copy(
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.Bold
+                    )
                 )
 
-                Spacer(modifier = Modifier.height(height = 40.dp))
+                Spacer(modifier = Modifier.height(height = 12.dp))
 
                 LazyColumn(
                     modifier = Modifier

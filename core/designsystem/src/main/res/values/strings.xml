@@ -80,8 +80,8 @@
     <string name="outcome">پرداخت</string>
     <string name="withdraw_from">برداشت از</string>
     <string name="deposit_to">انتقال به</string>
-    <string name="category">دسته بندی</string>
     <string name="date">تاریخ</string>
     <string name="clock">ساعت</string>
+    <string name="category">دسته‌بندی</string>
 
 </resources>

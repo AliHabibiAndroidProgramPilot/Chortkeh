@@ -24,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,12 +35,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Black
 import info.alihabibi.designsystem.theme.Gray11
@@ -70,6 +75,13 @@ fun NewTransactionDestination(
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val formattedTransactionDate by viewModel.formattedTransactionDate.collectAsStateWithLifecycle()
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.onEvent(NewTransactionUiIntent.Init)
+        }
+    }
 
     NewTransactionScreen(
         uiState = uiState,
@@ -125,7 +137,7 @@ private fun NewTransactionScreen(
             minYear = MinYear.On(1400),
             maxYear = MaxYear.On(1425),
             titleBottomSheet = stringResource(id = R.string.date),
-            titleStyle = MaterialTheme.typography.labelLarge.copy(textAlign = TextAlign.Center),
+            titleStyle = MaterialTheme.typography.labelLarge.copy(textAlign = TextAlign.Center, fontWeight = FontWeight.Bold),
             titleModifier = Modifier.fillMaxWidth(),
             font = R.font.iran_yekanx_normal,
             textButtonStyle = MaterialTheme.typography.labelLarge.copy(
@@ -178,10 +190,11 @@ private fun NewTransactionScreen(
     var showCategoryBottomSheet by remember { mutableStateOf(false) }
     if (showCategoryBottomSheet)
         ListedBottomSheet(
-            items = emptyList<Int>(),
-            itemTitle = { "" },
-            itemIcon = { R.drawable.header_app_logo },
-            itemKey = { 0 },
+            items = uiState.categories,
+            itemTitle = { it.title },
+            itemIcon = { it.iconResId },
+            itemKey = { it.id },
+            bottomSheetTitle = stringResource(id = R.string.category),
             onSelectItem = {},
             onDismissRequest = { showCategoryBottomSheet = false },
         )

@@ -13,15 +13,18 @@ import androidx.compose.material.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import info.alihabibi.designsystem.R
-import info.alihabibi.designsystem.theme.Gray11
+import info.alihabibi.designsystem.theme.Gray3
 
 @Composable
 fun ListedBottomSheetItem(
@@ -30,29 +33,33 @@ fun ListedBottomSheetItem(
     onClick: () -> Unit
 ) {
 
-    Row(
-        modifier = Modifier
-            .height(height = 48.dp)
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 4.dp)
-            .border(width = 1.dp, color = Gray11, shape = RoundedCornerShape(12.dp))
-            .clip(shape = RoundedCornerShape(12.dp))
-            .clickable(onClick = onClick),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.End
-    ) {
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
 
-        Text(
-            modifier = Modifier.padding(horizontal = 8.dp),
-            text = title,
-            style = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.End)
-        )
+        Row(
+            modifier = Modifier
+                .height(height = 60.dp)
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .border(width = 1.dp, color = Gray3, shape = RoundedCornerShape(size = 12.dp))
+                .clip(shape = RoundedCornerShape(size = 12.dp))
+                .clickable(onClick = onClick),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.End
+        ) {
 
-        Icon(
-            modifier = Modifier.padding(horizontal = 12.dp),
-            painter = painterResource(iconResId),
-            contentDescription = null
-        )
+            Text(
+                modifier = Modifier.padding(end = 10.dp),
+                text = title,
+                style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.End)
+            )
+
+            Icon(
+                modifier = Modifier.padding(end = 12.dp),
+                painter = painterResource(iconResId),
+                contentDescription = null
+            )
+
+        }
 
     }
 
