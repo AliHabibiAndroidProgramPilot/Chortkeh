@@ -46,6 +46,9 @@ dependencies {
     // datastore
     implementation(projects.core.datastore)
 
+    // Room Database
+    implementation(projects.core.database)
+
     // profile
     implementation(projects.features.profile)
 

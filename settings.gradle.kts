@@ -6,9 +6,9 @@ pluginManagement {
                 includeGroupByRegex("com\\.google.*")
                 includeGroupByRegex("androidx.*")
             }
-        }
-        gradlePluginPortal()*/
-        mavenCentral()
+        }*/
+//        gradlePluginPortal()
+//        mavenCentral()
 //        maven(url = "https://jitpack.io")
         maven(url = "https://maven.myket.ir")
     }
@@ -22,7 +22,7 @@ dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
 //        google()
-        mavenCentral()
+//        mavenCentral()
 //        maven(url = "https://jitpack.io")
         maven(url = "https://maven.myket.ir")
     }
@@ -42,3 +42,4 @@ include(":features:announcements")
 include(":features:new_transaction")
 include(":core:model")
 include(":features:profile")
+include(":core:database")

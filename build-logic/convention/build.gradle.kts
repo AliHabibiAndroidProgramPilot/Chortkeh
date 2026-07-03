@@ -1,4 +1,3 @@
-
 plugins {
     `kotlin-dsl`
 }
@@ -14,7 +13,6 @@ dependencies {
 
 gradlePlugin {
     plugins {
-
         register("androidApplication") {
             id = "info.alihabibi.chortkeh.android.application"
             implementationClass = "AndroidApplicationConventionPlugin"
@@ -28,6 +26,11 @@ gradlePlugin {
         register("androidCompose") {
             id = "info.alihabibi.chortkeh.android.compose"
             implementationClass = "AndroidComposeConventionPlugin"
+        }
+
+        register("androidRoomLibrary") {
+            id = "info.alihabibi.chortkeh.android.room"
+            implementationClass = "AndroidRoomConventionPlugin"
         }
     }
 }

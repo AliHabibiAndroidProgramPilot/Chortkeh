@@ -1,6 +1,7 @@
 [versions]
 agp = "8.13.0"
 kotlin = "2.2.20"
+ksp = "2.2.20-2.0.4"
 kotlinxSerializationJson = "1.7.3"
 compileSdk = "36"
 minSdk = "26"
@@ -19,6 +20,7 @@ composeBom = "2025.08.01"
 appcompat = "1.6.1"
 material = "1.10.0"
 koin = "4.0.0"
+room = "2.8.4"
 navigation = "2.9.0"
 uiGraphics = "1.9.5"
 core-splash = "1.0.1"
@@ -27,6 +29,9 @@ material3 = "1.4.0"
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+androidx-room-common = { module = "androidx.room:room-common", version.ref = "room" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 composedatepicker = { module = "com.github.MohammadSadeghMehrafzoon:ComposeDatePicker", version.ref = "composedatepicker" }
 compose-number-picker = { group = "com.chargemap.compose", name = "numberpicker", version.ref = "composeNumberPicker" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -65,5 +70,6 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 
