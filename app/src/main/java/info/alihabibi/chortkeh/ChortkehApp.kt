@@ -3,8 +3,9 @@ package info.alihabibi.chortkeh
 import android.app.Application
 import android.os.StrictMode
 import info.alihabibi.chortkeh.di.mainActivityModule
+import info.alihabibi.database.di.databaseModule
 import info.alihabibi.datastore.di.datastoreModule
-import info.alihabibi.domain.local.di.domainModule
+import info.alihabibi.domain.di.domainModule
 import info.alihabibi.home.di.homeModule
 import info.alihabibi.new_transaction.di.newTransactionModule
 import info.alihabibi.onboarding.di.onBoardingModule
@@ -23,6 +24,7 @@ class ChortkehApp : Application() {
                     mainActivityModule,
                     domainModule,
                     datastoreModule,
+                    databaseModule,
                     onBoardingModule,
                     homeModule,
                     newTransactionModule,

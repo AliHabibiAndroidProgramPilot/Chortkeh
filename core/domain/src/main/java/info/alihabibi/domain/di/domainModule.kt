@@ -1,4 +1,4 @@
-package info.alihabibi.domain.local.di
+package info.alihabibi.domain.di
 
 import info.alihabibi.domain.local.usecases.datastore.GetIsAppFirstLaunchUseCase
 import info.alihabibi.domain.local.usecases.datastore.GetIsSmsModalShownUseCase

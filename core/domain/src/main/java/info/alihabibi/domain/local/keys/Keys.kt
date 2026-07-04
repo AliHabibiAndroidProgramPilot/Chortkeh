@@ -11,4 +11,8 @@ object Keys {
     const val USER_PHONE = "USER_PHONE"
     const val USER_GENDER = "USER_GENDER"
 
+    // Database
+    const val DATABASE_NAME = "Chortkeh.db"
+    const val CATEGORY_TABLE_NAME = "category"
+
 }
