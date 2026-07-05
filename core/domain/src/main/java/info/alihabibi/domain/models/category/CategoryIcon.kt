@@ -5,5 +5,10 @@ enum class CategoryIcon {
     SHOPPING,
     HAVING_FUN,
     HOME,
-    CAR
+    CAR,
+    SALARY,
+    INCOME,
+    OTHERS,
+    PROFIT,
+    SUBSIDY
 }
