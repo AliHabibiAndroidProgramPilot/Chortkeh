@@ -28,4 +28,11 @@ class CategoryRepositoryImpl(
         }
     }
 
+    override suspend fun saveCategory(categories: List<Category>): List<Long> {
+        return withContext(Dispatchers.IO) {
+            val categoryEntities = categories.map(Category::asEntity)
+            dao.insertCategory(categoryEntities)
+        }
+    }
+
 }

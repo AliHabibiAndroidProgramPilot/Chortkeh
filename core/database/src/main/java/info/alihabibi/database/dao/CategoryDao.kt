@@ -14,6 +14,9 @@ interface CategoryDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertCategory(category: CategoryEntity): Long
 
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertCategory(categories: List<CategoryEntity>): List<Long>
+
     @Query("SELECT * FROM ${Keys.CATEGORY_TABLE_NAME} ORDER BY id ASC")
     fun getCategories(): Flow<List<CategoryEntity>>
 

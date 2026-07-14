@@ -9,7 +9,13 @@ android {
 
 dependencies {
 
+    // sqlite bundled / Rooms driver
+    implementation(libs.androidx.sqlite)
+
     //Domain
     implementation(projects.core.domain)
+
+    // common
+    implementation(projects.core.common)
 
 }

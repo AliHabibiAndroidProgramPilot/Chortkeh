@@ -3,13 +3,14 @@ package info.alihabibi.chortkeh
 import android.app.Application
 import android.os.StrictMode
 import info.alihabibi.chortkeh.di.mainActivityModule
+import info.alihabibi.common.di.commonModule
 import info.alihabibi.database.di.databaseModule
 import info.alihabibi.datastore.di.datastoreModule
 import info.alihabibi.domain.di.domainModule
 import info.alihabibi.home.di.homeModule
 import info.alihabibi.new_transaction.di.newTransactionModule
 import info.alihabibi.onboarding.di.onBoardingModule
-import info.alihabibi.profile.viewmodel.profileModule
+import info.alihabibi.profile.di.profileModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
@@ -25,6 +26,7 @@ class ChortkehApp : Application() {
                     domainModule,
                     datastoreModule,
                     databaseModule,
+                    commonModule,
                     onBoardingModule,
                     homeModule,
                     newTransactionModule,

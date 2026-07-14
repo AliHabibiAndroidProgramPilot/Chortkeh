@@ -8,9 +8,9 @@ import info.alihabibi.domain.models.category.CategoryType
 
 @Entity(tableName = Keys.CATEGORY_TABLE_NAME)
 data class CategoryEntity(
-    @PrimaryKey(autoGenerate = true)
-    val id: Long = 0L,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
     val title: String,
+    val isDefault: Boolean,
     val icon: CategoryIcon, // @TypeConverter -> CategoryIconConverter
     val type: CategoryType // @TypeConverter -> CategoryTypeConverter
 )

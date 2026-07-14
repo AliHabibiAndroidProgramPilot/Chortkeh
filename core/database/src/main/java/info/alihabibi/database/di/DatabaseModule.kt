@@ -1,10 +1,14 @@
 package info.alihabibi.database.di
 
 import androidx.room.Room
+import androidx.sqlite.driver.bundled.BundledSQLiteDriver
+import info.alihabibi.common.ApplicationScope
 import info.alihabibi.database.AppDatabase
 import info.alihabibi.database.repositories.CategoryRepositoryImpl
+import info.alihabibi.database.seeding.CategorySeedCallback
 import info.alihabibi.domain.local.keys.Keys
 import info.alihabibi.domain.local.repositories.CategoryRepository
+import kotlinx.coroutines.Dispatchers
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
@@ -16,7 +20,16 @@ val databaseModule = module {
             androidContext(),
             AppDatabase::class.java,
             Keys.DATABASE_NAME
-        ).build()
+        )
+            .setDriver(BundledSQLiteDriver())
+            .setQueryCoroutineContext(Dispatchers.IO)
+            .addCallback(
+                CategorySeedCallback(
+                    scope = get<ApplicationScope>(),
+                    databaseProvider = { get() }
+                )
+            )
+            .build()
     }
 
     // Dao's

@@ -21,6 +21,7 @@ appcompat = "1.6.1"
 material = "1.10.0"
 koin = "4.0.0"
 room = "2.8.4"
+sqlite-bundled = "2.6.2"
 navigation = "2.9.0"
 uiGraphics = "1.9.5"
 core-splash = "1.0.1"
@@ -32,6 +33,7 @@ androidx-datastore-preferences = { module = "androidx.datastore:datastore-prefer
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 androidx-room-common = { module = "androidx.room:room-common", version.ref = "room" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+androidx-sqlite = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite-bundled" }
 composedatepicker = { module = "com.github.MohammadSadeghMehrafzoon:ComposeDatePicker", version.ref = "composedatepicker" }
 compose-number-picker = { group = "com.chargemap.compose", name = "numberpicker", version.ref = "composeNumberPicker" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

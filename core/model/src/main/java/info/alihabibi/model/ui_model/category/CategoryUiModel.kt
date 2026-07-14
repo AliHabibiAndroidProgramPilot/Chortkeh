@@ -6,6 +6,7 @@ import info.alihabibi.designsystem.R
 data class CategoryUiModel(
     val id: Int = 0,
     val title: String = "",
-    @get:DrawableRes val iconResId: Int = R.drawable.women_profile, //todo change this
+    val isDefault: Boolean = true,
+    @get:DrawableRes val iconResId: Int = R.drawable.category_others,
     val type: CategoryTypeOptionUiModel = CategoryTypeOptionUiModel.OUTCOME
 )
