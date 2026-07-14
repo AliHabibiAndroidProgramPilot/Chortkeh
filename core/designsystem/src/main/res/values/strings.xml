@@ -83,5 +83,7 @@
     <string name="date">تاریخ</string>
     <string name="clock">ساعت</string>
     <string name="category">دسته‌بندی</string>
+    <string name="add_new_category">اضافه کردن دسته‌بندی جدید</string>
+    <string name="add_new_channel">اضافه کردن کانال جدید</string>
 
 </resources>

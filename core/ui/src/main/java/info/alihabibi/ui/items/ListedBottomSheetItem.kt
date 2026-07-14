@@ -38,9 +38,9 @@ fun ListedBottomSheetItem(
 
         Row(
             modifier = Modifier
-                .height(height = 60.dp)
+                .height(height = 55.dp)
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .padding(horizontal = 16.dp, vertical = 4.dp)
                 .border(width = 1.dp, color = Gray3, shape = RoundedCornerShape(size = 12.dp))
                 .clip(shape = RoundedCornerShape(size = 12.dp))
                 .clickable(onClick = onClick),
