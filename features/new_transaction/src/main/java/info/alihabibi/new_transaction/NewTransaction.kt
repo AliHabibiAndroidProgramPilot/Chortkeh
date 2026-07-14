@@ -53,6 +53,7 @@ import info.alihabibi.designsystem.theme.Gray8
 import info.alihabibi.designsystem.theme.Primary
 import info.alihabibi.designsystem.theme.White
 import info.alihabibi.model.ui_model.TransactionTypeOptionUiModel
+import info.alihabibi.model.ui_model.category.CategoryUiModel
 import info.alihabibi.ui.buttons.AppButton
 import info.alihabibi.ui.buttons.AppToggle
 import info.alihabibi.ui.dialogs.ListedBottomSheet
@@ -95,6 +96,9 @@ fun NewTransactionDestination(
         onTimeChange = { hour, minute ->
             viewModel.onEvent(NewTransactionUiIntent.OnTimeChanged(hour, minute))
         },
+        onCategoryChanged = { category ->
+            viewModel.onEvent(NewTransactionUiIntent.OnCategoryChanged(category))
+        },
         onSaveTransaction = {
             // TODO save transaction | call view model here, then navigate back
             onBackPressed()
@@ -115,6 +119,7 @@ private fun NewTransactionScreen(
     onPriceChanged: (price: String) -> Unit = {},
     onDateChanged: (year: Int, month: Int, day: Int) -> Unit = { _, _, _ -> },
     onTimeChange: (hour: Int?, minute: Int?) -> Unit = { _, _ -> },
+    onCategoryChanged: (category: CategoryUiModel) -> Unit = {},
     onSaveTransaction: () -> Unit = {},
     onTransactionTypeChanged: (type: TransactionTypeOptionUiModel) -> Unit = {},
     onBackPressed: () -> Unit
@@ -196,6 +201,7 @@ private fun NewTransactionScreen(
             itemKey = { it.id },
             bottomSheetTitle = stringResource(id = R.string.category),
             onSelectItem = { category ->
+                onCategoryChanged(category)
                 showCategoryBottomSheet = false
             },
             onDismissRequest = { showCategoryBottomSheet = false },
@@ -304,7 +310,10 @@ private fun NewTransactionScreen(
 
                 Text(
                     modifier = Modifier.padding(horizontal = 12.dp),
-                    text = stringResource(id = R.string.category),
+                    text = when {
+                        uiState.transactionCategory != null -> uiState.transactionCategory.title
+                        else  -> stringResource(id = R.string.category)
+                    },
                     style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp)
                 )
 

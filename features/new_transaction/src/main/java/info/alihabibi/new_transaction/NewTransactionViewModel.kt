@@ -52,6 +52,8 @@ class NewTransactionViewModel(
 
             is NewTransactionUiIntent.OnTimeChanged -> changeTime(event.hour, event.minute)
 
+            is NewTransactionUiIntent.OnCategoryChanged -> changeCategory(event.category)
+
             is NewTransactionUiIntent.OnTransactionTypeChanged -> changeTransactionType(event.type)
 
         }
@@ -111,8 +113,12 @@ class NewTransactionViewModel(
 
     private fun changeTransactionType(type: TransactionTypeOptionUiModel) {
         _uiState.update {
-            it.copy(transactionType = type)
+            it.copy(transactionType = type, transactionCategory = null)
         }
+    }
+
+    private fun changeCategory(category: CategoryUiModel) {
+        _uiState.update { it.copy(transactionCategory = category) }
     }
 
 }
@@ -126,6 +132,8 @@ sealed interface NewTransactionUiIntent {
     data class OnDateChanged(val year: Int, val month: Int, val day: Int) : NewTransactionUiIntent
 
     data class OnTimeChanged(val hour: Int?, val minute: Int?) : NewTransactionUiIntent
+
+    data class  OnCategoryChanged(val category: CategoryUiModel) : NewTransactionUiIntent
 
     data class OnTransactionTypeChanged(val type: TransactionTypeOptionUiModel) :
         NewTransactionUiIntent
@@ -141,5 +149,6 @@ data class NewTransactionUiState(
     val transactionYear: Int? = null,
     val transactionMonth: Int? = null,
     val transactionDay: Int? = null,
+    val transactionCategory: CategoryUiModel? = null,
     val categories: List<CategoryUiModel> = emptyList()
 )
