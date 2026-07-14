@@ -1,4 +1,4 @@
-package info.alihabibi.profile.viewmodel
+package info.alihabibi.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

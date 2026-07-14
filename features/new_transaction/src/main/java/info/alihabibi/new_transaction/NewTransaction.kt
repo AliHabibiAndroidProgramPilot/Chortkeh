@@ -195,7 +195,9 @@ private fun NewTransactionScreen(
             itemIcon = { it.iconResId },
             itemKey = { it.id },
             bottomSheetTitle = stringResource(id = R.string.category),
-            onSelectItem = {},
+            onSelectItem = { category ->
+                showCategoryBottomSheet = false
+            },
             onDismissRequest = { showCategoryBottomSheet = false },
         )
 

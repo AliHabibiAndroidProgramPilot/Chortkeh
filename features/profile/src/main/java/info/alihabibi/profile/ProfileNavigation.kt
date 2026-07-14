@@ -8,7 +8,6 @@ import androidx.navigation.navigation
 import info.alihabibi.profile.screens.PrivacyAndPolicyDestination
 import info.alihabibi.profile.screens.ProfileDestination
 import info.alihabibi.profile.screens.UserAccountInfoDestination
-import info.alihabibi.profile.viewmodel.ProfileViewModel
 import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
 

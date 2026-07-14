@@ -3,19 +3,26 @@ package info.alihabibi.new_transaction
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import info.alihabibi.common.PersianDateFormatter
-import info.alihabibi.designsystem.R
+import info.alihabibi.common.Utils.loog
+import info.alihabibi.domain.local.usecases.database.usecase.CategoryUseCases
+import info.alihabibi.model.mapper.toUiModel
 import info.alihabibi.model.ui_model.TransactionTypeOptionUiModel
+import info.alihabibi.model.ui_model.category.CategoryTypeOptionUiModel
 import info.alihabibi.model.ui_model.category.CategoryUiModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
-class NewTransactionViewModel : ViewModel() {
+class NewTransactionViewModel(
+    private val categoryUseCases: CategoryUseCases
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(NewTransactionUiState())
     val uiState: StateFlow<NewTransactionUiState> = _uiState.asStateFlow()
@@ -41,11 +48,7 @@ class NewTransactionViewModel : ViewModel() {
 
             is NewTransactionUiIntent.OnPriceChanged -> changePrice(event.price)
 
-            is NewTransactionUiIntent.OnDateChanged -> changeDate(
-                event.year,
-                event.month,
-                event.day
-            )
+            is NewTransactionUiIntent.OnDateChanged -> changeDate(event.year, event.month, event.day)
 
             is NewTransactionUiIntent.OnTimeChanged -> changeTime(event.hour, event.minute)
 
@@ -55,29 +58,22 @@ class NewTransactionViewModel : ViewModel() {
     }
 
     private fun init() {
-        // currently mocking categories
-        val categories = listOf(
-            CategoryUiModel(id = 1, title = "خوردنی", iconResId = R.drawable.header_app_logo),
-            CategoryUiModel(id = 2, title = "خوشگذرونی", iconResId = R.drawable.header_app_logo),
-            CategoryUiModel(id = 3, title = "خونه", iconResId = R.drawable.header_app_logo),
-            CategoryUiModel(id = 4, title = "ماشین", iconResId = R.drawable.header_app_logo),
-            CategoryUiModel(id = 5, title = "ماشین", iconResId = R.drawable.header_app_logo),
-            CategoryUiModel(id = 6, title = "ماشین", iconResId = R.drawable.header_app_logo),
-            CategoryUiModel(id = 7, title = "ماشین", iconResId = R.drawable.header_app_logo),
-            CategoryUiModel(id = 8, title = "ماشین", iconResId = R.drawable.header_app_logo),
-            CategoryUiModel(id = 9, title = "ماشین", iconResId = R.drawable.header_app_logo),
-            CategoryUiModel(id = 10, title = "ماشین", iconResId = R.drawable.header_app_logo),
-            CategoryUiModel(id = 11, title = "ماشین", iconResId = R.drawable.header_app_logo),
-            CategoryUiModel(id = 12, title = "ماشین", iconResId = R.drawable.header_app_logo),
-            CategoryUiModel(id = 13, title = "ماشین", iconResId = R.drawable.header_app_logo),
-            CategoryUiModel(id = 14, title = "ماشین", iconResId = R.drawable.header_app_logo),
-            CategoryUiModel(id = 15, title = "ماشین", iconResId = R.drawable.header_app_logo),
-            CategoryUiModel(id = 16, title = "ماشین", iconResId = R.drawable.header_app_logo),
-            CategoryUiModel(id = 17, title = "ماشین", iconResId = R.drawable.header_app_logo),
-            CategoryUiModel(id = 18, title = "ماشین", iconResId = R.drawable.header_app_logo),
-        )
-        _uiState.update {
-            it.copy(categories = categories)
+        viewModelScope.launch {
+            combine(
+                categoryUseCases.getCategoriesUseCase.invoke(),
+                _uiState.map { it.transactionType }.distinctUntilChanged()
+            ) { categories, transactionType ->
+                categories
+                    .map { it.toUiModel() }
+                    .filter {
+                        when (transactionType) {
+                            TransactionTypeOptionUiModel.OUTCOME -> it.type == CategoryTypeOptionUiModel.OUTCOME
+                            TransactionTypeOptionUiModel.INCOME -> it.type == CategoryTypeOptionUiModel.INCOME
+                        }
+                    }
+            }.collect { filteredCategories ->
+                _uiState.update { it.copy(categories = filteredCategories) }
+            }
         }
     }
 
