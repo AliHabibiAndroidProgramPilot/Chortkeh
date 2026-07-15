@@ -8,7 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import info.alihabibi.announcements.AnnouncementsDestination
 import info.alihabibi.home.HomeDestination
-import info.alihabibi.new_transaction.NewTransactionDestination
+import info.alihabibi.new_transaction.newTransactionGraph
 import info.alihabibi.onboarding.OnBoardingDestination
 import info.alihabibi.profile.Profile
 import info.alihabibi.profile.profileGraph
@@ -22,9 +22,6 @@ object Home
 
 @Serializable
 object Announcements
-
-@Serializable
-object NewTransaction
 
 /** non usable here, should be in its own module with a sub graph here! currently using it as help for Bottom nav bar implementation */
 @Serializable
@@ -79,14 +76,6 @@ fun DemoNavHost(
             )
         }
 
-        composable<NewTransaction> {
-            NewTransactionDestination(
-                onBackPressed = {
-                    navController.navigateUp()
-                }
-            )
-        }
-
         composable<Report> {
             Text("REPORTS")
         }
@@ -96,6 +85,8 @@ fun DemoNavHost(
         }
 
         profileGraph(navController = navController)
+
+        newTransactionGraph(navController = navController)
 
     }
 
