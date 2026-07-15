@@ -3,7 +3,6 @@ package info.alihabibi.new_transaction
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import info.alihabibi.common.PersianDateFormatter
-import info.alihabibi.common.Utils.loog
 import info.alihabibi.domain.local.usecases.database.usecase.CategoryUseCases
 import info.alihabibi.model.mapper.toUiModel
 import info.alihabibi.model.ui_model.TransactionTypeOptionUiModel
@@ -53,6 +52,10 @@ class NewTransactionViewModel(
             is NewTransactionUiIntent.OnTimeChanged -> changeTime(event.hour, event.minute)
 
             is NewTransactionUiIntent.OnCategoryChanged -> changeCategory(event.category)
+
+            is NewTransactionUiIntent.OnCategoryNameChanged -> changeCategoryName(event.categoryName)
+
+            is NewTransactionUiIntent.OnCategoryTypeChanged -> changeCategoryType(event.categoryType)
 
             is NewTransactionUiIntent.OnTransactionTypeChanged -> changeTransactionType(event.type)
 
@@ -121,6 +124,15 @@ class NewTransactionViewModel(
         _uiState.update { it.copy(transactionCategory = category) }
     }
 
+    private fun changeCategoryName(categoryName: String) {
+        if (categoryName.length <= 30)
+            _uiState.update { it.copy(categoryName = categoryName) }
+    }
+
+    private fun changeCategoryType(categoryType: CategoryTypeOptionUiModel) {
+        _uiState.update { it.copy(categoryType = categoryType) }
+    }
+
 }
 
 sealed interface NewTransactionUiIntent {
@@ -133,7 +145,11 @@ sealed interface NewTransactionUiIntent {
 
     data class OnTimeChanged(val hour: Int?, val minute: Int?) : NewTransactionUiIntent
 
-    data class  OnCategoryChanged(val category: CategoryUiModel) : NewTransactionUiIntent
+    data class OnCategoryChanged(val category: CategoryUiModel) : NewTransactionUiIntent
+
+    data class OnCategoryNameChanged(val categoryName: String) : NewTransactionUiIntent
+
+    data class OnCategoryTypeChanged(val categoryType: CategoryTypeOptionUiModel) : NewTransactionUiIntent
 
     data class OnTransactionTypeChanged(val type: TransactionTypeOptionUiModel) :
         NewTransactionUiIntent
@@ -150,5 +166,7 @@ data class NewTransactionUiState(
     val transactionMonth: Int? = null,
     val transactionDay: Int? = null,
     val transactionCategory: CategoryUiModel? = null,
+    val categoryName: String = "",
+    val categoryType: CategoryTypeOptionUiModel? = null,
     val categories: List<CategoryUiModel> = emptyList()
 )

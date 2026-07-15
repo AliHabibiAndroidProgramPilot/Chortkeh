@@ -1,4 +1,4 @@
-package info.alihabibi.new_transaction
+package info.alihabibi.new_transaction.screens
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -54,6 +54,9 @@ import info.alihabibi.designsystem.theme.Primary
 import info.alihabibi.designsystem.theme.White
 import info.alihabibi.model.ui_model.TransactionTypeOptionUiModel
 import info.alihabibi.model.ui_model.category.CategoryUiModel
+import info.alihabibi.new_transaction.NewTransactionUiIntent
+import info.alihabibi.new_transaction.NewTransactionUiState
+import info.alihabibi.new_transaction.NewTransactionViewModel
 import info.alihabibi.ui.buttons.AppButton
 import info.alihabibi.ui.buttons.AppToggle
 import info.alihabibi.ui.dialogs.ListedBottomSheet
@@ -71,6 +74,7 @@ import java.time.LocalTime
 @Composable
 fun NewTransactionDestination(
     viewModel: NewTransactionViewModel = koinViewModel(),
+    onAddNewCategory: () -> Unit = {},
     onBackPressed: () -> Unit
 ) {
 
@@ -87,6 +91,7 @@ fun NewTransactionDestination(
     NewTransactionScreen(
         uiState = uiState,
         formattedTransactionDate = formattedTransactionDate,
+        onAddNewCategory = onAddNewCategory,
         onPriceChanged = { price ->
             viewModel.onEvent(NewTransactionUiIntent.OnPriceChanged(price))
         },
@@ -121,6 +126,7 @@ private fun NewTransactionScreen(
     onTimeChange: (hour: Int?, minute: Int?) -> Unit = { _, _ -> },
     onCategoryChanged: (category: CategoryUiModel) -> Unit = {},
     onSaveTransaction: () -> Unit = {},
+    onAddNewCategory: () -> Unit = {},
     onTransactionTypeChanged: (type: TransactionTypeOptionUiModel) -> Unit = {},
     onBackPressed: () -> Unit
 ) {
@@ -204,6 +210,7 @@ private fun NewTransactionScreen(
                 onCategoryChanged(category)
                 showCategoryBottomSheet = false
             },
+            onAddNewItem = onAddNewCategory,
             onDismissRequest = { showCategoryBottomSheet = false },
         )
 

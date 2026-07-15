@@ -153,8 +153,7 @@ fun <T> AppRadioSelectionBottomSheet(
     optionLabel: @Composable (T) -> String,
     onRadioOptionSelected: (T) -> Unit,
     onConfirmClicked: () -> Unit = {},
-    onDismissRequest: () -> Unit,
-    modifier: Modifier = Modifier,
+    onDismissRequest: () -> Unit
 ) {
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {

@@ -84,6 +84,11 @@
     <string name="clock">ساعت</string>
     <string name="category">دسته‌بندی</string>
     <string name="add_new_category">اضافه کردن دسته‌بندی جدید</string>
+    <string name="new_category">دسته‌بندی جدید</string>
     <string name="add_new_channel">اضافه کردن کانال جدید</string>
+    <string name="name">نام</string>
+    <string name="category_name">نام دسته</string>
+    <string name="category_type">نوع دسته</string>
+    <string name="category_name_error">نام دسته‌بندی نمیتواند بیشتر از 30 کاراکتر باشد</string>
 
 </resources>
