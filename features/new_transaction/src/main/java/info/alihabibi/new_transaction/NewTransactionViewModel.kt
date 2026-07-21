@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 class NewTransactionViewModel(
     private val categoryUseCases: CategoryUseCases
@@ -39,7 +38,7 @@ class NewTransactionViewModel(
     }.stateIn(
         scope = viewModelScope,
         initialValue = "",
-        started = SharingStarted.WhileSubscribed(3_000)
+        started = SharingStarted.WhileSubscribed(5_000, 10_000)
     )
 
     fun onEvent(event: NewTransactionUiIntent) {
@@ -65,38 +64,21 @@ class NewTransactionViewModel(
     }
 
     private fun init() {
-        /*viewModelScope.launch {
-            combine(
-                categoryUseCases.getCategoriesUseCase.invoke(),
-                _uiState.map { it.transactionType }.distinctUntilChanged()
-            ) { categories, transactionType ->
-                categories
-                    .map { it.toUiModel() }
-                    .filter {
-                        when (transactionType) {
-                            TransactionTypeOptionUiModel.OUTCOME -> it.type == CategoryTypeOptionUiModel.OUTCOME
-                            TransactionTypeOptionUiModel.INCOME -> it.type == CategoryTypeOptionUiModel.INCOME
-                        }
+        combine(
+            categoryUseCases.getCategoriesUseCase.invoke(),
+            _uiState.map { it.transactionType }.distinctUntilChanged()
+        ) { categories, transactionType ->
+            categories
+                .map { it.toUiModel() }
+                .filter {
+                    when (transactionType) {
+                        TransactionTypeOptionUiModel.OUTCOME -> it.type == CategoryTypeOptionUiModel.OUTCOME
+                        TransactionTypeOptionUiModel.INCOME -> it.type == CategoryTypeOptionUiModel.INCOME
                     }
-            }.collect { filteredCategories ->
-                _uiState.update { it.copy(categories = filteredCategories) }
-            }
-        }*/
-            combine(
-                categoryUseCases.getCategoriesUseCase.invoke(),
-                _uiState.map { it.transactionType }.distinctUntilChanged()
-            ) { categories, transactionType ->
-                categories
-                    .map { it.toUiModel() }
-                    .filter {
-                        when (transactionType) {
-                            TransactionTypeOptionUiModel.OUTCOME -> it.type == CategoryTypeOptionUiModel.OUTCOME
-                            TransactionTypeOptionUiModel.INCOME -> it.type == CategoryTypeOptionUiModel.INCOME
-                        }
-                    }
-            }.onEach { filteredCategories ->
-                _uiState.update { it.copy(categories = filteredCategories) }
-            }.launchIn(viewModelScope)
+                }
+        }.onEach { filteredCategories ->
+            _uiState.update { it.copy(categories = filteredCategories) }
+        }.launchIn(viewModelScope)
     }
 
     private fun changePrice(price: String) {

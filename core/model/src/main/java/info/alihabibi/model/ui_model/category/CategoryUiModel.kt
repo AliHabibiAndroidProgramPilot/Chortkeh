@@ -7,6 +7,6 @@ data class CategoryUiModel(
     val id: Int = 0,
     val title: String = "",
     val isDefault: Boolean = true,
-    @get:DrawableRes val iconResId: Int = R.drawable.category_others,
+    @get:DrawableRes val iconResId: Int = R.drawable.category_ic_others,
     val type: CategoryTypeOptionUiModel = CategoryTypeOptionUiModel.OUTCOME
 )

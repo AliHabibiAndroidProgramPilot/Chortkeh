@@ -73,7 +73,7 @@ private fun ListedBottomSheetItemPreview() {
 
     ListedBottomSheetItem(
         title = "خوش گذرونی",
-        iconResId = R.drawable.category_income,
+        iconResId = R.drawable.category_ic_income,
         onClick = {}
     )
 

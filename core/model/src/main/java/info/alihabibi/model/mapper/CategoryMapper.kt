@@ -17,16 +17,16 @@ fun Category.toUiModel(): CategoryUiModel =
     )
 
 private fun CategoryIcon.toIconResId(): Int = when (this) {
-    CategoryIcon.FOOD -> R.drawable.category_food
-    CategoryIcon.SHOPPING -> R.drawable.category_shopping
-    CategoryIcon.HAVING_FUN -> R.drawable.category_having_fun
-    CategoryIcon.HOME -> R.drawable.category_home
-    CategoryIcon.CAR -> R.drawable.category_car
-    CategoryIcon.SUBSIDY -> R.drawable.category_subsidy
-    CategoryIcon.INCOME -> R.drawable.category_income
-    CategoryIcon.OTHERS -> R.drawable.category_others
-    CategoryIcon.SALARY -> R.drawable.category_salary
-    CategoryIcon.PROFIT -> R.drawable.category_profit
+    CategoryIcon.FOOD -> R.drawable.category_ic_food
+    CategoryIcon.SHOPPING -> R.drawable.category_ic_shopping
+    CategoryIcon.HAVING_FUN -> R.drawable.category_ic_having_fun
+    CategoryIcon.HOME -> R.drawable.category_ic_home
+    CategoryIcon.CAR -> R.drawable.category_ic_car
+    CategoryIcon.SUBSIDY -> R.drawable.category_ic_subsidy
+    CategoryIcon.INCOME -> R.drawable.category_ic_income
+    CategoryIcon.OTHERS -> R.drawable.category_ic_others
+    CategoryIcon.SALARY -> R.drawable.category_ic_salary
+    CategoryIcon.PROFIT -> R.drawable.category_ic_profit
 }
 
 private fun CategoryType.toUiOption(): CategoryTypeOptionUiModel = when(this) {
