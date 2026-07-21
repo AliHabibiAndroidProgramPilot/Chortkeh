@@ -27,6 +27,29 @@ private fun CategoryIcon.toIconResId(): Int = when (this) {
     CategoryIcon.OTHERS -> R.drawable.category_ic_others
     CategoryIcon.SALARY -> R.drawable.category_ic_salary
     CategoryIcon.PROFIT -> R.drawable.category_ic_profit
+    CategoryIcon.ACTIVITY -> R.drawable.category_ic_activity
+    CategoryIcon.AI -> R.drawable.category_ic_ai
+    CategoryIcon.AIRPLANE -> R.drawable.category_ic_airplane
+    CategoryIcon.BANK -> R.drawable.category_ic_bank
+    CategoryIcon.BITCOIN -> R.drawable.category_ic_bitcoin
+    CategoryIcon.BOOK -> R.drawable.category_ic_book
+    CategoryIcon.BOX -> R.drawable.category_ic_box
+    CategoryIcon.CARD_SEND -> R.drawable.category_ic_card_send
+    CategoryIcon.COFFEE -> R.drawable.category_ic_coffee
+    CategoryIcon.COIN -> R.drawable.category_ic_coin
+    CategoryIcon.COMPUTER -> R.drawable.category_ic_computer
+    CategoryIcon.EDUCATION -> R.drawable.category_ic_education
+    CategoryIcon.EMOJI_HAPPY -> R.drawable.category_ic_emoji_happy
+    CategoryIcon.GAME -> R.drawable.category_ic_game
+    CategoryIcon.GIFT -> R.drawable.category_ic_gift
+    CategoryIcon.HEART -> R.drawable.category_ic_heart
+    CategoryIcon.HOSPITAL -> R.drawable.category_ic_hospital
+    CategoryIcon.LAMP -> R.drawable.category_ic_lamp
+    CategoryIcon.PEOPLE -> R.drawable.category_ic_people
+    CategoryIcon.PET -> R.drawable.category_ic_pet
+    CategoryIcon.RECEIPT -> R.drawable.category_ic_receipt
+    CategoryIcon.ROUTING -> R.drawable.category_ic_routing
+    CategoryIcon.TICKET -> R.drawable.category_ic_ticket
 }
 
 private fun CategoryType.toUiOption(): CategoryTypeOptionUiModel = when(this) {
