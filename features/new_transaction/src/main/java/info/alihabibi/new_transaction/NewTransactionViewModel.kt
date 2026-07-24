@@ -1,5 +1,6 @@
 package info.alihabibi.new_transaction
 
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import info.alihabibi.common.PersianDateFormatter
@@ -193,6 +194,7 @@ sealed interface NewTransactionUiIntent {
 
 }
 
+@Immutable
 data class NewTransactionUiState(
     val transactionType: TransactionTypeOptionUiModel = TransactionTypeOptionUiModel.INCOME,
     val transactionPrice: String = "",
