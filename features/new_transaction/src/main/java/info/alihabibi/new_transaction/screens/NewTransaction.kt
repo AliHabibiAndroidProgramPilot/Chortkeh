@@ -78,7 +78,7 @@ fun NewTransactionDestination(
     onBackPressed: () -> Unit
 ) {
 
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.newTransactionUiState.collectAsStateWithLifecycle()
     val formattedTransactionDate by viewModel.formattedTransactionDate.collectAsStateWithLifecycle()
 
     val lifecycleOwner = LocalLifecycleOwner.current

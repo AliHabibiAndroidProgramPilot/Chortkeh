@@ -39,8 +39,8 @@ import info.alihabibi.designsystem.theme.Gray11
 import info.alihabibi.designsystem.theme.Gray8
 import info.alihabibi.model.ui_model.category.CategoryIconOptionUiModel
 import info.alihabibi.model.ui_model.category.CategoryTypeOptionUiModel
+import info.alihabibi.new_transaction.CategoryUiState
 import info.alihabibi.new_transaction.NewTransactionUiIntent
-import info.alihabibi.new_transaction.NewTransactionUiState
 import info.alihabibi.new_transaction.NewTransactionViewModel
 import info.alihabibi.ui.buttons.AppButton
 import info.alihabibi.ui.dialogs.AppIconSelectionBottomSheet
@@ -55,7 +55,7 @@ fun AddCategoryDestination(
     onBackPressed: () -> Unit
 ) {
 
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.categoryUiState.collectAsStateWithLifecycle()
 
     AddCategoryScreen(
         uiState = uiState,
@@ -80,14 +80,13 @@ fun AddCategoryDestination(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AddCategoryScreen(
-    uiState: NewTransactionUiState,
+    uiState: CategoryUiState,
     onCategoryNameChanged: (categoryName: String) -> Unit = {},
     onCategoryTypeChanged: (categoryType: CategoryTypeOptionUiModel) -> Unit = {},
     onCategoryIconChanged: (categoryIcon: CategoryIconOptionUiModel) -> Unit = {},
     onSaveCategory: () -> Unit = {},
     onBackPressed: () -> Unit
 ) {
-
 
     var showCategoryTypeSelectionModel by remember { mutableStateOf(false) }
     if (showCategoryTypeSelectionModel)

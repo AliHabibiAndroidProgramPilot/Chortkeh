@@ -28,13 +28,16 @@ class NewTransactionViewModel(
     private val categoryUseCases: CategoryUseCases
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(NewTransactionUiState())
-    val uiState: StateFlow<NewTransactionUiState> = _uiState.asStateFlow()
+    private val _newTransactionUiState = MutableStateFlow(NewTransactionUiState())
+    val newTransactionUiState: StateFlow<NewTransactionUiState> = _newTransactionUiState.asStateFlow()
+
+    private val _categoryUiState = MutableStateFlow(CategoryUiState())
+    val categoryUiState: StateFlow<CategoryUiState> = _categoryUiState.asStateFlow()
 
     val formattedTransactionDate: StateFlow<String> = combine(
-        uiState.map { it.transactionYear },
-        uiState.map { it.transactionMonth },
-        uiState.map { it.transactionDay }
+        newTransactionUiState.map { it.transactionYear },
+        newTransactionUiState.map { it.transactionMonth },
+        newTransactionUiState.map { it.transactionDay }
     ) { year, month, day ->
         if (year != null && month != null && day != null)
             PersianDateFormatter.format(year, month, day)
@@ -74,7 +77,7 @@ class NewTransactionViewModel(
     private fun init() {
         combine(
             categoryUseCases.getCategoriesUseCase.invoke(),
-            _uiState.map { it.transactionType }.distinctUntilChanged()
+            _newTransactionUiState.map { it.transactionType }.distinctUntilChanged()
         ) { categories, transactionType ->
             categories
                 .map { it.toUiModel() }
@@ -85,25 +88,25 @@ class NewTransactionViewModel(
                     }
                 }
         }.onEach { filteredCategories ->
-            _uiState.update { it.copy(categories = filteredCategories) }
+            _newTransactionUiState.update { it.copy(categories = filteredCategories) }
         }.launchIn(viewModelScope)
     }
 
     private fun saveCategory() {
         viewModelScope.launch {
-            val state = _uiState.value
+            val state = _categoryUiState.value
             if(state.categoryName.isEmpty() || state.categoryType == null || state.categoryIcon == null)
                 return@launch
 
             val category = CategoryUiModel(
-                title = _uiState.value.categoryName,
+                title = _categoryUiState.value.categoryName,
                 isDefault = false,
-                icon = _uiState.value.categoryIcon ?: CategoryIconOptionUiModel.OTHERS,
-                type = _uiState.value.categoryType ?: CategoryTypeOptionUiModel.OUTCOME
+                icon = _categoryUiState.value.categoryIcon ?: CategoryIconOptionUiModel.OTHERS,
+                type = _categoryUiState.value.categoryType ?: CategoryTypeOptionUiModel.OUTCOME
             ).toDomain()
             categoryUseCases.saveCategoryUseCase.invoke(category)
             // reset Saved values from ui state
-            _uiState.update {
+            _categoryUiState.update {
                 it.copy(
                     categoryName = "",
                     categoryType = null,
@@ -118,7 +121,7 @@ class NewTransactionViewModel(
             .filter(Char::isDigit)
             .take(17)
             .trimStart('0')
-        _uiState.update {
+        _newTransactionUiState.update {
             it.copy(transactionPrice = digits)
         }
     }
@@ -126,7 +129,7 @@ class NewTransactionViewModel(
     private fun changeTime(hour: Int?, minute: Int?) {
         val formattedTime =
             if (hour != null && minute != null) "$hour : $minute" else ""
-        _uiState.update {
+        _newTransactionUiState.update {
             it.copy(
                 formattedTransactionTime = formattedTime,
                 transactionHour = hour,
@@ -136,7 +139,7 @@ class NewTransactionViewModel(
     }
 
     private fun changeDate(year: Int, month: Int, day: Int) {
-        _uiState.update {
+        _newTransactionUiState.update {
             it.copy(
                 transactionYear = year,
                 transactionMonth = month,
@@ -146,26 +149,26 @@ class NewTransactionViewModel(
     }
 
     private fun changeTransactionType(type: TransactionTypeOptionUiModel) {
-        _uiState.update {
+        _newTransactionUiState.update {
             it.copy(transactionType = type, transactionCategory = null)
         }
     }
 
     private fun changeCategory(category: CategoryUiModel) {
-        _uiState.update { it.copy(transactionCategory = category) }
+        _newTransactionUiState.update { it.copy(transactionCategory = category) }
     }
 
     private fun changeCategoryName(categoryName: String) {
         if (categoryName.length <= 30)
-            _uiState.update { it.copy(categoryName = categoryName) }
+            _categoryUiState.update { it.copy(categoryName = categoryName) }
     }
 
     private fun changeCategoryType(categoryType: CategoryTypeOptionUiModel) {
-        _uiState.update { it.copy(categoryType = categoryType) }
+        _categoryUiState.update { it.copy(categoryType = categoryType) }
     }
 
     private fun changeCategoryIcon(categoryIcon: CategoryIconOptionUiModel) {
-        _uiState.update { it.copy(categoryIcon = categoryIcon) }
+        _categoryUiState.update { it.copy(categoryIcon = categoryIcon) }
     }
 
 }
@@ -205,10 +208,14 @@ data class NewTransactionUiState(
     val transactionMonth: Int? = null,
     val transactionDay: Int? = null,
     val transactionCategory: CategoryUiModel? = null,
+    val categories: List<CategoryUiModel> = emptyList()
+)
+
+@Immutable
+data class CategoryUiState(
     val categoryName: String = "",
     val categoryType: CategoryTypeOptionUiModel? = null,
     val categoryIcon: CategoryIconOptionUiModel? = null,
-    val categories: List<CategoryUiModel> = emptyList()
 ) {
     val isCategorySaveEnabled: Boolean
         get() = categoryName.isNotEmpty() && categoryType != null && categoryIcon != null
