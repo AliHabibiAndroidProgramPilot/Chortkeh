@@ -4,8 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import info.alihabibi.common.PersianDateFormatter
 import info.alihabibi.domain.local.usecases.database.usecase.CategoryUseCases
+import info.alihabibi.model.mapper.toDomain
 import info.alihabibi.model.mapper.toUiModel
 import info.alihabibi.model.ui_model.TransactionTypeOptionUiModel
+import info.alihabibi.model.ui_model.category.CategoryIconOptionUiModel
 import info.alihabibi.model.ui_model.category.CategoryTypeOptionUiModel
 import info.alihabibi.model.ui_model.category.CategoryUiModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,6 +21,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 class NewTransactionViewModel(
     private val categoryUseCases: CategoryUseCases
@@ -46,19 +49,23 @@ class NewTransactionViewModel(
 
             is NewTransactionUiIntent.Init -> init()
 
-            is NewTransactionUiIntent.OnPriceChanged -> changePrice(event.price)
+            is NewTransactionUiIntent.SaveCategory -> saveCategory()
 
-            is NewTransactionUiIntent.OnDateChanged -> changeDate(event.year, event.month, event.day)
+            is NewTransactionUiIntent.PriceChanged -> changePrice(event.price)
 
-            is NewTransactionUiIntent.OnTimeChanged -> changeTime(event.hour, event.minute)
+            is NewTransactionUiIntent.DateChanged -> changeDate(event.year, event.month, event.day)
 
-            is NewTransactionUiIntent.OnCategoryChanged -> changeCategory(event.category)
+            is NewTransactionUiIntent.TimeChanged -> changeTime(event.hour, event.minute)
 
-            is NewTransactionUiIntent.OnCategoryNameChanged -> changeCategoryName(event.categoryName)
+            is NewTransactionUiIntent.CategoryChanged -> changeCategory(event.category)
 
-            is NewTransactionUiIntent.OnCategoryTypeChanged -> changeCategoryType(event.categoryType)
+            is NewTransactionUiIntent.CategoryNameChanged -> changeCategoryName(event.categoryName)
 
-            is NewTransactionUiIntent.OnTransactionTypeChanged -> changeTransactionType(event.type)
+            is NewTransactionUiIntent.CategoryTypeChanged -> changeCategoryType(event.categoryType)
+
+            is NewTransactionUiIntent.CategoryIconChanged -> changeCategoryIcon(event.categoryIcon)
+
+            is NewTransactionUiIntent.TransactionTypeChanged -> changeTransactionType(event.type)
 
         }
     }
@@ -79,6 +86,30 @@ class NewTransactionViewModel(
         }.onEach { filteredCategories ->
             _uiState.update { it.copy(categories = filteredCategories) }
         }.launchIn(viewModelScope)
+    }
+
+    private fun saveCategory() {
+        viewModelScope.launch {
+            val state = _uiState.value
+            if(state.categoryName.isEmpty() || state.categoryType == null || state.categoryIcon == null)
+                return@launch
+
+            val category = CategoryUiModel(
+                title = _uiState.value.categoryName,
+                isDefault = false,
+                icon = _uiState.value.categoryIcon ?: CategoryIconOptionUiModel.OTHERS,
+                type = _uiState.value.categoryType ?: CategoryTypeOptionUiModel.OUTCOME
+            ).toDomain()
+            categoryUseCases.saveCategoryUseCase.invoke(category)
+            // reset Saved values from ui state
+            _uiState.update {
+                it.copy(
+                    categoryName = "",
+                    categoryType = null,
+                    categoryIcon = null
+                )
+            }
+        }
     }
 
     private fun changePrice(price: String) {
@@ -132,26 +163,33 @@ class NewTransactionViewModel(
         _uiState.update { it.copy(categoryType = categoryType) }
     }
 
+    private fun changeCategoryIcon(categoryIcon: CategoryIconOptionUiModel) {
+        _uiState.update { it.copy(categoryIcon = categoryIcon) }
+    }
+
 }
 
 sealed interface NewTransactionUiIntent {
 
     data object Init : NewTransactionUiIntent
 
-    data class OnPriceChanged(val price: String) : NewTransactionUiIntent
+    data object SaveCategory: NewTransactionUiIntent
 
-    data class OnDateChanged(val year: Int, val month: Int, val day: Int) : NewTransactionUiIntent
+    data class PriceChanged(val price: String) : NewTransactionUiIntent
 
-    data class OnTimeChanged(val hour: Int?, val minute: Int?) : NewTransactionUiIntent
+    data class DateChanged(val year: Int, val month: Int, val day: Int) : NewTransactionUiIntent
 
-    data class OnCategoryChanged(val category: CategoryUiModel) : NewTransactionUiIntent
+    data class TimeChanged(val hour: Int?, val minute: Int?) : NewTransactionUiIntent
 
-    data class OnCategoryNameChanged(val categoryName: String) : NewTransactionUiIntent
+    data class CategoryChanged(val category: CategoryUiModel) : NewTransactionUiIntent
 
-    data class OnCategoryTypeChanged(val categoryType: CategoryTypeOptionUiModel) : NewTransactionUiIntent
+    data class CategoryNameChanged(val categoryName: String) : NewTransactionUiIntent
 
-    data class OnTransactionTypeChanged(val type: TransactionTypeOptionUiModel) :
-        NewTransactionUiIntent
+    data class CategoryTypeChanged(val categoryType: CategoryTypeOptionUiModel) : NewTransactionUiIntent
+
+    data class CategoryIconChanged(val categoryIcon: CategoryIconOptionUiModel) : NewTransactionUiIntent
+
+    data class TransactionTypeChanged(val type: TransactionTypeOptionUiModel) : NewTransactionUiIntent
 
 }
 
@@ -167,5 +205,9 @@ data class NewTransactionUiState(
     val transactionCategory: CategoryUiModel? = null,
     val categoryName: String = "",
     val categoryType: CategoryTypeOptionUiModel? = null,
+    val categoryIcon: CategoryIconOptionUiModel? = null,
     val categories: List<CategoryUiModel> = emptyList()
-)
+) {
+    val isCategorySaveEnabled: Boolean
+        get() = categoryName.isNotEmpty() && categoryType != null && categoryIcon != null
+}

@@ -1,7 +1,6 @@
 package info.alihabibi.chortkeh
 
 import android.app.Application
-import android.os.StrictMode
 import info.alihabibi.chortkeh.di.mainActivityModule
 import info.alihabibi.common.di.commonModule
 import info.alihabibi.database.di.databaseModule
@@ -34,7 +33,7 @@ class ChortkehApp : Application() {
                 )
             )
         }
-        if (BuildConfig.DEBUG) {
+        /*if (BuildConfig.DEBUG) {
             StrictMode.setThreadPolicy(
                 StrictMode.ThreadPolicy.Builder()
                     .detectDiskReads()
@@ -52,7 +51,7 @@ class ChortkehApp : Application() {
                     .penaltyDeath()
                     .build()
             )
-        }
+        }*/
     }
 
 }

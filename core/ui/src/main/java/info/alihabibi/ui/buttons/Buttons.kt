@@ -28,6 +28,7 @@ fun AppButton(
     color: Color = Primary,
     contentColor: Color = White,
     text: String = "",
+    enabled: Boolean = true,
     startIcon: (@Composable () -> Unit)? = null,
     endIcon: (@Composable () -> Unit)? = null,
 ) {
@@ -36,6 +37,7 @@ fun AppButton(
         onClick = onClick,
         modifier = modifier,
         shape = RoundedCornerShape(20),
+        enabled = enabled,
         colors = ButtonDefaults.buttonColors(containerColor = color, contentColor = contentColor),
         contentPadding = PaddingValues(vertical = 6.dp, horizontal = 4.dp)
     ) {

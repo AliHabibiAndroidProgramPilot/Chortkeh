@@ -71,6 +71,7 @@
 
     // New Transaction
     <string name="register_transaction">ثبت تراکنش</string>
+    <string name="register_category">ثبت دسته‌بندی</string>
     <string name="register_income_transaction">ثبت درآمد</string>
     <string name="register_outcome_transaction">ثبت هزینه</string>
     <string name="price">مبلغ</string>
@@ -89,6 +90,8 @@
     <string name="name">نام</string>
     <string name="category_name">نام دسته</string>
     <string name="category_type">نوع دسته</string>
+    <string name="category_icon">آیکون دسته</string>
+    <string name="category_icon2">آیکون دسته‌بندی</string>
     <string name="category_name_error">نام دسته‌بندی نمیتواند بیشتر از 30 کاراکتر باشد</string>
 
 </resources>

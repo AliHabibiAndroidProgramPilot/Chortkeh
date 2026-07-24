@@ -66,6 +66,7 @@ private fun AnnouncementsScreen(
         AppToggle(
             toggleItems = toggleItems,
             itemTitle = { it },
+            selectedOption = toggleItems.first(),
             onToggleSelectionChanged = {}
         )
 

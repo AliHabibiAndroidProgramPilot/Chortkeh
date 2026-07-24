@@ -93,23 +93,23 @@ fun NewTransactionDestination(
         formattedTransactionDate = formattedTransactionDate,
         onAddNewCategory = onAddNewCategory,
         onPriceChanged = { price ->
-            viewModel.onEvent(NewTransactionUiIntent.OnPriceChanged(price))
+            viewModel.onEvent(NewTransactionUiIntent.PriceChanged(price))
         },
         onDateChanged = { year, month, day ->
-            viewModel.onEvent(NewTransactionUiIntent.OnDateChanged(year, month, day))
+            viewModel.onEvent(NewTransactionUiIntent.DateChanged(year, month, day))
         },
         onTimeChange = { hour, minute ->
-            viewModel.onEvent(NewTransactionUiIntent.OnTimeChanged(hour, minute))
+            viewModel.onEvent(NewTransactionUiIntent.TimeChanged(hour, minute))
         },
         onCategoryChanged = { category ->
-            viewModel.onEvent(NewTransactionUiIntent.OnCategoryChanged(category))
+            viewModel.onEvent(NewTransactionUiIntent.CategoryChanged(category))
         },
         onSaveTransaction = {
             // TODO save transaction | call view model here, then navigate back
             onBackPressed()
         },
         onTransactionTypeChanged = { type ->
-            viewModel.onEvent(NewTransactionUiIntent.OnTransactionTypeChanged(type))
+            viewModel.onEvent(NewTransactionUiIntent.TransactionTypeChanged(type))
         },
         onBackPressed = onBackPressed
     )
@@ -203,7 +203,7 @@ private fun NewTransactionScreen(
         ListedBottomSheet(
             items = uiState.categories,
             itemTitle = { it.title },
-            itemIcon = { it.iconResId },
+            itemIcon = { it.icon.iconResId },
             itemKey = { it.id },
             bottomSheetTitle = stringResource(id = R.string.category),
             onSelectItem = { category ->
@@ -240,6 +240,7 @@ private fun NewTransactionScreen(
             AppToggle(
                 toggleItems = TransactionTypeOptionUiModel.entries.toList(),
                 itemTitle = { transactionType -> stringResource(id = transactionType.labelRes) },
+                selectedOption = uiState.transactionType,
                 onToggleSelectionChanged = { selected ->
                     onTransactionTypeChanged(selected)
                 }
