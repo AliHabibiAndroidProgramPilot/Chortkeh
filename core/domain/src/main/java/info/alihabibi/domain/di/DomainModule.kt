@@ -1,5 +1,6 @@
 package info.alihabibi.domain.di
 
+import info.alihabibi.domain.local.usecases.database.DeleteCategoriesUseCase
 import info.alihabibi.domain.local.usecases.database.GetCategoriesUseCase
 import info.alihabibi.domain.local.usecases.database.SaveCategoryUseCase
 import info.alihabibi.domain.local.usecases.database.usecase.CategoryUseCases
@@ -38,12 +39,14 @@ val domainModule = module {
         )
     }
 
-    factory { GetCategoriesUseCase(get()) }
     factory { SaveCategoryUseCase(get()) }
+    factory { DeleteCategoriesUseCase(get()) }
+    factory { GetCategoriesUseCase(get()) }
 
     factory {
         CategoryUseCases(
             getCategoriesUseCase = get(),
+            deleteCategoriesUseCase = get(),
             saveCategoryUseCase = get()
         )
     }

@@ -69,6 +69,8 @@ class NewTransactionViewModel(
 
             is NewTransactionUiIntent.CategoryIconChanged -> changeCategoryIcon(event.categoryIcon)
 
+            is NewTransactionUiIntent.CategoriesDeleted -> deleteCategories(event.categoriesToDelete)
+
             is NewTransactionUiIntent.TransactionTypeChanged -> changeTransactionType(event.type)
 
         }
@@ -105,7 +107,8 @@ class NewTransactionViewModel(
                 type = _categoryUiState.value.categoryType ?: CategoryTypeOptionUiModel.OUTCOME
             ).toDomain()
             categoryUseCases.saveCategoryUseCase.invoke(category)
-            // reset Saved values from ui state
+
+            // reset saved values from ui state
             _categoryUiState.update {
                 it.copy(
                     categoryName = "",
@@ -171,6 +174,13 @@ class NewTransactionViewModel(
         _categoryUiState.update { it.copy(categoryIcon = categoryIcon) }
     }
 
+    private fun deleteCategories(categoriesToDelete: List<CategoryUiModel>) {
+        viewModelScope.launch {
+            val categories = categoriesToDelete.map { it.toDomain() }
+            categoryUseCases.deleteCategoriesUseCase.invoke(categories)
+        }
+    }
+
 }
 
 sealed interface NewTransactionUiIntent {
@@ -192,6 +202,8 @@ sealed interface NewTransactionUiIntent {
     data class CategoryTypeChanged(val categoryType: CategoryTypeOptionUiModel) : NewTransactionUiIntent
 
     data class CategoryIconChanged(val categoryIcon: CategoryIconOptionUiModel) : NewTransactionUiIntent
+
+    data class CategoriesDeleted(val categoriesToDelete: List<CategoryUiModel>) : NewTransactionUiIntent
 
     data class TransactionTypeChanged(val type: TransactionTypeOptionUiModel) : NewTransactionUiIntent
 

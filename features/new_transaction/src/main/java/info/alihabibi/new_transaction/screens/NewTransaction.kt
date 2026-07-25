@@ -104,6 +104,9 @@ fun NewTransactionDestination(
         onCategoryChanged = { category ->
             viewModel.onEvent(NewTransactionUiIntent.CategoryChanged(category))
         },
+        onCategoriesDelete = { categoriesToDelete ->
+            viewModel.onEvent(NewTransactionUiIntent.CategoriesDeleted(categoriesToDelete))
+        },
         onSaveTransaction = {
             // TODO save transaction | call view model here, then navigate back
             onBackPressed()
@@ -125,6 +128,8 @@ private fun NewTransactionScreen(
     onDateChanged: (year: Int, month: Int, day: Int) -> Unit = { _, _, _ -> },
     onTimeChange: (hour: Int?, minute: Int?) -> Unit = { _, _ -> },
     onCategoryChanged: (category: CategoryUiModel) -> Unit = {},
+    onCategoriesDelete: (categoriesToDelete: List<CategoryUiModel>) -> Unit = {},
+    onCategoryEdit: (categoryToEdit: CategoryUiModel) -> Unit = {},
     onSaveTransaction: () -> Unit = {},
     onAddNewCategory: () -> Unit = {},
     onTransactionTypeChanged: (type: TransactionTypeOptionUiModel) -> Unit = {},
@@ -148,7 +153,10 @@ private fun NewTransactionScreen(
             minYear = MinYear.On(1400),
             maxYear = MaxYear.On(1425),
             titleBottomSheet = stringResource(id = R.string.date),
-            titleStyle = MaterialTheme.typography.labelLarge.copy(textAlign = TextAlign.Center, fontWeight = FontWeight.Bold),
+            titleStyle = MaterialTheme.typography.labelLarge.copy(
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold
+            ),
             titleModifier = Modifier.fillMaxWidth(),
             font = R.font.iran_yekanx_normal,
             textButtonStyle = MaterialTheme.typography.labelLarge.copy(
@@ -210,6 +218,8 @@ private fun NewTransactionScreen(
                 onCategoryChanged(category)
                 showCategoryBottomSheet = false
             },
+            onDeleteItems = onCategoriesDelete,
+            onEditItem = onCategoryEdit,
             onAddNewItem = onAddNewCategory,
             onDismissRequest = { showCategoryBottomSheet = false },
         )
@@ -320,7 +330,7 @@ private fun NewTransactionScreen(
                     modifier = Modifier.padding(horizontal = 12.dp),
                     text = when {
                         uiState.transactionCategory != null -> uiState.transactionCategory.title
-                        else  -> stringResource(id = R.string.category)
+                        else -> stringResource(id = R.string.category)
                     },
                     style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp)
                 )

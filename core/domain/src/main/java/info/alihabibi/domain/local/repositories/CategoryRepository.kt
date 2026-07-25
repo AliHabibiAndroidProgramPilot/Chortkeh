@@ -11,4 +11,6 @@ interface CategoryRepository {
 
     suspend fun saveCategory(categories: List<Category>): List<Long>
 
+    suspend fun deleteCategory(categories: List<Category>)
+
 }

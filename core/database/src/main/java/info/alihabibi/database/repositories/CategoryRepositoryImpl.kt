@@ -12,9 +12,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
-class CategoryRepositoryImpl(
-    private val dao: CategoryDao
-) : CategoryRepository {
+class CategoryRepositoryImpl(private val dao: CategoryDao) : CategoryRepository {
 
     override fun getCategories(): Flow<List<Category>> {
         return dao.getCategories()
@@ -32,6 +30,15 @@ class CategoryRepositoryImpl(
         return withContext(Dispatchers.IO) {
             val categoryEntities = categories.map(Category::asEntity)
             dao.insertCategory(categoryEntities)
+        }
+    }
+
+    override suspend fun deleteCategory(categories: List<Category>) {
+        withContext(Dispatchers.IO) {
+            val categoryEntities = categories.map(Category::asEntity)
+            categoryEntities.forEach {
+                dao.deleteCategory(it)
+            }
         }
     }
 

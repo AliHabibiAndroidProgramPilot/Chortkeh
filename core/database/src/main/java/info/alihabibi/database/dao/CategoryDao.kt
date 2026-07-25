@@ -1,6 +1,7 @@
 package info.alihabibi.database.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -19,5 +20,8 @@ interface CategoryDao {
 
     @Query("SELECT * FROM ${Keys.CATEGORY_TABLE_NAME} ORDER BY id ASC")
     fun getCategories(): Flow<List<CategoryEntity>>
+
+    @Delete
+    suspend fun deleteCategory(category: CategoryEntity)
 
 }
