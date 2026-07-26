@@ -136,7 +136,8 @@ fun <T> ListedBottomSheet(
                             IconButton(
                                 modifier = Modifier.size(size = 24.dp),
                                 onClick = {
-                                    onEditItem(items.first())
+                                    val itemToEdit = items.firstOrNull { itemKey(it) in selectedKeys } ?: return@IconButton
+                                    onEditItem(itemToEdit)
                                     selectedKeys.clear()
                                     selectionModeEnabled = false
                                 }

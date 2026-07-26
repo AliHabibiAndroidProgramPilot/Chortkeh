@@ -55,6 +55,8 @@ class NewTransactionViewModel(
 
             is NewTransactionUiIntent.SaveCategory -> saveCategory()
 
+            is NewTransactionUiIntent.EditCategory -> editCategory(event.id)
+
             is NewTransactionUiIntent.PriceChanged -> changePrice(event.price)
 
             is NewTransactionUiIntent.DateChanged -> changeDate(event.year, event.month, event.day)
@@ -70,6 +72,10 @@ class NewTransactionViewModel(
             is NewTransactionUiIntent.CategoryIconChanged -> changeCategoryIcon(event.categoryIcon)
 
             is NewTransactionUiIntent.CategoriesDeleted -> deleteCategories(event.categoriesToDelete)
+
+            is NewTransactionUiIntent.FetchEditingCategory -> fetchEditingCategory(event.categoryId)
+
+            is NewTransactionUiIntent.ResetCategoryDrafts -> resetCategoryDrafts()
 
             is NewTransactionUiIntent.TransactionTypeChanged -> changeTransactionType(event.type)
 
@@ -116,6 +122,32 @@ class NewTransactionViewModel(
                     categoryIcon = null
                 )
             }
+        }
+    }
+
+    private fun editCategory(categoryId: Int) {
+        viewModelScope.launch {
+            val state = _categoryUiState.value
+            if(state.categoryName.isEmpty() || state.categoryType == null || state.categoryIcon == null)
+                return@launch
+            val category = CategoryUiModel(
+                id = categoryId,
+                title = _categoryUiState.value.categoryName,
+                isDefault = false,
+                icon = _categoryUiState.value.categoryIcon ?: CategoryIconOptionUiModel.OTHERS,
+                type = _categoryUiState.value.categoryType ?: CategoryTypeOptionUiModel.OUTCOME
+            ).toDomain()
+            categoryUseCases.updateCategoryUseCase.invoke(category)
+
+            // reset saved values from ui state
+            _categoryUiState.update {
+                it.copy(
+                    categoryName = "",
+                    categoryType = null,
+                    categoryIcon = null
+                )
+            }
+            _newTransactionUiState.update { it.copy(transactionCategory = null) }
         }
     }
 
@@ -174,6 +206,27 @@ class NewTransactionViewModel(
         _categoryUiState.update { it.copy(categoryIcon = categoryIcon) }
     }
 
+    private fun fetchEditingCategory(categoryId: Int) {
+        val category = _newTransactionUiState.value.categories.firstOrNull { it.id == categoryId } ?: return
+        _categoryUiState.update { _ ->
+            CategoryUiState(
+                categoryName = category.title,
+                categoryType = category.type,
+                categoryIcon = category.icon
+            )
+        }
+    }
+
+    private fun resetCategoryDrafts() {
+        _categoryUiState.update {
+            CategoryUiState(
+                categoryName = "",
+                categoryType = null,
+                categoryIcon = null
+            )
+        }
+    }
+
     private fun deleteCategories(categoriesToDelete: List<CategoryUiModel>) {
         viewModelScope.launch {
             val categories = categoriesToDelete.map { it.toDomain() }
@@ -188,6 +241,8 @@ sealed interface NewTransactionUiIntent {
     data object Init : NewTransactionUiIntent
 
     data object SaveCategory: NewTransactionUiIntent
+
+    data class EditCategory(val id: Int): NewTransactionUiIntent
 
     data class PriceChanged(val price: String) : NewTransactionUiIntent
 
@@ -204,6 +259,10 @@ sealed interface NewTransactionUiIntent {
     data class CategoryIconChanged(val categoryIcon: CategoryIconOptionUiModel) : NewTransactionUiIntent
 
     data class CategoriesDeleted(val categoriesToDelete: List<CategoryUiModel>) : NewTransactionUiIntent
+
+    data class FetchEditingCategory(val categoryId: Int) : NewTransactionUiIntent
+
+    data object ResetCategoryDrafts : NewTransactionUiIntent
 
     data class TransactionTypeChanged(val type: TransactionTypeOptionUiModel) : NewTransactionUiIntent
 
@@ -229,6 +288,6 @@ data class CategoryUiState(
     val categoryType: CategoryTypeOptionUiModel? = null,
     val categoryIcon: CategoryIconOptionUiModel? = null,
 ) {
-    val isCategorySaveEnabled: Boolean
+    val isCategoryRegisterButtonEnabled: Boolean
         get() = categoryName.isNotEmpty() && categoryType != null && categoryIcon != null
 }

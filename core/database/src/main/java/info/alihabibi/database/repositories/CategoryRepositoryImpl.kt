@@ -1,5 +1,6 @@
 package info.alihabibi.database.repositories
 
+import android.util.Log
 import info.alihabibi.database.dao.CategoryDao
 import info.alihabibi.database.entities.CategoryEntity
 import info.alihabibi.database.mappers.asEntity
@@ -39,6 +40,13 @@ class CategoryRepositoryImpl(private val dao: CategoryDao) : CategoryRepository 
             categoryEntities.forEach {
                 dao.deleteCategory(it)
             }
+        }
+    }
+
+    override suspend fun updateCategory(category: Category) {
+        Log.i("Ali", category.toString())
+        withContext(Dispatchers.IO) {
+            dao.updateCategory(category.asEntity())
         }
     }
 

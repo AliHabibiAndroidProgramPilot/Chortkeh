@@ -13,4 +13,6 @@ interface CategoryRepository {
 
     suspend fun deleteCategory(categories: List<Category>)
 
+    suspend fun updateCategory(category: Category)
+
 }

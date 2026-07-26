@@ -21,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,13 +53,22 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun AddCategoryDestination(
     viewModel: NewTransactionViewModel = koinViewModel(),
+    editingCategoryId: Int? = null,
     onBackPressed: () -> Unit
 ) {
 
     val uiState by viewModel.categoryUiState.collectAsStateWithLifecycle()
 
+    LaunchedEffect(editingCategoryId) {
+        if (editingCategoryId != null)
+            viewModel.onEvent(NewTransactionUiIntent.FetchEditingCategory(editingCategoryId))
+        else
+            viewModel.onEvent(NewTransactionUiIntent.ResetCategoryDrafts)
+    }
+
     AddCategoryScreen(
         uiState = uiState,
+        isEditingCategory = editingCategoryId != null,
         onCategoryNameChanged = { categoryName ->
             viewModel.onEvent(NewTransactionUiIntent.CategoryNameChanged(categoryName))
         },
@@ -68,8 +78,11 @@ fun AddCategoryDestination(
         onCategoryIconChanged = { categoryIcon ->
             viewModel.onEvent(NewTransactionUiIntent.CategoryIconChanged(categoryIcon))
         },
-        onSaveCategory = {
-            viewModel.onEvent(NewTransactionUiIntent.SaveCategory)
+        onRegisterCategory = {
+            if (editingCategoryId != null)
+                viewModel.onEvent(NewTransactionUiIntent.EditCategory(editingCategoryId))
+            else
+                viewModel.onEvent(NewTransactionUiIntent.SaveCategory)
             onBackPressed()
         },
         onBackPressed = onBackPressed
@@ -81,10 +94,11 @@ fun AddCategoryDestination(
 @Composable
 private fun AddCategoryScreen(
     uiState: CategoryUiState,
+    isEditingCategory: Boolean = false,
     onCategoryNameChanged: (categoryName: String) -> Unit = {},
     onCategoryTypeChanged: (categoryType: CategoryTypeOptionUiModel) -> Unit = {},
     onCategoryIconChanged: (categoryIcon: CategoryIconOptionUiModel) -> Unit = {},
-    onSaveCategory: () -> Unit = {},
+    onRegisterCategory: () -> Unit = {},
     onBackPressed: () -> Unit
 ) {
 
@@ -129,7 +143,10 @@ private fun AddCategoryScreen(
         ) {
 
             AppHeader(
-                title = stringResource(id = R.string.new_category),
+                title = when(isEditingCategory) {
+                    true -> stringResource(id = R.string.update_category)
+                    false -> stringResource(id = R.string.new_category)
+                },
                 windowInsets = TopAppBarDefaults.windowInsets.only(sides = WindowInsetsSides.Top),
                 isMenuAvailable = false,
                 onNavigationClick = onBackPressed
@@ -224,9 +241,12 @@ private fun AddCategoryScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(end = 24.dp, start = 24.dp),
-            enabled = uiState.isCategorySaveEnabled,
-            onClick = onSaveCategory,
-            text = stringResource(id = R.string.register_category)
+            enabled = uiState.isCategoryRegisterButtonEnabled,
+            onClick = onRegisterCategory,
+            text = when(isEditingCategory) {
+                true -> stringResource(id = R.string.update_category)
+                false -> stringResource(id = R.string.register_category)
+            }
         )
 
     }

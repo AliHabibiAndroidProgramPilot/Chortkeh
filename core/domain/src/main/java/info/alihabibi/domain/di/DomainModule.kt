@@ -3,6 +3,7 @@ package info.alihabibi.domain.di
 import info.alihabibi.domain.local.usecases.database.DeleteCategoriesUseCase
 import info.alihabibi.domain.local.usecases.database.GetCategoriesUseCase
 import info.alihabibi.domain.local.usecases.database.SaveCategoryUseCase
+import info.alihabibi.domain.local.usecases.database.UpdateCategoryUseCase
 import info.alihabibi.domain.local.usecases.database.usecase.CategoryUseCases
 import info.alihabibi.domain.local.usecases.datastore.GetIsAppFirstLaunchUseCase
 import info.alihabibi.domain.local.usecases.datastore.GetIsSmsModalShownUseCase
@@ -42,12 +43,14 @@ val domainModule = module {
     factory { SaveCategoryUseCase(get()) }
     factory { DeleteCategoriesUseCase(get()) }
     factory { GetCategoriesUseCase(get()) }
+    factory { UpdateCategoryUseCase(get()) }
 
     factory {
         CategoryUseCases(
             getCategoriesUseCase = get(),
+            saveCategoryUseCase = get(),
             deleteCategoriesUseCase = get(),
-            saveCategoryUseCase = get()
+            updateCategoryUseCase = get()
         )
     }
 
