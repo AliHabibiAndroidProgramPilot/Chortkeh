@@ -39,9 +39,9 @@ import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray11
 import info.alihabibi.designsystem.theme.Gray8
 import info.alihabibi.model.ui_model.GenderOptionUiModel
-import info.alihabibi.profile.viewmodel.ProfileUiIntent
-import info.alihabibi.profile.viewmodel.ProfileUiState
-import info.alihabibi.profile.viewmodel.ProfileViewModel
+import info.alihabibi.profile.ProfileUiIntent
+import info.alihabibi.profile.ProfileUiState
+import info.alihabibi.profile.ProfileViewModel
 import info.alihabibi.ui.buttons.AppButton
 import info.alihabibi.ui.dialogs.AppRadioSelectionBottomSheet
 import info.alihabibi.ui.headrs.AppHeader

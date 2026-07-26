@@ -1,4 +1,4 @@
-package info.alihabibi.new_transaction
+package info.alihabibi.new_transaction.screens
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -24,20 +24,27 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Black
 import info.alihabibi.designsystem.theme.Gray11
@@ -46,8 +53,13 @@ import info.alihabibi.designsystem.theme.Gray8
 import info.alihabibi.designsystem.theme.Primary
 import info.alihabibi.designsystem.theme.White
 import info.alihabibi.model.ui_model.TransactionTypeOptionUiModel
+import info.alihabibi.model.ui_model.category.CategoryUiModel
+import info.alihabibi.new_transaction.NewTransactionUiIntent
+import info.alihabibi.new_transaction.NewTransactionUiState
+import info.alihabibi.new_transaction.NewTransactionViewModel
 import info.alihabibi.ui.buttons.AppButton
 import info.alihabibi.ui.buttons.AppToggle
+import info.alihabibi.ui.dialogs.ListedBottomSheet
 import info.alihabibi.ui.dialogs.TimePickerBottomSheetContent
 import info.alihabibi.ui.headrs.AppHeader
 import info.alihabibi.ui.inputs.AppTitledPriceTextField
@@ -62,30 +74,47 @@ import java.time.LocalTime
 @Composable
 fun NewTransactionDestination(
     viewModel: NewTransactionViewModel = koinViewModel(),
+    onAddNewCategory: () -> Unit = {},
+    onEditCategory: (categoryId: Int) -> Unit = {},
     onBackPressed: () -> Unit
 ) {
 
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.newTransactionUiState.collectAsStateWithLifecycle()
     val formattedTransactionDate by viewModel.formattedTransactionDate.collectAsStateWithLifecycle()
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.onEvent(NewTransactionUiIntent.Init)
+        }
+    }
 
     NewTransactionScreen(
         uiState = uiState,
         formattedTransactionDate = formattedTransactionDate,
+        onAddNewCategory = onAddNewCategory,
+        onEditCategory = onEditCategory,
         onPriceChanged = { price ->
-            viewModel.onEvent(NewTransactionUiIntent.OnPriceChanged(price))
+            viewModel.onEvent(NewTransactionUiIntent.PriceChanged(price))
         },
         onDateChanged = { year, month, day ->
-            viewModel.onEvent(NewTransactionUiIntent.OnDateChanged(year, month, day))
+            viewModel.onEvent(NewTransactionUiIntent.DateChanged(year, month, day))
         },
         onTimeChange = { hour, minute ->
-            viewModel.onEvent(NewTransactionUiIntent.OnTimeChanged(hour, minute))
+            viewModel.onEvent(NewTransactionUiIntent.TimeChanged(hour, minute))
+        },
+        onCategoryChanged = { category ->
+            viewModel.onEvent(NewTransactionUiIntent.CategoryChanged(category))
+        },
+        onCategoriesDelete = { categoriesToDelete ->
+            viewModel.onEvent(NewTransactionUiIntent.CategoriesDeleted(categoriesToDelete))
         },
         onSaveTransaction = {
             // TODO save transaction | call view model here, then navigate back
             onBackPressed()
         },
         onTransactionTypeChanged = { type ->
-            viewModel.onEvent(NewTransactionUiIntent.OnTransactionTypeChanged(type))
+            viewModel.onEvent(NewTransactionUiIntent.TransactionTypeChanged(type))
         },
         onBackPressed = onBackPressed
     )
@@ -99,8 +128,12 @@ private fun NewTransactionScreen(
     formattedTransactionDate: String = "",
     onPriceChanged: (price: String) -> Unit = {},
     onDateChanged: (year: Int, month: Int, day: Int) -> Unit = { _, _, _ -> },
-    onTimeChange: (hour: Int, minute: Int) -> Unit = { _, _ -> },
+    onTimeChange: (hour: Int?, minute: Int?) -> Unit = { _, _ -> },
+    onCategoryChanged: (category: CategoryUiModel) -> Unit = {},
+    onCategoriesDelete: (categoriesToDelete: List<CategoryUiModel>) -> Unit = {},
+    onEditCategory: (categoryId: Int) -> Unit = {},
     onSaveTransaction: () -> Unit = {},
+    onAddNewCategory: () -> Unit = {},
     onTransactionTypeChanged: (type: TransactionTypeOptionUiModel) -> Unit = {},
     onBackPressed: () -> Unit
 ) {
@@ -122,7 +155,10 @@ private fun NewTransactionScreen(
             minYear = MinYear.On(1400),
             maxYear = MaxYear.On(1425),
             titleBottomSheet = stringResource(id = R.string.date),
-            titleStyle = MaterialTheme.typography.labelLarge.copy(textAlign = TextAlign.Center),
+            titleStyle = MaterialTheme.typography.labelLarge.copy(
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold
+            ),
             titleModifier = Modifier.fillMaxWidth(),
             font = R.font.iran_yekanx_normal,
             textButtonStyle = MaterialTheme.typography.labelLarge.copy(
@@ -172,6 +208,26 @@ private fun NewTransactionScreen(
             }
         )
 
+    var showCategoryBottomSheet by remember { mutableStateOf(false) }
+    if (showCategoryBottomSheet)
+        ListedBottomSheet(
+            items = uiState.categories,
+            itemTitle = { it.title },
+            itemIcon = { it.icon.iconResId },
+            itemKey = { it.id },
+            bottomSheetTitle = stringResource(id = R.string.category),
+            onSelectItem = { category ->
+                onCategoryChanged(category)
+                showCategoryBottomSheet = false
+            },
+            onDeleteItems = onCategoriesDelete,
+            onEditItem = { category ->
+                onEditCategory(category.id)
+            },
+            onAddNewItem = onAddNewCategory,
+            onDismissRequest = { showCategoryBottomSheet = false },
+        )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -198,6 +254,7 @@ private fun NewTransactionScreen(
             AppToggle(
                 toggleItems = TransactionTypeOptionUiModel.entries.toList(),
                 itemTitle = { transactionType -> stringResource(id = transactionType.labelRes) },
+                selectedOption = uiState.transactionType,
                 onToggleSelectionChanged = { selected ->
                     onTransactionTypeChanged(selected)
                 }
@@ -260,7 +317,7 @@ private fun NewTransactionScreen(
                     .padding(horizontal = 16.dp)
                     .border(width = 1.dp, color = Gray11, shape = RoundedCornerShape(12.dp))
                     .clip(shape = RoundedCornerShape(size = 12.dp))
-                    .clickable {},
+                    .clickable { showCategoryBottomSheet = true },
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
@@ -275,7 +332,10 @@ private fun NewTransactionScreen(
 
                 Text(
                     modifier = Modifier.padding(horizontal = 12.dp),
-                    text = stringResource(id = R.string.category),
+                    text = when {
+                        uiState.transactionCategory != null -> uiState.transactionCategory.title
+                        else -> stringResource(id = R.string.category)
+                    },
                     style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp)
                 )
 

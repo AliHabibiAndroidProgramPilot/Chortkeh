@@ -18,9 +18,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,10 +33,9 @@ import info.alihabibi.designsystem.theme.White
 fun <T> AppToggle(
     toggleItems: List<T>,
     itemTitle: @Composable (T) -> String,
+    selectedOption: T,
     onToggleSelectionChanged: (item: T) -> Unit
 ) {
-
-    var selectedIndex by remember { mutableIntStateOf(toggleItems.lastIndex) }
 
     val shape = RoundedCornerShape(20)
     val selectedColor = Primary
@@ -53,17 +49,17 @@ fun <T> AppToggle(
         toggleItems.forEachIndexed { index, item ->
 
             val containerColor by animateColorAsState(
-                targetValue = if (selectedIndex == index) selectedColor else Color.Transparent,
+                targetValue = if (selectedOption == item) selectedColor else Color.Transparent,
                 animationSpec = tween(easing = FastOutLinearInEasing, durationMillis = 180)
             )
 
             val contentColor by animateColorAsState(
-                targetValue = if (selectedIndex == index) White else unselectedColor,
+                targetValue = if (selectedOption == item) White else unselectedColor,
                 animationSpec = tween(easing = FastOutLinearInEasing, durationMillis = 180)
             )
 
             val borderColor by animateColorAsState(
-                targetValue = if (selectedIndex == index) Color.Transparent else unselectedColor,
+                targetValue = if (selectedOption == item) Color.Transparent else unselectedColor,
                 animationSpec = tween(easing = FastOutLinearInEasing, durationMillis = 180)
             )
 
@@ -77,7 +73,7 @@ fun <T> AppToggle(
                     .weight(1f)
                     .fillMaxHeight()
                     .offset(x = boxOffset)
-                    .zIndex(zIndex = if (selectedIndex == index) 1f else 0f)
+                    .zIndex(zIndex = if (selectedOption == item) 1f else 0f)
                     .padding(
                         start = if (index == 0) 14.dp else 0.dp,
                         end = if (index == toggleItems.lastIndex) 14.dp else 0.dp
@@ -90,7 +86,6 @@ fun <T> AppToggle(
                     .clip(shape)
                     .background(color = containerColor)
                     .clickable {
-                        selectedIndex = index
                         onToggleSelectionChanged(item)
                     },
                 contentAlignment = Alignment.Center
@@ -113,6 +108,7 @@ private fun AppTogglePreview() {
     AppToggle(
         toggleItems = listOf("بانکی", "چرتکه"),
         itemTitle = { it },
+        selectedOption = "",
         onToggleSelectionChanged = {}
     )
 

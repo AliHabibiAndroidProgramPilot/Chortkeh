@@ -22,6 +22,9 @@ dependencies {
     // design system
     implementation(projects.core.designsystem)
 
+    // common
+    implementation(projects.core.common)
+
     // common android
     implementation(projects.core.commonAndroid)
 
@@ -45,6 +48,9 @@ dependencies {
 
     // datastore
     implementation(projects.core.datastore)
+
+    // Room Database
+    implementation(projects.core.database)
 
     // profile
     implementation(projects.features.profile)

@@ -36,9 +36,9 @@ import info.alihabibi.common.Utils
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray7
 import info.alihabibi.model.ui_model.CurrenciesOptionUiModel
-import info.alihabibi.profile.viewmodel.ProfileUiIntent
-import info.alihabibi.profile.viewmodel.ProfileUiState
-import info.alihabibi.profile.viewmodel.ProfileViewModel
+import info.alihabibi.profile.ProfileUiIntent
+import info.alihabibi.profile.ProfileUiState
+import info.alihabibi.profile.ProfileViewModel
 import info.alihabibi.ui.dialogs.AppDialog
 import info.alihabibi.ui.dialogs.AppRadioSelectionBottomSheet
 import info.alihabibi.ui.items.AppDangerousListItem

@@ -1,5 +1,6 @@
-package info.alihabibi.profile.viewmodel
+package info.alihabibi.profile
 
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import info.alihabibi.domain.local.usecases.datastore.usecase.DatastoreUseCases
@@ -119,6 +120,7 @@ sealed interface ProfileUiIntent {
 
 }
 
+@Immutable
 data class ProfileUiState(
     val currency: CurrenciesOptionUiModel = CurrenciesOptionUiModel.TOMAN,
     val userAccountInfo: UserAccountInfoUiModel = UserAccountInfoUiModel(),

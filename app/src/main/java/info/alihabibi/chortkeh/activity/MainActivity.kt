@@ -22,12 +22,12 @@ import androidx.navigation.compose.rememberNavController
 import info.alihabibi.chortkeh.navigation.BottomNavItems
 import info.alihabibi.chortkeh.navigation.DemoNavHost
 import info.alihabibi.chortkeh.navigation.Home
-import info.alihabibi.chortkeh.navigation.NewTransaction
 import info.alihabibi.chortkeh.navigation.OnBoarding
 import info.alihabibi.chortkeh.navigation.topLevelDestinations
 import info.alihabibi.common_android.ObserveAsEvents
 import info.alihabibi.common_android.snackbar.SnackBarController
 import info.alihabibi.designsystem.theme.ChortkehTheme
+import info.alihabibi.new_transaction.NewTransaction
 import info.alihabibi.ui.navigation.AppBottomNavigation
 import info.alihabibi.ui.scaffolds.BaseScaffold
 import info.alihabibi.ui.snackbars.AppSnackBar
@@ -77,8 +77,7 @@ class MainActivity : ComponentActivity() {
 
                 when (val state = uiState.value) {
 
-                    is MainActivityUiState.Loading -> { /* still showing splash screen */
-                    }
+                    is MainActivityUiState.Loading -> { /* still showing splash screen */ }
 
                     is MainActivityUiState.Success -> {
                         val startDestination = when (state.isFirstLaunch) {
@@ -104,7 +103,9 @@ class MainActivity : ComponentActivity() {
                                     AppBottomNavigation(
                                         currentDestination = currentDestination?.destination,
                                         items = BottomNavItems.entries.map { it.toUiData() },
-                                        onFabClick = { navController.navigate(NewTransaction) },
+                                        onFabClick = {
+                                            navController.navigate(NewTransaction)
+                                        },
                                         onNavItemClicked = { navItem ->
                                             navController.navigate(navItem.route) {
                                                 popUpTo(Home) { saveState = true }

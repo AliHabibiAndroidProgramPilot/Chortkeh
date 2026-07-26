@@ -1,5 +1,8 @@
 package info.alihabibi.ui.dialogs
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +16,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -26,11 +32,15 @@ import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -47,6 +57,7 @@ import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.ErrorExtraRedLight
 import info.alihabibi.designsystem.theme.ErrorRed
 import info.alihabibi.designsystem.theme.Gray1
+import info.alihabibi.designsystem.theme.Gray2
 import info.alihabibi.designsystem.theme.Gray3
 import info.alihabibi.designsystem.theme.Gray6
 import info.alihabibi.designsystem.theme.Gray9
@@ -153,8 +164,7 @@ fun <T> AppRadioSelectionBottomSheet(
     optionLabel: @Composable (T) -> String,
     onRadioOptionSelected: (T) -> Unit,
     onConfirmClicked: () -> Unit = {},
-    onDismissRequest: () -> Unit,
-    modifier: Modifier = Modifier,
+    onDismissRequest: () -> Unit
 ) {
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
@@ -219,6 +229,75 @@ fun <T> AppRadioSelectionBottomSheet(
                 contentColor = Primary,
                 text = stringResource(id = R.string.confirm)
             )
+
+        }
+
+    }
+
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun <T> AppIconSelectionBottomSheet(
+    title: String = stringResource(id = R.string.category_icon2),
+    options: List<T>,
+    iconsResId: (T) -> Int,
+    onOptionSelected: (iconsResId: T) -> Unit,
+    onDismissRequest: () -> Unit
+) {
+
+    ModalBottomSheet(
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+        containerColor = Gray1,
+        onDismissRequest = onDismissRequest
+    ) {
+
+        Text(
+            modifier = Modifier
+                .fillMaxWidth(),
+            text = title,
+            style = MaterialTheme.typography.bodyMedium.copy(
+                fontSize = 16.sp,
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold
+            )
+        )
+
+        LazyVerticalGrid(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(max = 350.dp)
+                .padding(top = 12.dp, end = 16.dp, start = 16.dp)
+                .clip(shape = RoundedCornerShape(size = 12.dp))
+                .background(color = Gray2),
+            columns = GridCells.Fixed(5),
+            horizontalArrangement = Arrangement.Absolute.Center,
+            verticalArrangement = Arrangement.Center
+        ) {
+
+            items(items = options) { icon ->
+
+                Box(
+                    modifier = Modifier
+                        .padding(vertical = 10.dp)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = ripple(bounded = false),
+                            onClick = { onOptionSelected(icon) }
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+
+                    Icon(
+                        modifier = Modifier.size(size = 38.dp),
+                        painter = painterResource(id = iconsResId(icon)),
+                        contentDescription = null,
+                        tint = Color.Unspecified
+                    )
+
+                }
+
+            }
 
         }
 
