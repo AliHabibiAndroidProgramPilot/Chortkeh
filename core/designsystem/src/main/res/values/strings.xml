@@ -29,6 +29,10 @@
     <string name="confirm">تایید</string>
     <string name="cancel">لغو</string>
 
+    // Home
+    <string name="bookkeeping">حساب کتاب</string>
+    <string name="all_accounts">همه حساب‌ها</string>
+
     // On Boarding
     <string name="piggy_bank">قلک</string>
     <string name="piggy_bank_description">تا قلک پره نگران هیج اتفاق غیر قابل پیش بینی نباش</string>

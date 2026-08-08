@@ -60,7 +60,11 @@ object Utils {
             cal.get(Calendar.MONTH) + 1,
             cal.get(Calendar.DAY_OF_MONTH)
         )
-        return PersianDateFormatter.persianMonths[jm - 1]
+        val month = listOf(
+            "فروردین ماه", "اردیبهشت ماه", "خرداد ماه", "تیر ماه", "مرداد ماه", "شهریور ماه",
+            "مهر ماه", "آبان ماه", "آذر ماه", "دی ماه", "بهمن ماه", "اسفند ماه"
+        )
+        return month[jm - 1]
     }
 
     fun getAppVersionName(context: Context): String =
