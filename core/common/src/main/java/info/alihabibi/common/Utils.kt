@@ -25,10 +25,10 @@ object Utils {
      *   this implementation with a well-tested date/time library.
      */
     private fun gregorianToPersianDate(year: Int, month: Int, day: Int): IntArray {
-        val gDaysInMonth = intArrayOf(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
+        val gDaysBeforeMonth = intArrayOf(0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334)
         val gy2 = if (month > 2) year + 1 else year
         var days = 355666 + (365 * year) + ((gy2 + 3) / 4) - ((gy2 + 99) / 100) +
-                ((gy2 + 399) / 400) + day + gDaysInMonth[month - 1]
+                ((gy2 + 399) / 400) + day + gDaysBeforeMonth[month - 1]
 
         var jy = -1595 + (33 * (days / 12053))
         days %= 12053
