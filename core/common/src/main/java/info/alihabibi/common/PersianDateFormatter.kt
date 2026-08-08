@@ -1,7 +1,7 @@
 package info.alihabibi.common
 
 object PersianDateFormatter {
-    private val persianMonths = listOf(
+    internal val persianMonths = listOf(
         "فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور",
         "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"
     )
