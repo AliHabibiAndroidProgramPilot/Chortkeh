@@ -9,10 +9,13 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -32,6 +35,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray3
+import info.alihabibi.designsystem.theme.Gray8
 import info.alihabibi.designsystem.theme.Primary
 
 @Composable
@@ -90,15 +94,81 @@ fun ListedBottomSheetItem(
 
 }
 
+@Composable
+fun ListedChannelItem(
+    title: String,
+    subTitle: String = "",
+    @DrawableRes iconResId: Int,
+    isSelected: Boolean = false,
+    onClick: () -> Unit
+) {
+
+    val shape = RoundedCornerShape(size = 12.dp)
+
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+
+        Row(
+            modifier = Modifier
+                .height(height = 55.dp)
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 4.dp)
+                .border(width = 1.dp, color = Gray3, shape = shape)
+                .clip(shape = shape)
+                .clickable(onClick = onClick),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.End
+        ) {
+
+            if (isSelected) {
+                Icon(
+                    modifier = Modifier.padding(start = 16.dp),
+                    painter = painterResource(id = R.drawable.blue_tick),
+                    contentDescription = null,
+                    tint = Color.Unspecified
+                )
+
+                Spacer(modifier = Modifier.weight(weight = 1f))
+            }
+
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
+                Text(
+                    modifier = Modifier.padding(end = 10.dp),
+                    text = title,
+                    style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.End)
+                )
+
+                Text(
+                    modifier = Modifier.padding(end = 10.dp),
+                    text = "موجودی: $subTitle",
+                    style = MaterialTheme.typography.bodySmall.copy(textAlign = TextAlign.End, color = Gray8)
+                )
+
+            }
+
+            Icon(
+                modifier = Modifier.padding(end = 12.dp),
+                painter = painterResource(iconResId),
+                contentDescription = null,
+                tint = Color.Unspecified
+            )
+
+        }
+
+    }
+
+}
+
 @Preview
 @Composable
 private fun ListedBottomSheetItemPreview() {
 
-    ListedBottomSheetItem(
-        title = "خوش گذرونی",
-        iconResId = R.drawable.category_ic_income,
-        onClick = {},
-        onLongClick = {}
+    ListedChannelItem(
+        title = "بانک سامان",
+        subTitle = "2,450,000 تومان",
+        iconResId = R.drawable.category_ic_ticket,
+        isSelected = true,
+        onClick = {}
     )
 
 }

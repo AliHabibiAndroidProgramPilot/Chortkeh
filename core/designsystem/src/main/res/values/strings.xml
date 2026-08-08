@@ -32,6 +32,7 @@
     // Home
     <string name="bookkeeping">حساب کتاب</string>
     <string name="all_accounts">همه حساب‌ها</string>
+    <string name="input_channels">کانال‌های ورودی</string>
 
     // On Boarding
     <string name="piggy_bank">قلک</string>
