@@ -5,8 +5,7 @@ import androidx.sqlite.SQLiteConnection
 import info.alihabibi.common.ApplicationScope
 import info.alihabibi.database.AppDatabase
 import info.alihabibi.database.mappers.asEntity
-import info.alihabibi.domain.local.defaults.DefaultCategories
-import info.alihabibi.domain.models.category.Category
+import info.alihabibi.domain.local.defaults.DefaultChannels
 import kotlinx.coroutines.launch
 
 /**
@@ -15,7 +14,7 @@ import kotlinx.coroutines.launch
  * This is NOT circular despite referencing `AppDatabase` from inside its own builder.
  */
 
-internal class CategorySeedCallback(
+internal class ChannelSeedCallback(
     private val scope: ApplicationScope,
     private val databaseProvider: () -> AppDatabase
 ) : RoomDatabase.Callback() {
@@ -23,10 +22,8 @@ internal class CategorySeedCallback(
     override fun onCreate(connection: SQLiteConnection) {
         super.onCreate(connection)
         scope.launch {
-            val dao = databaseProvider.invoke().categoryDao()
-            dao.insertCategory(
-                DefaultCategories.categories.map(Category::asEntity)
-            )
+            val dao = databaseProvider.invoke().channelDao()
+            dao.insertChannel(DefaultChannels.channel.asEntity())
         }
     }
 

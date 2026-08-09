@@ -6,6 +6,7 @@ import info.alihabibi.common.ApplicationScope
 import info.alihabibi.database.AppDatabase
 import info.alihabibi.database.repositories.CategoryRepositoryImpl
 import info.alihabibi.database.seeding.CategorySeedCallback
+import info.alihabibi.database.seeding.ChannelSeedCallback
 import info.alihabibi.domain.local.keys.Keys
 import info.alihabibi.domain.local.repositories.CategoryRepository
 import kotlinx.coroutines.Dispatchers
@@ -29,11 +30,18 @@ val databaseModule = module {
                     databaseProvider = { get() }
                 )
             )
+            .addCallback(
+                ChannelSeedCallback(
+                    scope = get<ApplicationScope>(),
+                    databaseProvider = { get() }
+                )
+            )
             .build()
     }
 
     // Dao's
     single { get<AppDatabase>().categoryDao() }
+    single { get<AppDatabase>().channelDao() }
 
     // Repositories
     single<CategoryRepository> { CategoryRepositoryImpl(get()) }
