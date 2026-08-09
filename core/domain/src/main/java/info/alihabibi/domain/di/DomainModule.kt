@@ -1,10 +1,15 @@
 package info.alihabibi.domain.di
 
-import info.alihabibi.domain.local.usecases.database.DeleteCategoriesUseCase
-import info.alihabibi.domain.local.usecases.database.GetCategoriesUseCase
-import info.alihabibi.domain.local.usecases.database.SaveCategoryUseCase
-import info.alihabibi.domain.local.usecases.database.UpdateCategoryUseCase
-import info.alihabibi.domain.local.usecases.database.usecase.CategoryUseCases
+import info.alihabibi.domain.local.usecases.database.category.DeleteCategoriesUseCase
+import info.alihabibi.domain.local.usecases.database.category.GetCategoriesUseCase
+import info.alihabibi.domain.local.usecases.database.category.SaveCategoryUseCase
+import info.alihabibi.domain.local.usecases.database.category.UpdateCategoryUseCase
+import info.alihabibi.domain.local.usecases.database.category.usecase.CategoryUseCases
+import info.alihabibi.domain.local.usecases.database.channel.DeleteChannelUseCase
+import info.alihabibi.domain.local.usecases.database.channel.GetChannelsUseCase
+import info.alihabibi.domain.local.usecases.database.channel.SaveChannelUseCase
+import info.alihabibi.domain.local.usecases.database.channel.UpdateChannelUseCase
+import info.alihabibi.domain.local.usecases.database.channel.usecase.ChannelUseCases
 import info.alihabibi.domain.local.usecases.datastore.GetIsAppFirstLaunchUseCase
 import info.alihabibi.domain.local.usecases.datastore.GetIsSmsModalShownUseCase
 import info.alihabibi.domain.local.usecases.datastore.GetPreferredCurrencyUseCase
@@ -17,6 +22,8 @@ import info.alihabibi.domain.local.usecases.datastore.usecase.DatastoreUseCases
 import org.koin.dsl.module
 
 val domainModule = module {
+
+    // region Datastore
 
     factory { GetIsAppFirstLaunchUseCase(get()) }
     factory { SaveFirstLaunchUseCase(get()) }
@@ -40,6 +47,10 @@ val domainModule = module {
         )
     }
 
+    // endregion
+
+    // region Category
+
     factory { SaveCategoryUseCase(get()) }
     factory { DeleteCategoriesUseCase(get()) }
     factory { GetCategoriesUseCase(get()) }
@@ -47,11 +58,31 @@ val domainModule = module {
 
     factory {
         CategoryUseCases(
-            getCategoriesUseCase = get(),
             saveCategoryUseCase = get(),
+            getCategoriesUseCase = get(),
             deleteCategoriesUseCase = get(),
             updateCategoryUseCase = get()
         )
     }
+
+    // endregion
+
+    // region Channel
+
+    factory { SaveChannelUseCase(get()) }
+    factory { DeleteChannelUseCase(get()) }
+    factory { GetChannelsUseCase(get()) }
+    factory { UpdateChannelUseCase(get()) }
+
+    factory {
+        ChannelUseCases(
+            saveChannelUseCase = SaveChannelUseCase(get()),
+            getChannelUseCase = GetChannelsUseCase(get()),
+            deleteChannelUseCase = DeleteChannelUseCase(get()),
+            updateChannelUseCase = UpdateChannelUseCase(get())
+        )
+    }
+
+    // endregion
 
 }
