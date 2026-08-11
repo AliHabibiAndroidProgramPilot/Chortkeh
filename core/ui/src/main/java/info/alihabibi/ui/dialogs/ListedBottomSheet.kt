@@ -294,56 +294,55 @@ fun <T> ChannelListedBottomSheet(
                         }
 
                     }
+                }
 
-                    Spacer(modifier = Modifier.height(height = 12.dp))
+                Spacer(modifier = Modifier.height(height = 12.dp))
 
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight()
-                    ) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                ) {
 
-                        items(
-                            items = items,
-                            key = { item -> itemKey(item) }
-                        ) { item ->
+                    items(
+                        items = items,
+                        key = { item -> itemKey(item) }
+                    ) { item ->
 
-                            ListedChannelItem(
-                                title = itemTitle(item),
-                                iconResId = itemIcon(item),
-                                subTitle = itemSubTitle(item),
-                                onClick = { onSelectItem(item) }
+                        ListedChannelItem(
+                            title = itemTitle(item),
+                            iconResId = itemIcon(item),
+                            subTitle = itemSubTitle(item),
+                            onClick = { onSelectItem(item) }
+                        )
+
+                    }
+
+                    item(key = "ADD_NEW") {
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(height = 50.dp)
+                                .padding(horizontal = 16.dp)
+                                .clip(shape = RoundedCornerShape(12.dp))
+                                .clickable(onClick = onAddNewItem),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.End
+                        ) {
+
+                            Text(
+                                modifier = Modifier.padding(end = 10.dp),
+                                text = addNewItemTitle,
+                                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 14.sp)
                             )
 
-                        }
-
-                        item(key = "ADD_NEW") {
-
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(height = 50.dp)
-                                    .padding(horizontal = 16.dp)
-                                    .clip(shape = RoundedCornerShape(12.dp))
-                                    .clickable(onClick = onAddNewItem),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.End
-                            ) {
-
-                                Text(
-                                    modifier = Modifier.padding(end = 10.dp),
-                                    text = addNewItemTitle,
-                                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 14.sp)
-                                )
-
-                                Icon(
-                                    modifier = Modifier.padding(end = 12.dp),
-                                    painter = painterResource(id = R.drawable.add_square),
-                                    contentDescription = null,
-                                    tint = Primary
-                                )
-
-                            }
+                            Icon(
+                                modifier = Modifier.padding(end = 12.dp),
+                                painter = painterResource(id = R.drawable.add_square),
+                                contentDescription = null,
+                                tint = Primary
+                            )
 
                         }
 

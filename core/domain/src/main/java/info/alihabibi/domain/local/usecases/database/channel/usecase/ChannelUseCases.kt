@@ -7,7 +7,7 @@ import info.alihabibi.domain.local.usecases.database.channel.UpdateChannelUseCas
 
 data class ChannelUseCases(
     val saveChannelUseCase: SaveChannelUseCase,
-    val getChannelUseCase: GetChannelsUseCase,
+    val getChannelsUseCase: GetChannelsUseCase,
     val deleteChannelUseCase: DeleteChannelUseCase,
     val updateChannelUseCase: UpdateChannelUseCase
 )

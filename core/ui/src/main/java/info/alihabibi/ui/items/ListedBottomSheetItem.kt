@@ -5,6 +5,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -130,10 +131,10 @@ fun ListedChannelItem(
                 Spacer(modifier = Modifier.weight(weight = 1f))
             }
 
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(horizontalAlignment = Alignment.End) {
 
                 Text(
-                    modifier = Modifier.padding(end = 10.dp),
+                    modifier = Modifier.padding(end = 10.dp, bottom = 8.dp),
                     text = title,
                     style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.End)
                 )

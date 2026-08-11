@@ -77,7 +77,7 @@ val domainModule = module {
     factory {
         ChannelUseCases(
             saveChannelUseCase = SaveChannelUseCase(get()),
-            getChannelUseCase = GetChannelsUseCase(get()),
+            getChannelsUseCase = GetChannelsUseCase(get()),
             deleteChannelUseCase = DeleteChannelUseCase(get()),
             updateChannelUseCase = UpdateChannelUseCase(get())
         )
