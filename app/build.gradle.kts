@@ -40,6 +40,9 @@ dependencies {
     // announcements
     implementation(projects.features.announcements)
 
+    // channels
+    implementation(projects.features.channels)
+
     // ui
     implementation(projects.core.ui)
 
