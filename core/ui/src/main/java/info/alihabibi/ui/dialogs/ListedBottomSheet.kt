@@ -250,7 +250,8 @@ fun <T> ChannelListedBottomSheet(
     addNewItemTitle: String = stringResource(id = R.string.add_new_channel),
     onAddNewItem: () -> Unit = {},
     onDismissRequest: () -> Unit,
-    onSelectItem: (item: T) -> Unit
+    onSelectItem: (item: T) -> Unit,
+    onChannelsEdit: () -> Unit
 ) {
 
     ModalBottomSheet(
@@ -284,7 +285,7 @@ fun <T> ChannelListedBottomSheet(
 
                         IconButton(
                             modifier = Modifier.size(size = 24.dp),
-                            onClick = {}
+                            onClick = onChannelsEdit
                         ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.edit),

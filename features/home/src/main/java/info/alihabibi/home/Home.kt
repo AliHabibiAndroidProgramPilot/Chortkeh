@@ -14,7 +14,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,13 +40,14 @@ import info.alihabibi.designsystem.theme.Primary
 import info.alihabibi.ui.buttons.AppOutlinedButton
 import info.alihabibi.ui.dialogs.ChannelListedBottomSheet
 import info.alihabibi.ui.headrs.HomePageHeader
-import info.alihabibi.ui.items.ListedBottomSheetItem
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun HomeDestination(
     viewModel: HomeViewModel = koinViewModel(),
     onAnnouncements: () -> Unit = {},
+    onNewChannel: () -> Unit = {},
+    onChannels: () -> Unit = {},
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -57,7 +57,9 @@ fun HomeDestination(
         onSmsModalShowed = {
             viewModel.onEvent(HomeUiIntent.SaveSmsPermissionModalShownState(value = true))
         },
-        onAnnouncements = onAnnouncements
+        onAnnouncements = onAnnouncements,
+        onNewChannel = onNewChannel,
+        onChannels = onChannels
     )
 
 }
@@ -68,7 +70,9 @@ fun HomeDestination(
 private fun HomeScreen(
     uiState: HomeUiState,
     onSmsModalShowed: () -> Unit = {},
-    onAnnouncements: () -> Unit = {}
+    onAnnouncements: () -> Unit = {},
+    onNewChannel: () -> Unit = {},
+    onChannels: () -> Unit = {},
 ) {
 
     val notificationPermission =
@@ -99,7 +103,11 @@ private fun HomeScreen(
             itemIcon = { it.icon.iconResId },
             itemKey = { it.id },
             onDismissRequest = { showChannelsBottomSheet = false },
-            onSelectItem = {}
+            onAddNewItem = onNewChannel,
+            onChannelsEdit = onChannels,
+            onSelectItem = {
+                // change selected channel and update home screen
+            }
         )
 
     Column(

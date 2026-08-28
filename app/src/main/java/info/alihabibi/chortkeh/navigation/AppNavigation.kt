@@ -64,6 +64,12 @@ fun DemoNavHost(
             HomeDestination(
                 onAnnouncements = {
                     navController.navigate(Announcements)
+                },
+                onChannels = {
+
+                },
+                onNewChannel = {
+
                 }
             )
         }
