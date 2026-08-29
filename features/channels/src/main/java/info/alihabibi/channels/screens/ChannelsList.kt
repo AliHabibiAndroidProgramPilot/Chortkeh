@@ -4,9 +4,12 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,15 +22,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray7
+import info.alihabibi.model.ui_model.channel.ChannelUiModel
 import info.alihabibi.ui.buttons.AppButton
 import info.alihabibi.ui.headrs.AppHeader
+import info.alihabibi.ui.items.ListedChannelItem
 
 @Composable
 fun ChannelsListDestination(
     onBackPressed: () -> Unit
 ) {
 
-    val fakeListItems = remember { emptyList<Any>() }
+    val fakeListItems = remember { emptyList<ChannelUiModel>() }
 
     ChannelsListScreen(
         fakeListItems,
@@ -38,7 +43,7 @@ fun ChannelsListDestination(
 
 @Composable
 private fun ChannelsListScreen(
-    channels: List<Any>,
+    channels: List<ChannelUiModel>,
     onBackPressed: () -> Unit
 ) {
 
@@ -61,7 +66,12 @@ private fun ChannelsListScreen(
                     .fillMaxWidth()
             )
         else
-            ChannelsListContent(channels)
+            ChannelsListContent(
+                modifier = Modifier
+                    .weight(weight = 1f)
+                    .fillMaxWidth(),
+                channels = channels
+            )
 
         AppButton(
             modifier = Modifier
@@ -77,9 +87,31 @@ private fun ChannelsListScreen(
 
 @Composable
 private fun ChannelsListContent(
-    channels: List<Any>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    channels: List<ChannelUiModel>,
+    onChannelItemClicked: (channel: ChannelUiModel) -> Unit = {}
 ) {
+
+    LazyColumn(
+        modifier = modifier,
+        contentPadding = PaddingValues(vertical = 12.dp)
+    ) {
+
+        items(
+            items = channels,
+            key = { it.id }
+        ) { channel ->
+
+            ListedChannelItem(
+                title = channel.channelName,
+                subTitle = channel.channelBalance,
+                iconResId = channel.icon.iconResId,
+                onClick = { onChannelItemClicked(channel) }
+            )
+
+        }
+
+    }
 
 }
 

@@ -104,13 +104,13 @@ fun ListedChannelItem(
     onClick: () -> Unit
 ) {
 
-    val shape = RoundedCornerShape(size = 12.dp)
+    val shape = RoundedCornerShape(size = 10.dp)
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
 
         Row(
             modifier = Modifier
-                .height(height = 55.dp)
+                .height(height = 65.dp)
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 4.dp)
                 .border(width = 1.dp, color = Gray3, shape = shape)
