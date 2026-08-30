@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
@@ -27,6 +28,7 @@ import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import info.alihabibi.common.banks.Bank
 import info.alihabibi.common.banks.BankCardIdentifier
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Black
@@ -331,7 +333,13 @@ fun AppCardNumberTextField(
     title: String = ""
 ) {
 
-    val bank = remember(text) { BankCardIdentifier.identify(text) }
+    val tempBank = remember(key1 = text.length >= 6) {
+        if (text.length >= 6) BankCardIdentifier.identify(text) else Bank.UNKNOWN
+    }
+
+    val bank = remember(key1 = tempBank, key2 = text.length >= 8) {
+        if (text.length >= 8) BankCardIdentifier.identifyNeoBanks(text, tempBank) else tempBank
+    }
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
@@ -355,6 +363,7 @@ fun AppCardNumberTextField(
             onValueChange = onValueChange,
             leadingIcon = {
                 Icon(
+                    modifier = Modifier.size(size = 32.dp),
                     painter = painterResource(id = bank.iconResId),
                     contentDescription = null,
                     tint = Color.Unspecified

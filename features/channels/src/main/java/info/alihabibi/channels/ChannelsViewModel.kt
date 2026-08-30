@@ -14,7 +14,11 @@ class ChannelsViewModel : ViewModel() {
 
     fun onEvent(event: ChannelsUiIntent) {
         when(event) {
+
             is ChannelsUiIntent.OnChannelTypeChanged -> changeChannelType(event.isBankAccountChannel)
+
+            is ChannelsUiIntent.OnCardNumberChanged -> changeCardNumber(event.cardNumber)
+
         }
     }
 
@@ -22,11 +26,17 @@ class ChannelsViewModel : ViewModel() {
         _addChannelUiState.update { it.copy(isBankAccountChannel = isBankAccountChannel) }
     }
 
+    private fun changeCardNumber(cardNumber: String) {
+        _addChannelUiState.update { it.copy(cardNumber = cardNumber) }
+    }
+
 }
 
 sealed interface ChannelsUiIntent {
 
     data class OnChannelTypeChanged(val isBankAccountChannel: Boolean) : ChannelsUiIntent
+
+    data class OnCardNumberChanged(val cardNumber: String) : ChannelsUiIntent
 
 }
 

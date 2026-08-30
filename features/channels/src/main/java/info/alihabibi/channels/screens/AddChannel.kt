@@ -40,6 +40,7 @@ import info.alihabibi.designsystem.theme.Gray6
 import info.alihabibi.designsystem.theme.Primary
 import info.alihabibi.ui.buttons.AppButton
 import info.alihabibi.ui.headrs.AppHeader
+import info.alihabibi.ui.inputs.AppCardNumberTextField
 import info.alihabibi.ui.inputs.AppTitledTextField
 
 @Composable
@@ -55,6 +56,9 @@ fun AddChannelDestination(
         onChannelTypeChange = { isBankAccountChannel ->
             viewModel.onEvent(ChannelsUiIntent.OnChannelTypeChanged(isBankAccountChannel))
         },
+        onCardNumberChange = { cardNumber ->
+            viewModel.onEvent(ChannelsUiIntent.OnCardNumberChanged(cardNumber))
+        },
         onBackPressed = onBackPressed
     )
 
@@ -65,6 +69,7 @@ private fun AddNewChannelScreen(
     uiState: AddChannelUiState,
     onSaveChannel: () -> Unit = {},
     onChannelTypeChange: (isBankAccountChannel: Boolean) -> Unit = {},
+    onCardNumberChange: (cardNumber: String) -> Unit = {},
     onBackPressed: () -> Unit
 ) {
 
@@ -162,7 +167,8 @@ private fun AddNewChannelScreen(
                         .weight(weight = 1f)
                         .fillMaxWidth(),
                     cardNumber = uiState.cardNumber,
-                    initialBalance = uiState.initialBalance
+                    initialBalance = uiState.initialBalance,
+                    onCardNumberChange = onCardNumberChange
                 )
 
             AppButton(
@@ -183,9 +189,23 @@ private fun AddNewChannelScreen(
 private fun BankAccountChannelContent(
     modifier: Modifier = Modifier,
     cardNumber: String,
-    initialBalance: String
+    initialBalance: String,
+    onCardNumberChange: (value: String) -> Unit = {},
+    onInitialBalanceChange: (value: String) -> Unit = {}
 ) {
 
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
 
+        AppCardNumberTextField(
+            modifier = Modifier.padding(horizontal = 4.dp),
+            text = cardNumber,
+            onValueChange = onCardNumberChange,
+            title = stringResource(id = R.string.card_number)
+        )
+
+    }
 
 }

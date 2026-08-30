@@ -46,7 +46,7 @@ enum class Bank(
 
     IRAN_VENEZUELA(
         R.drawable.iran_venezuela,
-R.string.bank_iran_venezuela
+        R.string.bank_iran_venezuela
     ),
 
     IRAN_ZAMIN(
@@ -172,5 +172,10 @@ R.string.bank_iran_venezuela
     WEPOD(
         R.drawable.wepod,
         R.string.bank_wepod
-    )
+    ),
+
+    UNKNOWN(
+        R.drawable.unknown,
+        R.string.empty
+    );
 }

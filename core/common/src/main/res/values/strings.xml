@@ -34,5 +34,6 @@
     <string name="bank_tosee_saderat">بانک توسعه صادرات ایران</string>
     <string name="bank_tosee_taavon">بانک توسعه تعاون</string>
     <string name="bank_wepod">ویپاد</string>
+    <string name="empty" />
 
 </resources>
