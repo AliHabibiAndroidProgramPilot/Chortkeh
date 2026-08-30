@@ -12,6 +12,9 @@ dependencies {
     // design system
     implementation(projects.core.designsystem)
 
+    // common
+    implementation(projects.core.common)
+
     // compose number wheel picker (time picker usage)
     implementation(libs.compose.number.picker)
 
