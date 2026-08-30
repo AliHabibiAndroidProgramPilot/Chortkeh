@@ -8,6 +8,8 @@ object DefaultChannels {
     val channel = Channel(
         channelName = "همه کانال ها",
         channelBalance = "0",
+        isBankCardChannel = false,
+        cardNumber = null,
         icon = ChannelIcon.DEFAULT
     )
 

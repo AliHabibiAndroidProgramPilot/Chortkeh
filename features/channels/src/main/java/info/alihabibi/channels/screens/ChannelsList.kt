@@ -29,6 +29,8 @@ import info.alihabibi.ui.items.ListedChannelItem
 
 @Composable
 fun ChannelsListDestination(
+    onEditChannel: (channelId: Int) -> Unit = {},
+    onAddNewChannel: () -> Unit = {},
     onBackPressed: () -> Unit
 ) {
 
@@ -36,6 +38,10 @@ fun ChannelsListDestination(
 
     ChannelsListScreen(
         fakeListItems,
+        onEditChannel = { channel ->
+            onEditChannel(channel.id)
+        },
+        onAddNewChannel = onAddNewChannel,
         onBackPressed = onBackPressed
     )
 
@@ -44,6 +50,8 @@ fun ChannelsListDestination(
 @Composable
 private fun ChannelsListScreen(
     channels: List<ChannelUiModel>,
+    onEditChannel: (channel: ChannelUiModel) -> Unit = {},
+    onAddNewChannel: () -> Unit = {},
     onBackPressed: () -> Unit
 ) {
 
@@ -59,7 +67,6 @@ private fun ChannelsListScreen(
         )
 
         if (channels.isEmpty())
-            // both should be fill max width and weight 1
             EmptyChannelState(
                 modifier = Modifier
                     .weight(weight = 1f)
@@ -70,14 +77,15 @@ private fun ChannelsListScreen(
                 modifier = Modifier
                     .weight(weight = 1f)
                     .fillMaxWidth(),
-                channels = channels
+                channels = channels,
+                onChannelItemClicked = onEditChannel
             )
 
         AppButton(
             modifier = Modifier
                 .fillMaxWidth(fraction = 0.9f)
                 .padding(bottom = 16.dp),
-            onClick = {},
+            onClick = onAddNewChannel,
             text = stringResource(id = R.string.add_new_channel)
         )
 

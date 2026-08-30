@@ -102,5 +102,13 @@
 
     // Channels
     <string name="empty_channels_list_message">هنوز کانالی ثبت نکردی</string>
+    <string name="register_channel">ثبت کانال ورودی</string>
+    <string name="input_channel_type">نوع کانال ورودی</string>
+    <string name="bank_card">کارت بانکی</string>
+    <string name="other_source">منبع دیگر</string>
+    <string name="card_number">شماره کارت 16 رقمی</string>
+    <string name="source_name">نام منبع</string>
+    <string name="initial_card_balance">موجودی اولیه کارت</string>
+    <string name="initial_source_balance">موجودی اولیه منبع</string>
 
 </resources>

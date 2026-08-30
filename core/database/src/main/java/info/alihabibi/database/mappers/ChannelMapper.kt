@@ -7,6 +7,8 @@ fun ChannelEntity.asExternalModel(): Channel = Channel(
     id = id.toInt(),
     channelName = channelName,
     channelBalance = channelBalance,
+    isBankCardChannel = isBankCardChannel,
+    cardNumber = cardNUmber,
     icon = icon
 )
 
@@ -14,5 +16,7 @@ fun Channel.asEntity(): ChannelEntity = ChannelEntity(
     id = id.toLong(),
     channelName = channelName,
     channelBalance = channelBalance,
+    isBankCardChannel = isBankCardChannel,
+    cardNUmber = cardNumber,
     icon = icon
 )

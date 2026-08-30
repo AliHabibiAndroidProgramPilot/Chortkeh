@@ -10,5 +10,7 @@ data class ChannelEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
     val channelName: String,
     val channelBalance: String,
+    val isBankCardChannel: Boolean,
+    val cardNUmber: String?,
     val icon: ChannelIcon, // @TypeConverter -> ChannelIconConverter
 )

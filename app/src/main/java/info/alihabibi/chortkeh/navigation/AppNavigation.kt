@@ -7,9 +7,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import info.alihabibi.announcements.AnnouncementsDestination
-import info.alihabibi.channels.AddNewChannel
+import info.alihabibi.channels.AddChannel
 import info.alihabibi.channels.ChannelGraphRoute
-import info.alihabibi.channels.ChannelsList
 import info.alihabibi.channels.channelsGraph
 import info.alihabibi.home.HomeDestination
 import info.alihabibi.new_transaction.newTransactionGraph
@@ -74,7 +73,7 @@ fun DemoNavHost(
                 },
                 onNewChannel = {
                     navController.navigate(ChannelGraphRoute)
-                    navController.navigate(AddNewChannel)
+                    navController.navigate(AddChannel)
                 }
             )
         }

@@ -1,6 +1,7 @@
 package info.alihabibi.chortkeh
 
 import android.app.Application
+import info.alihabibi.channels.di.channelsModule
 import info.alihabibi.chortkeh.di.mainActivityModule
 import info.alihabibi.common.di.commonModule
 import info.alihabibi.database.di.databaseModule
@@ -29,7 +30,8 @@ class ChortkehApp : Application() {
                     onBoardingModule,
                     homeModule,
                     newTransactionModule,
-                    profileModule
+                    profileModule,
+                    channelsModule
                 )
             )
         }

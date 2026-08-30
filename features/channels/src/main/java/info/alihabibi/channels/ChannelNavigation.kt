@@ -1,15 +1,14 @@
 package info.alihabibi.channels
 
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.runtime.remember
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import info.alihabibi.channels.screens.AddChannelDestination
 import info.alihabibi.channels.screens.ChannelsListDestination
 import kotlinx.serialization.Serializable
+import org.koin.androidx.compose.koinViewModel
 
 @Serializable
 object ChannelGraphRoute
@@ -18,10 +17,10 @@ object ChannelGraphRoute
 object ChannelsList
 
 @Serializable
-object EditChannel
+data class EditChannel(val editingChannelId: Int? = null)
 
 @Serializable
-object AddNewChannel
+object AddChannel
 
 fun NavGraphBuilder.channelsGraph(navController: NavController) {
 
@@ -29,6 +28,12 @@ fun NavGraphBuilder.channelsGraph(navController: NavController) {
 
         composable<ChannelsList> {
             ChannelsListDestination(
+                onEditChannel = { channelId ->
+                    navController.navigate(EditChannel(channelId))
+                },
+                onAddNewChannel = {
+                    navController.navigate(AddChannel)
+                },
                 onBackPressed = {
                     navController.navigateUp()
                 }
@@ -39,8 +44,17 @@ fun NavGraphBuilder.channelsGraph(navController: NavController) {
 
         }
 
-        composable<AddNewChannel> {
-            Text("Add New Channel", Modifier.fillMaxSize(), textAlign = TextAlign.Center)
+        composable<AddChannel> { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry<ChannelGraphRoute>()
+            }
+            val viewModel: ChannelsViewModel = koinViewModel(viewModelStoreOwner = parentEntry)
+            AddChannelDestination(
+                viewModel = viewModel,
+                onBackPressed = {
+                    navController.navigateUp()
+                }
+            )
         }
 
     }
