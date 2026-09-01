@@ -58,6 +58,7 @@
     <string name="exit_from_account_description">مطمعنی میخوای از حساب کاربری خارج بشی؟</string>
     <string name="chortkeh_user">کاربر چرتکه</string>
     <string name="toman">تومان</string>
+    <string name="toman_0">0 تومان</string>
     <string name="rial">ریال</string>
     <string name="enter_with_biometrics">ورود با اثر انگشت</string>
     <string name="grant_sms_permission">با فعال کردن دسترسی به پیامک های بانکی تراکنش ها میتونن خودکار ثبت بشن!</string>
@@ -108,7 +109,9 @@
     <string name="other_source">منبع دیگر</string>
     <string name="card_number">شماره کارت 16 رقمی</string>
     <string name="source_name">نام منبع</string>
-    <string name="initial_card_balance">موجودی اولیه کارت</string>
+    <string name="balance">موجودی</string>
     <string name="initial_source_balance">موجودی اولیه منبع</string>
+    <string name="icon">آیکون</string>
+    <string name="channel_icon">آیکون کانال</string>
 
 </resources>

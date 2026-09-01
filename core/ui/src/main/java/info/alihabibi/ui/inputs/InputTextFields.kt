@@ -336,9 +336,8 @@ fun AppCardNumberTextField(
     val tempBank = remember(key1 = text.length >= 6) {
         if (text.length >= 6) BankCardIdentifier.identify(text) else Bank.UNKNOWN
     }
-
     val bank = remember(key1 = tempBank, key2 = text.length >= 8) {
-        if (text.length >= 8) BankCardIdentifier.identifyNeoBanks(text, tempBank) else tempBank
+        if (text.length >= 8) BankCardIdentifier.identifyPossibleNeoBanks(text, tempBank) else tempBank
     }
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {

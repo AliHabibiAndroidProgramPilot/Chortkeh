@@ -54,7 +54,7 @@ object BankCardIdentifier {
     fun identify(digits: String): Bank =
         cardNumberPrefixes.firstOrNull { digits.startsWith(it.prefix) }?.bank ?: Bank.UNKNOWN
 
-    fun identifyNeoBanks(digits: String, currentBank: Bank): Bank =
+    fun identifyPossibleNeoBanks(digits: String, currentBank: Bank): Bank =
         neoBanksCardNumberPrefixes.firstOrNull { digits.startsWith(it.prefix) }?.bank ?: currentBank
 
 }

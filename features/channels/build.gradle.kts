@@ -12,6 +12,9 @@ dependencies {
     // design system
     implementation(projects.core.designsystem)
 
+    // common
+    implementation(projects.core.common)
+
     // ui
     implementation(projects.core.ui)
 
