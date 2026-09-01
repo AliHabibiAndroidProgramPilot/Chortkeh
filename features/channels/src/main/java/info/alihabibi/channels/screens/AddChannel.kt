@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -90,6 +91,10 @@ fun AddChannelDestination(
         },
         onChannelIconChanged = { icon ->
             viewModel.onEvent(ChannelsUiIntent.OnChannelIconChanged(icon))
+        },
+        onSaveChannel = {
+            viewModel.onEvent(ChannelsUiIntent.OnSaveChannel)
+            onBackPressed()
         },
         onBackPressed = onBackPressed
     )
@@ -298,7 +303,7 @@ private fun BankAccountChannelContent(
         ) {
 
             Switch(
-                checked = true,
+                checked = false,
                 onCheckedChange = {
 
                 },
@@ -394,7 +399,7 @@ private fun OtherChannelContent(
 
             if (channelSelectedIcon != null)
                 Icon(
-                    modifier = Modifier.padding(horizontal = 12.dp),
+                    modifier = Modifier.padding(horizontal = 12.dp).size(28.dp),
                     painter = painterResource(id = channelSelectedIcon.iconResId),
                     contentDescription = null,
                     tint = Color.Unspecified

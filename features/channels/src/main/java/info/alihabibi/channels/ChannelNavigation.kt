@@ -26,8 +26,13 @@ fun NavGraphBuilder.channelsGraph(navController: NavController) {
 
     navigation<ChannelGraphRoute>(startDestination = ChannelsList) {
 
-        composable<ChannelsList> {
+        composable<ChannelsList> { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry<ChannelGraphRoute>()
+            }
+            val viewModel: ChannelsViewModel = koinViewModel(viewModelStoreOwner = parentEntry)
             ChannelsListDestination(
+                viewModel = viewModel,
                 onEditChannel = { channelId ->
                     navController.navigate(EditChannel(channelId))
                 },

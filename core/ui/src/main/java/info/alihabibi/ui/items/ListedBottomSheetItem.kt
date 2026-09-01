@@ -148,7 +148,9 @@ fun ListedChannelItem(
             }
 
             Icon(
-                modifier = Modifier.padding(end = 12.dp),
+                modifier = Modifier
+                    .padding(end = 12.dp)
+                    .size(size = 28.dp),
                 painter = painterResource(iconResId),
                 contentDescription = null,
                 tint = Color.Unspecified

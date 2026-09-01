@@ -8,8 +8,9 @@ fun ChannelEntity.asExternalModel(): Channel = Channel(
     channelName = channelName,
     channelBalance = channelBalance,
     isBankCardChannel = isBankCardChannel,
-    cardNumber = cardNUmber,
-    icon = icon
+    cardNumber = cardNumber,
+    icon = icon,
+    bankName = bankName
 )
 
 fun Channel.asEntity(): ChannelEntity = ChannelEntity(
@@ -17,6 +18,7 @@ fun Channel.asEntity(): ChannelEntity = ChannelEntity(
     channelName = channelName,
     channelBalance = channelBalance,
     isBankCardChannel = isBankCardChannel,
-    cardNUmber = cardNumber,
-    icon = icon
+    cardNumber = cardNumber,
+    icon = icon,
+    bankName = bankName
 )

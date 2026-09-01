@@ -35,7 +35,7 @@ enum class ChannelIcon {
     ROUTING,
     TICKET,
 
-    DEFAULT,
+    UNKNOWN,
 
     ANSAR,
     BLU_BANK,

@@ -11,7 +11,8 @@ fun Channel.toUiModel(): ChannelUiModel = ChannelUiModel(
     channelBalance = channelBalance,
     isBankCardChannel = isBankCardChannel,
     cardNumber = cardNumber.orEmpty(),
-    icon = icon.toUiOption()
+    icon = icon.toUiOption(),
+    bankName = bankName
 )
 
 fun ChannelUiModel.toDomain(): Channel = Channel(
@@ -20,7 +21,8 @@ fun ChannelUiModel.toDomain(): Channel = Channel(
     channelBalance = channelBalance,
     isBankCardChannel = isBankCardChannel,
     cardNumber = cardNumber,
-    icon = icon.toDomain()
+    icon = icon.toDomain(),
+    bankName = bankName
 )
 
 fun ChannelIcon.toUiOption(): ChannelIconOptionUiModel = ChannelIconOptionUiModel.valueOf(name)

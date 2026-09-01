@@ -6,6 +6,6 @@ import org.koin.dsl.module
 
 val channelsModule = module {
 
-    viewModel { ChannelsViewModel() }
+    viewModel { ChannelsViewModel(get()) }
 
 }

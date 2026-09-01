@@ -6,5 +6,6 @@ data class Channel(
     val channelBalance: String,
     val isBankCardChannel: Boolean,
     val cardNumber: String?,
-    val icon: ChannelIcon
+    val icon: ChannelIcon,
+    val bankName: String? = null
 )

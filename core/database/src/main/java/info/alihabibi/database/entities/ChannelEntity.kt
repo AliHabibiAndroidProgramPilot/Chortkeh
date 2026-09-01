@@ -11,6 +11,7 @@ data class ChannelEntity(
     val channelName: String,
     val channelBalance: String,
     val isBankCardChannel: Boolean,
-    val cardNUmber: String?,
+    val cardNumber: String?,
     val icon: ChannelIcon, // @TypeConverter -> ChannelIconConverter
+    val bankName: String?
 )

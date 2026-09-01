@@ -39,7 +39,7 @@ enum class ChannelIconOptionUiModel(
     RECEIPT(R.drawable.category_ic_receipt),
     ROUTING(R.drawable.category_ic_routing),
 
-    DEFAULT(R.drawable.channel_ic_default),
+    UNKNOWN(R.drawable.channel_ic_default),
 
     ANSAR(info.alihabibi.common.R.drawable.ansar),
     BLU_BANK(info.alihabibi.common.R.drawable.blu),

@@ -13,6 +13,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,6 +22,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import info.alihabibi.channels.ChannelsViewModel
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray7
 import info.alihabibi.model.ui_model.channel.ChannelUiModel
@@ -29,15 +33,16 @@ import info.alihabibi.ui.items.ListedChannelItem
 
 @Composable
 fun ChannelsListDestination(
+    viewModel: ChannelsViewModel,
     onEditChannel: (channelId: Int) -> Unit = {},
     onAddNewChannel: () -> Unit = {},
     onBackPressed: () -> Unit
 ) {
 
-    val fakeListItems = remember { emptyList<ChannelUiModel>() }
+    val channels by viewModel.channels.collectAsStateWithLifecycle()
 
     ChannelsListScreen(
-        fakeListItems,
+        channels = channels,
         onEditChannel = { channel ->
             onEditChannel(channel.id)
         },

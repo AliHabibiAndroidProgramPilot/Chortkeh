@@ -107,10 +107,10 @@ class NewTransactionViewModel(
                 return@launch
 
             val category = CategoryUiModel(
-                title = _categoryUiState.value.categoryName,
+                title = state.categoryName,
                 isDefault = false,
-                icon = _categoryUiState.value.categoryIcon ?: CategoryIconOptionUiModel.OTHERS,
-                type = _categoryUiState.value.categoryType ?: CategoryTypeOptionUiModel.OUTCOME
+                icon = state.categoryIcon,
+                type = state.categoryType
             ).toDomain()
             categoryUseCases.saveCategoryUseCase.invoke(category)
 
