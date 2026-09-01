@@ -363,7 +363,7 @@ fun AppCardNumberTextField(
             onValueChange = onValueChange,
             leadingIcon = {
                 Icon(
-                    modifier = Modifier.size(size = 32.dp),
+                    modifier = Modifier.size(size = 28.dp),
                     painter = painterResource(id = bank.iconResId),
                     contentDescription = null,
                     tint = Color.Unspecified

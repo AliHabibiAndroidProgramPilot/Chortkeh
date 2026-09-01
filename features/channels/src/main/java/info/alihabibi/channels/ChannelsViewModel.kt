@@ -27,7 +27,11 @@ class ChannelsViewModel : ViewModel() {
     }
 
     private fun changeCardNumber(cardNumber: String) {
-        _addChannelUiState.update { it.copy(cardNumber = cardNumber) }
+        // safe with recomposition - StateFlow won't emit duplicated values!
+        val digits = cardNumber
+            .filter(Char::isDigit)
+            .take(16)
+        _addChannelUiState.update { it.copy(cardNumber = digits) }
     }
 
 }
