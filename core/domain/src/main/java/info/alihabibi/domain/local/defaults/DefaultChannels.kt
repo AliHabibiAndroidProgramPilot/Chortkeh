@@ -10,7 +10,8 @@ object DefaultChannels {
         channelBalance = "0",
         isBankCardChannel = false,
         cardNumber = null,
-        icon = ChannelIcon.OTHERS
+        isAppDefaultChannel = true,
+        icon = ChannelIcon.UNKNOWN
     )
 
 }

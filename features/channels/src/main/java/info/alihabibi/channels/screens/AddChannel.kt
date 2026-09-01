@@ -399,7 +399,9 @@ private fun OtherChannelContent(
 
             if (channelSelectedIcon != null)
                 Icon(
-                    modifier = Modifier.padding(horizontal = 12.dp).size(28.dp),
+                    modifier = Modifier
+                        .padding(horizontal = 12.dp)
+                        .size(size = 28.dp),
                     painter = painterResource(id = channelSelectedIcon.iconResId),
                     contentDescription = null,
                     tint = Color.Unspecified

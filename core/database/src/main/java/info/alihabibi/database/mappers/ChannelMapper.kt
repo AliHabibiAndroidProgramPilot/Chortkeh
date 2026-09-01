@@ -10,6 +10,7 @@ fun ChannelEntity.asExternalModel(): Channel = Channel(
     isBankCardChannel = isBankCardChannel,
     cardNumber = cardNumber,
     icon = icon,
+    isAppDefaultChannel = isAppDefaultChannel,
     bankName = bankName
 )
 
@@ -19,6 +20,7 @@ fun Channel.asEntity(): ChannelEntity = ChannelEntity(
     channelBalance = channelBalance,
     isBankCardChannel = isBankCardChannel,
     cardNumber = cardNumber,
+    isAppDefaultChannel = isAppDefaultChannel,
     icon = icon,
     bankName = bankName
 )

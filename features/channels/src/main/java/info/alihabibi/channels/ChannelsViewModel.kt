@@ -32,7 +32,9 @@ class ChannelsViewModel(
     init {
         channelsUseCases.getChannelsUseCase.invoke()
             .onEach { channels ->
-                _channels.value = channels.map(Channel::toUiModel)
+                _channels.value = channels
+                    .filterNot { it.isAppDefaultChannel }
+                    .map(Channel::toUiModel)
             }
             .launchIn(viewModelScope)
     }
