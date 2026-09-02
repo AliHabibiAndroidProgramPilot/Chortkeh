@@ -9,7 +9,7 @@ import info.alihabibi.domain.models.channel.ChannelIcon
 data class ChannelEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
     val channelName: String,
-    val channelBalance: String,
+    val channelBalance: Long,
     val isBankCardChannel: Boolean,
     val cardNumber: String?,
     val isAppDefaultChannel: Boolean = false,

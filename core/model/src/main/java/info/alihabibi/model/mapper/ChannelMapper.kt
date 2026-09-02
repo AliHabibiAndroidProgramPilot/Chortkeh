@@ -8,7 +8,7 @@ import info.alihabibi.model.ui_model.channel.ChannelUiModel
 fun Channel.toUiModel(): ChannelUiModel = ChannelUiModel(
     id = id,
     channelName = channelName,
-    channelBalance = channelBalance,
+    channelBalance = channelBalance.toString(),
     isBankCardChannel = isBankCardChannel,
     cardNumber = cardNumber.orEmpty(),
     isAppDefaultChannel = isAppDefaultChannel,
@@ -19,7 +19,7 @@ fun Channel.toUiModel(): ChannelUiModel = ChannelUiModel(
 fun ChannelUiModel.toDomain(): Channel = Channel(
     id = id,
     channelName = channelName,
-    channelBalance = channelBalance,
+    channelBalance = channelBalance.toLongOrNull() ?: 0L,
     isBankCardChannel = isBankCardChannel,
     cardNumber = cardNumber,
     isAppDefaultChannel = isAppDefaultChannel,

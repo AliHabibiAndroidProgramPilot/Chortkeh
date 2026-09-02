@@ -7,7 +7,7 @@ object DefaultChannels {
 
     val channel = Channel(
         channelName = "همه کانال ها",
-        channelBalance = "0",
+        channelBalance = 0L,
         isBankCardChannel = false,
         cardNumber = null,
         isAppDefaultChannel = true,

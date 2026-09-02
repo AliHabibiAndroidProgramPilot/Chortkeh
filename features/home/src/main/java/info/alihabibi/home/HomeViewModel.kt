@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -27,11 +28,18 @@ class HomeViewModel(
     init {
         combine(
             dataStoreUseCases.getIsSmsModalShownUseCase.invoke(),
-            channelsUseCase.getChannelsUseCase.invoke()
-        ) { isSmsModalShown, channels ->
+            channelsUseCase.getChannelsUseCase.invoke(),
+            channelsUseCase.getTotalBalanceUseCase.invoke()
+        ) { isSmsModalShown, channels, totalBalance ->
+            val uiChannels = channels.map {
+                if (it.isAppDefaultChannel)
+                    it.copy(channelBalance = totalBalance).toUiModel()
+                else
+                    it.toUiModel()
+            }
             HomeUiState(
                 isSmsModalShown = isSmsModalShown,
-                channels = channels.map(Channel::toUiModel)
+                channels = uiChannels
             )
         }
             .onEach { state -> _uiState.update { state } }

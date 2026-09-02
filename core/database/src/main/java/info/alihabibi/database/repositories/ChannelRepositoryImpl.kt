@@ -41,4 +41,8 @@ class ChannelRepositoryImpl(private val dao: ChannelDao) : ChannelRepository {
         }
     }
 
+    override fun getTotalBalance(): Flow<Long> {
+        return dao.getTotalBalance()
+    }
+
 }
