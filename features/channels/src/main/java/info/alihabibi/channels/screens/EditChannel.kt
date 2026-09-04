@@ -10,6 +10,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -22,6 +25,7 @@ import info.alihabibi.channels.ChannelsViewModel
 import info.alihabibi.designsystem.R
 import info.alihabibi.model.ui_model.channel.ChannelIconOptionUiModel
 import info.alihabibi.ui.buttons.AppButton
+import info.alihabibi.ui.dialogs.AppDialog
 import info.alihabibi.ui.headrs.AppHeader
 import org.koin.androidx.compose.koinViewModel
 
@@ -46,8 +50,9 @@ fun EditChannelDestination(
             viewModel.onEvent(ChannelsUiIntent.EditChannel(editingChannelId ?: 0))
             onBackPressed()
         },
-        onChannelDelete = {
-            // show Dialog before
+        onDeleteChannel = {
+            viewModel.onEvent(ChannelsUiIntent.DeleteChannel(editingChannelId ?: 0))
+            onBackPressed()
         },
         onCardNumberChange = { cardNumber ->
             viewModel.onEvent(ChannelsUiIntent.CardNumberChanged(cardNumber))
@@ -69,7 +74,7 @@ fun EditChannelDestination(
 @Composable
 private fun EditChannelScreen(
     uiState: ChannelUiState,
-    onChannelDelete: () -> Unit = {},
+    onDeleteChannel: () -> Unit = {},
     onEditChannel: () -> Unit = {},
     onChannelNameChanged: (name: String) -> Unit = {},
     onCardNumberChange: (cardNumber: String) -> Unit = {},
@@ -77,6 +82,21 @@ private fun EditChannelScreen(
     onChannelIconChanged: (icon: ChannelIconOptionUiModel) -> Unit = {},
     onBackPressed: () -> Unit
 ) {
+
+    var showDeleteWarning by remember { mutableStateOf(false) }
+    if (showDeleteWarning)
+        AppDialog(
+            title = stringResource(id = R.string.delete_channel),
+            message = stringResource(id = R.string.delete_channel_description),
+            confirmButtonText = stringResource(id = R.string.cancel),
+            cancelButtonText = stringResource(id = R.string.delete),
+            onConfirmClicked = { showDeleteWarning = false },
+            onCancelClicked = {
+                onDeleteChannel()
+                showDeleteWarning = false
+            },
+            onDismissRequest = { showDeleteWarning = false }
+        )
 
     Column(
         modifier = Modifier
@@ -94,7 +114,7 @@ private fun EditChannelScreen(
                 title = stringResource(id = R.string.edit_channel),
                 actionIcon = painterResource(id = R.drawable.trash),
                 onNavigationClicked = onBackPressed,
-                onActionClicked = onChannelDelete
+                onActionClicked = { showDeleteWarning = true }
             )
 
             if (uiState.isBankAccountChannel)

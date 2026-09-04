@@ -70,7 +70,7 @@ fun AddChannelDestination(
             viewModel.onEvent(ChannelsUiIntent.ChannelIconChanged(icon))
         },
         onSaveChannel = {
-            viewModel.onEvent(ChannelsUiIntent.OnSaveChannel)
+            viewModel.onEvent(ChannelsUiIntent.SaveChannel)
             onBackPressed()
         },
         onBackPressed = onBackPressed

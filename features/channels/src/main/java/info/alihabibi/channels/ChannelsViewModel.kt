@@ -57,7 +57,9 @@ class ChannelsViewModel(
 
             is ChannelsUiIntent.EditChannel -> editChannel(event.id)
 
-            is ChannelsUiIntent.OnSaveChannel -> saveChannel()
+            is ChannelsUiIntent.DeleteChannel -> deleteChannel(event.id)
+
+            is ChannelsUiIntent.SaveChannel -> saveChannel()
 
         }
     }
@@ -151,6 +153,23 @@ class ChannelsViewModel(
         }
     }
 
+    private fun deleteChannel(id: Int) {
+        viewModelScope.launch {
+            val state = _channelUiState.value
+            val channel = ChannelUiModel(
+                id = id,
+                channelName = state.channelName,
+                channelBalance = state.channelBalance,
+                isBankCardChannel = state.isBankAccountChannel,
+                icon = ChannelIconOptionUiModel.UNKNOWN,
+            ).toDomain()
+            channelsUseCases.deleteChannelUseCase.invoke(channel)
+            _channelUiState.update {
+                ChannelUiState()
+            }
+        }
+    }
+
     private fun getChannelById(id: Int) {
         viewModelScope.launch {
             val channel = channelsUseCases.getChannelByIdUseCase.invoke(id).first()
@@ -196,7 +215,9 @@ sealed interface ChannelsUiIntent {
 
     data class EditChannel(val id: Int) : ChannelsUiIntent
 
-    data object OnSaveChannel : ChannelsUiIntent
+    data class DeleteChannel(val id: Int) : ChannelsUiIntent
+
+    data object SaveChannel : ChannelsUiIntent
 
 }
 

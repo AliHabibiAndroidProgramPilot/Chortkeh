@@ -117,5 +117,12 @@
     <string name="read_sms_description">دریافتی‌ها و پرداختی‌ها مسقیم از پیامک خونده میشه</string>
     <string name="edit_channel">ویرایش کانال</string>
     <string name="save_changes">ذخیره تغییرات</string>
+    <string name="delete_channel">حذف کانال</string>
+    <string name="delete_channel_description">
+        آیا از حذف کانال ورودی مطمئنی؟
+        \n
+        در صورت حذف، تمام تراکنش‌های مربوط به کانال حذف خواهد شد.
+    </string>
+    <string name="delete">حذف کردن</string>
 
 </resources>
