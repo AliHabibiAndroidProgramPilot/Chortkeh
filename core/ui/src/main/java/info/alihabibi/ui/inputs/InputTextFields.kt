@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
@@ -14,8 +15,10 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -25,6 +28,8 @@ import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import info.alihabibi.common.banks.Bank
+import info.alihabibi.common.banks.BankCardIdentifier
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Black
 import info.alihabibi.designsystem.theme.ErrorRed
@@ -315,6 +320,75 @@ fun AppTitledPhoneTextField(
                 )
 
             }
+
+    }
+
+}
+
+@Composable
+fun AppCardNumberTextField(
+    modifier: Modifier = Modifier,
+    text: String,
+    onValueChange: (newValue: String) -> Unit,
+    title: String = ""
+) {
+
+    val tempBank = remember(key1 = text.length >= 6) {
+        if (text.length >= 6) BankCardIdentifier.identify(text) else Bank.UNKNOWN
+    }
+    val bank = remember(key1 = tempBank, key2 = text.length >= 8) {
+        if (text.length >= 8) BankCardIdentifier.identifyPossibleNeoBanks(text, tempBank) else tempBank
+    }
+
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
+        Text(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 2.dp),
+            text = title,
+            style = MaterialTheme.typography.labelLarge.copy(
+                fontSize = 16.sp,
+                textAlign = TextAlign.End
+            )
+        )
+
+        OutlinedTextField(
+            modifier = modifier
+                .fillMaxWidth()
+                .height(55.dp)
+                .padding(start = 12.dp, end = 12.dp, top = 6.dp),
+            value = text,
+            onValueChange = onValueChange,
+            leadingIcon = {
+                Icon(
+                    modifier = Modifier.size(size = 28.dp),
+                    painter = painterResource(id = bank.iconResId),
+                    contentDescription = null,
+                    tint = Color.Unspecified
+                )
+            },
+            textStyle = MaterialTheme.typography.labelLarge.copy(
+                textAlign = TextAlign.Left,
+                textDirection = TextDirection.Ltr
+            ),
+            keyboardOptions = KeyboardOptions(
+                autoCorrectEnabled = false,
+                keyboardType = KeyboardType.Phone,
+                imeAction = ImeAction.Done,
+                showKeyboardOnFocus = true
+            ),
+            singleLine = true,
+            shape = RoundedCornerShape(size = 12.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Primary,
+                focusedTextColor = Black,
+                cursorColor = Primary,
+                unfocusedBorderColor = Gray11,
+                unfocusedTextColor = Gray11,
+            ),
+            visualTransformation = CardNumberVisualTransformation()
+        )
 
     }
 

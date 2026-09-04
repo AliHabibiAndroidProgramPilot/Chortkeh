@@ -92,6 +92,7 @@ class ProfileViewModel(
     }
 
     private fun changePhone(phone: String) {
+        // safe with recomposition - StateFlow won't emit duplicated values!
         val digits = phone
             .filter(Char::isDigit)
             .take(11)

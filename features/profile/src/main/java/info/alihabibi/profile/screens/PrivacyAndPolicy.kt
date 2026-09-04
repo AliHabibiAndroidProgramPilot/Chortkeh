@@ -110,8 +110,8 @@ private fun PrivacyAndPolicyScreen(
 
         AppHeader(
             title = stringResource(id = R.string.privacy_policy),
-            isMenuAvailable = false,
-            onNavigationClick = onBackPressed
+            isActionAvailable = false,
+            onNavigationClicked = onBackPressed
         )
 
         Column(

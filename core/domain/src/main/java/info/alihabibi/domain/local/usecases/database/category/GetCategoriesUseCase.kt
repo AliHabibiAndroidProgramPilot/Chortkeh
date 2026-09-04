@@ -1,4 +1,4 @@
-package info.alihabibi.domain.local.usecases.database
+package info.alihabibi.domain.local.usecases.database.category
 
 import info.alihabibi.domain.local.repositories.CategoryRepository
 import info.alihabibi.domain.models.category.Category

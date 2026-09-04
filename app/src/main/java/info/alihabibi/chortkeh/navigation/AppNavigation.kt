@@ -7,6 +7,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import info.alihabibi.announcements.AnnouncementsDestination
+import info.alihabibi.channels.AddChannel
+import info.alihabibi.channels.ChannelGraphRoute
+import info.alihabibi.channels.channelsGraph
 import info.alihabibi.home.HomeDestination
 import info.alihabibi.new_transaction.newTransactionGraph
 import info.alihabibi.onboarding.OnBoardingDestination
@@ -64,6 +67,13 @@ fun DemoNavHost(
             HomeDestination(
                 onAnnouncements = {
                     navController.navigate(Announcements)
+                },
+                onChannels = {
+                    navController.navigate(ChannelGraphRoute)
+                },
+                onNewChannel = {
+                    navController.navigate(ChannelGraphRoute)
+                    navController.navigate(AddChannel)
                 }
             )
         }
@@ -87,6 +97,8 @@ fun DemoNavHost(
         profileGraph(navController = navController)
 
         newTransactionGraph(navController = navController)
+
+        channelsGraph(navController = navController)
 
     }
 

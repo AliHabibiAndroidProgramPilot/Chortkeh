@@ -3,10 +3,8 @@ package info.alihabibi.ui.items
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -27,10 +25,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray3
 import info.alihabibi.designsystem.theme.Primary
 
@@ -87,18 +83,5 @@ fun ListedBottomSheetItem(
         }
 
     }
-
-}
-
-@Preview
-@Composable
-private fun ListedBottomSheetItemPreview() {
-
-    ListedBottomSheetItem(
-        title = "خوش گذرونی",
-        iconResId = R.drawable.category_ic_income,
-        onClick = {},
-        onLongClick = {}
-    )
 
 }

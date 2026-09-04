@@ -29,6 +29,11 @@
     <string name="confirm">تایید</string>
     <string name="cancel">لغو</string>
 
+    // Home
+    <string name="bookkeeping">حساب کتاب</string>
+    <string name="all_accounts">همه حساب‌ها</string>
+    <string name="input_channels">کانال‌های ورودی</string>
+
     // On Boarding
     <string name="piggy_bank">قلک</string>
     <string name="piggy_bank_description">تا قلک پره نگران هیج اتفاق غیر قابل پیش بینی نباش</string>
@@ -53,6 +58,7 @@
     <string name="exit_from_account_description">مطمعنی میخوای از حساب کاربری خارج بشی؟</string>
     <string name="chortkeh_user">کاربر چرتکه</string>
     <string name="toman">تومان</string>
+    <string name="toman_0">0 تومان</string>
     <string name="rial">ریال</string>
     <string name="enter_with_biometrics">ورود با اثر انگشت</string>
     <string name="grant_sms_permission">با فعال کردن دسترسی به پیامک های بانکی تراکنش ها میتونن خودکار ثبت بشن!</string>
@@ -94,5 +100,29 @@
     <string name="category_icon">آیکون دسته</string>
     <string name="category_icon2">آیکون دسته‌بندی</string>
     <string name="category_name_error">نام دسته‌بندی نمیتواند بیشتر از 30 کاراکتر باشد</string>
+
+    // Channels
+    <string name="empty_channels_list_message">هنوز کانالی ثبت نکردی</string>
+    <string name="register_channel">ثبت کانال ورودی</string>
+    <string name="input_channel_type">نوع کانال ورودی</string>
+    <string name="bank_card">کارت بانکی</string>
+    <string name="other_source">منبع دیگر</string>
+    <string name="card_number">شماره کارت 16 رقمی</string>
+    <string name="source_name">نام منبع</string>
+    <string name="balance">موجودی</string>
+    <string name="initial_source_balance">موجودی اولیه منبع</string>
+    <string name="icon">آیکون</string>
+    <string name="channel_icon">آیکون کانال</string>
+    <string name="read_sms">خواندن پیامک ها</string>
+    <string name="read_sms_description">دریافتی‌ها و پرداختی‌ها مسقیم از پیامک خونده میشه</string>
+    <string name="edit_channel">ویرایش کانال</string>
+    <string name="save_changes">ذخیره تغییرات</string>
+    <string name="delete_channel">حذف کانال</string>
+    <string name="delete_channel_description">
+        آیا از حذف کانال ورودی مطمئنی؟
+        \n
+        در صورت حذف، تمام تراکنش‌های مربوط به کانال حذف خواهد شد.
+    </string>
+    <string name="delete">حذف کردن</string>
 
 </resources>

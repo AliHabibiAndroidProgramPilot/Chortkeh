@@ -23,7 +23,7 @@ internal class CategorySeedCallback(
     override fun onCreate(connection: SQLiteConnection) {
         super.onCreate(connection)
         scope.launch {
-            val dao = databaseProvider().categoryDao()
+            val dao = databaseProvider.invoke().categoryDao()
             dao.insertCategory(
                 DefaultCategories.categories.map(Category::asEntity)
             )

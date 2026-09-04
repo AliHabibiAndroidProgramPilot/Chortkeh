@@ -90,9 +90,10 @@ fun AppHeader(
     modifier: Modifier = Modifier,
     title: String,
     windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
-    isMenuAvailable: Boolean = true,
-    onMenuClick: () -> Unit = {},
-    onNavigationClick: () -> Unit = {}
+    actionIcon: Painter = painterResource(id = R.drawable.kebab_menu),
+    isActionAvailable: Boolean = true,
+    onActionClicked: () -> Unit = {},
+    onNavigationClicked: () -> Unit = {}
 ) {
 
     CenterAlignedTopAppBar(
@@ -105,19 +106,19 @@ fun AppHeader(
             )
         },
         navigationIcon = {
-            if (isMenuAvailable)
+            if (isActionAvailable)
                 IconButton(
-                    onClick = onMenuClick
+                    onClick = onActionClicked
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.kebab_menu),
+                        painter = actionIcon,
                         contentDescription = null
                     )
                 }
         },
         actions = {
             IconButton(
-                onClick = onNavigationClick
+                onClick = onNavigationClicked
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.arrow_right),

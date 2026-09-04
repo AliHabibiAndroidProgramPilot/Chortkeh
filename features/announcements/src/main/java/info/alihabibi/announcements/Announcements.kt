@@ -57,8 +57,8 @@ private fun AnnouncementsScreen(
 
         AppHeader(
             title = stringResource(id = R.string.announcements),
-            isMenuAvailable = false,
-            onNavigationClick = onBackPressed
+            isActionAvailable = false,
+            onNavigationClicked = onBackPressed
         )
 
         Spacer(Modifier.height(height = 8.dp))

@@ -4,7 +4,7 @@ import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import info.alihabibi.common.PersianDateFormatter
-import info.alihabibi.domain.local.usecases.database.usecase.CategoryUseCases
+import info.alihabibi.domain.local.usecases.database.category.usecase.CategoryUseCases
 import info.alihabibi.model.mapper.toDomain
 import info.alihabibi.model.mapper.toUiModel
 import info.alihabibi.model.ui_model.TransactionTypeOptionUiModel
@@ -107,10 +107,10 @@ class NewTransactionViewModel(
                 return@launch
 
             val category = CategoryUiModel(
-                title = _categoryUiState.value.categoryName,
+                title = state.categoryName,
                 isDefault = false,
-                icon = _categoryUiState.value.categoryIcon ?: CategoryIconOptionUiModel.OTHERS,
-                type = _categoryUiState.value.categoryType ?: CategoryTypeOptionUiModel.OUTCOME
+                icon = state.categoryIcon,
+                type = state.categoryType
             ).toDomain()
             categoryUseCases.saveCategoryUseCase.invoke(category)
 

@@ -124,8 +124,8 @@ private fun UserAccountInfoScreen(
 
             AppHeader(
                 title = stringResource(id = R.string.user_account_info),
-                isMenuAvailable = false,
-                onNavigationClick = onBackPressed
+                isActionAvailable = false,
+                onNavigationClicked = onBackPressed
             )
 
             Spacer(modifier = Modifier.height(height = 12.dp))

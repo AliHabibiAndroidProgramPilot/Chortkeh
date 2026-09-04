@@ -47,6 +47,7 @@ import info.alihabibi.designsystem.theme.Gray9
 import info.alihabibi.designsystem.theme.Primary
 import info.alihabibi.designsystem.theme.White
 import info.alihabibi.ui.items.ListedBottomSheetItem
+import info.alihabibi.ui.items.ListedChannelItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -136,7 +137,9 @@ fun <T> ListedBottomSheet(
                             IconButton(
                                 modifier = Modifier.size(size = 24.dp),
                                 onClick = {
-                                    val itemToEdit = items.firstOrNull { itemKey(it) in selectedKeys } ?: return@IconButton
+                                    val itemToEdit =
+                                        items.firstOrNull { itemKey(it) in selectedKeys }
+                                            ?: return@IconButton
                                     onEditItem(itemToEdit)
                                     selectedKeys.clear()
                                     selectionModeEnabled = false
@@ -192,6 +195,126 @@ fun <T> ListedBottomSheet(
                                 selectionModeEnabled = true
                                 selectedKeys.add(key)
                             }
+                        )
+
+                    }
+
+                    item(key = "ADD_NEW") {
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(height = 50.dp)
+                                .padding(horizontal = 16.dp)
+                                .clip(shape = RoundedCornerShape(12.dp))
+                                .clickable(onClick = onAddNewItem),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.End
+                        ) {
+
+                            Text(
+                                modifier = Modifier.padding(end = 10.dp),
+                                text = addNewItemTitle,
+                                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 14.sp)
+                            )
+
+                            Icon(
+                                modifier = Modifier.padding(end = 12.dp),
+                                painter = painterResource(id = R.drawable.add_square),
+                                contentDescription = null,
+                                tint = Primary
+                            )
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun <T> ChannelListedBottomSheet(
+    items: List<T>,
+    itemTitle: (T) -> String,
+    itemSubTitle: (T) -> String,
+    itemIcon: (T) -> Int,
+    itemKey: (T) -> Any,
+    addNewItemTitle: String = stringResource(id = R.string.add_new_channel),
+    onAddNewItem: () -> Unit = {},
+    onDismissRequest: () -> Unit,
+    onSelectItem: (item: T) -> Unit,
+    onChannelsEdit: () -> Unit
+) {
+
+    ModalBottomSheet(
+        containerColor = White,
+        onDismissRequest = onDismissRequest
+    ) {
+
+        Surface(modifier = Modifier.fillMaxWidth()) {
+
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
+                Box(modifier = Modifier.fillMaxWidth()) {
+
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(alignment = Alignment.Center),
+                        text = stringResource(id = R.string.input_channels),
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+
+                    Row(
+                        modifier = Modifier
+                            .align(Alignment.CenterStart)
+                            .padding(start = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        IconButton(
+                            modifier = Modifier.size(size = 24.dp),
+                            onClick = onChannelsEdit
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.edit),
+                                contentDescription = null,
+                                tint = Gray9
+                            )
+                        }
+
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(height = 12.dp))
+
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                ) {
+
+                    items(
+                        items = items,
+                        key = { item -> itemKey(item) }
+                    ) { item ->
+
+                        ListedChannelItem(
+                            title = itemTitle(item),
+                            iconResId = itemIcon(item),
+                            subTitle = itemSubTitle(item),
+                            onClick = { onSelectItem(item) }
                         )
 
                     }

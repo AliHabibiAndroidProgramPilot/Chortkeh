@@ -245,8 +245,8 @@ private fun NewTransactionScreen(
             AppHeader(
                 title = stringResource(id = R.string.register_transaction),
                 windowInsets = TopAppBarDefaults.windowInsets.only(sides = WindowInsetsSides.Top),
-                isMenuAvailable = false,
-                onNavigationClick = onBackPressed
+                isActionAvailable = false,
+                onNavigationClicked = onBackPressed
             )
 
             Spacer(Modifier.height(height = 8.dp))
