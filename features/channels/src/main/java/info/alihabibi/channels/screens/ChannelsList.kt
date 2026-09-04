@@ -24,6 +24,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import info.alihabibi.channels.ChannelsUiIntent
 import info.alihabibi.channels.ChannelsViewModel
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray7
@@ -48,7 +49,10 @@ fun ChannelsListDestination(
         onEditChannel = { channel ->
             onEditChannel(channel.id)
         },
-        onAddNewChannel = onAddNewChannel,
+        onAddNewChannel = {
+            viewModel.onEvent(ChannelsUiIntent.ResetChannelsDraft)
+            onAddNewChannel()
+        },
         onBackPressed = onBackPressed
     )
 

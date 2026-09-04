@@ -61,6 +61,8 @@ class ChannelsViewModel(
 
             is ChannelsUiIntent.SaveChannel -> saveChannel()
 
+            is ChannelsUiIntent.ResetChannelsDraft -> resetDraft()
+
         }
     }
 
@@ -117,9 +119,7 @@ class ChannelsViewModel(
             ).toDomain()
             channelsUseCases.saveChannelUseCase.invoke(channel)
 
-            _channelUiState.update {
-                ChannelUiState()
-            }
+            resetDraft()
         }
     }
 
@@ -147,9 +147,7 @@ class ChannelsViewModel(
             ).toDomain()
             channelsUseCases.updateChannelUseCase.invoke(channel)
 
-            _channelUiState.update {
-                ChannelUiState()
-            }
+            resetDraft()
         }
     }
 
@@ -164,9 +162,7 @@ class ChannelsViewModel(
                 icon = ChannelIconOptionUiModel.UNKNOWN,
             ).toDomain()
             channelsUseCases.deleteChannelUseCase.invoke(channel)
-            _channelUiState.update {
-                ChannelUiState()
-            }
+            resetDraft()
         }
     }
 
@@ -189,6 +185,12 @@ class ChannelsViewModel(
                     channelIcon = if (channel.isBankCardChannel) null else channel.icon
                 )
             }
+        }
+    }
+
+    private fun resetDraft() {
+        _channelUiState.update {
+            ChannelUiState()
         }
     }
 
@@ -218,6 +220,8 @@ sealed interface ChannelsUiIntent {
     data class DeleteChannel(val id: Int) : ChannelsUiIntent
 
     data object SaveChannel : ChannelsUiIntent
+
+    data object ResetChannelsDraft : ChannelsUiIntent
 
 }
 
