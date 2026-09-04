@@ -1,5 +1,6 @@
 package info.alihabibi.model.mapper
 
+import info.alihabibi.common.Utils
 import info.alihabibi.domain.models.channel.Channel
 import info.alihabibi.domain.models.channel.ChannelIcon
 import info.alihabibi.model.ui_model.channel.ChannelIconOptionUiModel
@@ -8,7 +9,7 @@ import info.alihabibi.model.ui_model.channel.ChannelUiModel
 fun Channel.toUiModel(): ChannelUiModel = ChannelUiModel(
     id = id,
     channelName = channelName,
-    channelBalance = channelBalance.toString(),
+    channelBalance = Utils.decimalFormatterPattern.format(channelBalance),
     isBankCardChannel = isBankCardChannel,
     cardNumber = cardNumber.orEmpty(),
     isAppDefaultChannel = isAppDefaultChannel,

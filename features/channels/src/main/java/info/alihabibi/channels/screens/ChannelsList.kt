@@ -25,6 +25,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import info.alihabibi.channels.ChannelsViewModel
+import info.alihabibi.common.Utils.loog
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray7
 import info.alihabibi.model.ui_model.channel.ChannelUiModel
@@ -115,7 +116,7 @@ private fun ChannelsListContent(
             items = channels,
             key = { it.id }
         ) { channel ->
-
+            channel.loog("Ali")
             ListedChannelItem(
                 title = channel.channelName,
                 subTitle = channel.channelBalance,

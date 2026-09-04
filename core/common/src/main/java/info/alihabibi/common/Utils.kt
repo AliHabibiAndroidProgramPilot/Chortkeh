@@ -2,9 +2,12 @@ package info.alihabibi.common
 
 import android.content.Context
 import android.util.Log
+import java.text.DecimalFormat
 import java.util.Calendar
 
 object Utils {
+
+    val decimalFormatterPattern = DecimalFormat("#,###")
 
     fun <T> T.loog(tag: String = "loog", param: String = "param"): T {
         return this.apply {
