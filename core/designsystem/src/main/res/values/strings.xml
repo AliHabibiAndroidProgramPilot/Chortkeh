@@ -115,5 +115,7 @@
     <string name="channel_icon">آیکون کانال</string>
     <string name="read_sms">خواندن پیامک ها</string>
     <string name="read_sms_description">دریافتی‌ها و پرداختی‌ها مسقیم از پیامک خونده میشه</string>
+    <string name="edit_channel">ویرایش کانال</string>
+    <string name="save_changes">ذخیره تغییرات</string>
 
 </resources>

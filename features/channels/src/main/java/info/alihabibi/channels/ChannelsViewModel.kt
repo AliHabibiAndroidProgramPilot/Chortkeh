@@ -14,6 +14,7 @@ import info.alihabibi.model.ui_model.channel.ChannelUiModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -23,8 +24,8 @@ class ChannelsViewModel(
     private val channelsUseCases: ChannelUseCases
 ) : ViewModel() {
 
-    private val _addChannelUiState = MutableStateFlow(AddChannelUiState())
-    val addChannelUiState: StateFlow<AddChannelUiState> = _addChannelUiState.asStateFlow()
+    private val _channelUiState = MutableStateFlow(ChannelUiState())
+    val channelUiState: StateFlow<ChannelUiState> = _channelUiState.asStateFlow()
 
     private val _channels: MutableStateFlow<List<ChannelUiModel>> = MutableStateFlow(emptyList())
     val channels: StateFlow<List<ChannelUiModel>> = _channels.asStateFlow()
@@ -42,15 +43,19 @@ class ChannelsViewModel(
     fun onEvent(event: ChannelsUiIntent) {
         when (event) {
 
-            is ChannelsUiIntent.OnChannelTypeChanged -> changeChannelType(event.isBankAccountChannel)
+            is ChannelsUiIntent.ChannelTypeChanged -> changeChannelType(event.isBankAccountChannel)
 
-            is ChannelsUiIntent.OnCardNumberChanged -> changeCardNumber(event.cardNumber)
+            is ChannelsUiIntent.CardNumberChanged -> changeCardNumber(event.cardNumber)
 
-            is ChannelsUiIntent.OnInitialBalanceChanged -> changeInitialBalance(event.balance)
+            is ChannelsUiIntent.BalanceChanged -> changeInitialBalance(event.balance)
 
-            is ChannelsUiIntent.OnChannelNameChanged -> changeChannelName(event.name)
+            is ChannelsUiIntent.ChannelNameChanged -> changeChannelName(event.name)
 
-            is ChannelsUiIntent.OnChannelIconChanged -> changeChannelIcon(event.icon)
+            is ChannelsUiIntent.ChannelIconChanged -> changeChannelIcon(event.icon)
+
+            is ChannelsUiIntent.GetChannelById -> getChannelById(event.id)
+
+            is ChannelsUiIntent.EditChannel -> editChannel(event.id)
 
             is ChannelsUiIntent.OnSaveChannel -> saveChannel()
 
@@ -58,8 +63,8 @@ class ChannelsViewModel(
     }
 
     private fun changeChannelType(isBankAccountChannel: Boolean) {
-        _addChannelUiState.update {
-            AddChannelUiState(isBankAccountChannel = isBankAccountChannel)
+        _channelUiState.update {
+            ChannelUiState(isBankAccountChannel = isBankAccountChannel)
         }
     }
 
@@ -68,63 +73,102 @@ class ChannelsViewModel(
         val digits = cardNumber
             .filter(Char::isDigit)
             .take(16)
-        _addChannelUiState.update { it.copy(cardNumber = digits) }
+        _channelUiState.update { it.copy(cardNumber = digits) }
     }
 
     private fun changeInitialBalance(balance: String) {
         val balanceWithLimit = balance
             .filter(Char::isDigit)
             .take(20)
-        _addChannelUiState.update { it.copy(initialBalance = balanceWithLimit) }
+        _channelUiState.update { it.copy(channelBalance = balanceWithLimit) }
     }
 
     private fun changeChannelName(name: String) {
         if (name.length < 30)
-            _addChannelUiState.update { it.copy(channelName = name) }
+            _channelUiState.update { it.copy(channelName = name) }
     }
 
     private fun changeChannelIcon(icon: ChannelIconOptionUiModel) {
-        _addChannelUiState.update { it.copy(channelIcon = icon) }
+        _channelUiState.update { it.copy(channelIcon = icon) }
     }
 
     private fun saveChannel() {
         viewModelScope.launch {
-            val state = _addChannelUiState.value
+            val state = _channelUiState.value
             val hasEmptyFields = if (state.isBankAccountChannel)
-                state.channelName.isEmpty() || state.initialBalance.isEmpty() || state.cardNumber.isEmpty()
+                state.channelName.isEmpty() || state.channelBalance.isEmpty() || state.cardNumber.isEmpty()
             else
-                state.channelName.isEmpty() || state.initialBalance.isEmpty() || state.channelIcon == null
+                state.channelName.isEmpty() || state.channelBalance.isEmpty() || state.channelIcon == null
             if (hasEmptyFields) return@launch
 
             val bank = fetchBank(state.cardNumber)
-            // May get exception on filling icon field, it's a dangerous code I might change it later!
-            try {
-                val channel = ChannelUiModel(
-                    channelName = state.channelName,
-                    channelBalance = state.initialBalance,
-                    isBankCardChannel = state.isBankAccountChannel,
-                    cardNumber = state.cardNumber,
-                    icon = state.channelIcon ?: ChannelIconOptionUiModel.valueOf(bank.name),
-                    bankName = if (bank == Bank.UNKNOWN) null else bank.name
-                ).toDomain()
 
-                channelsUseCases.saveChannelUseCase.invoke(channel)
-            } catch (e: IllegalArgumentException) {
-                e.printStackTrace()
-                val channel = ChannelUiModel(
-                    channelName = state.channelName,
-                    channelBalance = state.initialBalance,
-                    isBankCardChannel = state.isBankAccountChannel,
-                    cardNumber = state.cardNumber,
-                    icon = ChannelIconOptionUiModel.UNKNOWN,
-                    bankName = if (bank == Bank.UNKNOWN) null else bank.name
-                ).toDomain()
+            val channel = ChannelUiModel(
+                channelName = state.channelName,
+                channelBalance = state.channelBalance,
+                isBankCardChannel = state.isBankAccountChannel,
+                cardNumber = state.cardNumber,
+                icon = state.channelIcon
+                    ?: ChannelIconOptionUiModel.entries.find { it.name == bank.name }
+                    ?: ChannelIconOptionUiModel.UNKNOWN,
+                bankName = if (bank == Bank.UNKNOWN) null else bank.name
+            ).toDomain()
+            channelsUseCases.saveChannelUseCase.invoke(channel)
 
-                channelsUseCases.saveChannelUseCase.invoke(channel)
-            } finally {
-                _addChannelUiState.update {
-                    AddChannelUiState()
-                }
+            _channelUiState.update {
+                ChannelUiState()
+            }
+        }
+    }
+
+    private fun editChannel(id: Int) {
+        viewModelScope.launch {
+            val state = _channelUiState.value
+            val hasEmptyFields = if (state.isBankAccountChannel)
+                state.channelName.isEmpty() || state.channelBalance.isEmpty() || state.cardNumber.isEmpty()
+            else
+                state.channelName.isEmpty() || state.channelBalance.isEmpty() || state.channelIcon == null
+            if (hasEmptyFields) return@launch
+
+            val bank = fetchBank(state.cardNumber)
+
+            val channel = ChannelUiModel(
+                id = id,
+                channelName = state.channelName,
+                channelBalance = state.channelBalance,
+                isBankCardChannel = state.isBankAccountChannel,
+                cardNumber = state.cardNumber,
+                icon = state.channelIcon
+                    ?: ChannelIconOptionUiModel.entries.find { it.name == bank.name }
+                    ?: ChannelIconOptionUiModel.UNKNOWN,
+                bankName = if (bank == Bank.UNKNOWN) null else bank.name
+            ).toDomain()
+            channelsUseCases.updateChannelUseCase.invoke(channel)
+
+            _channelUiState.update {
+                ChannelUiState()
+            }
+        }
+    }
+
+    private fun getChannelById(id: Int) {
+        viewModelScope.launch {
+            val channel = channelsUseCases.getChannelByIdUseCase.invoke(id).first()
+                .toUiModel(needsBalanceFormat = false)
+            _channelUiState.update {
+                ChannelUiState(
+                    isBankAccountChannel = channel.isBankCardChannel,
+                    channelName = channel.channelName,
+                    channelBalance = channel.channelBalance,
+                    cardNumber = channel.cardNumber,
+                    /**
+                     * Won't fill the icon here if it's bank account, it will corrupt editing functionality
+                     * everytime we save/edit channel the bank account icon will be automatically fetch using `fetchBank()` function
+                     * the bank account icon selection is not on the user behalf. compose components shows it; Bank enum fetches it for save/edit
+                     * but non bank account icon is user selectable, so we fill it user might change it and that value will be saved.
+                     */
+                    channelIcon = if (channel.isBankCardChannel) null else channel.icon
+                )
             }
         }
     }
@@ -138,34 +182,38 @@ class ChannelsViewModel(
 
 sealed interface ChannelsUiIntent {
 
-    data class OnChannelTypeChanged(val isBankAccountChannel: Boolean) : ChannelsUiIntent
+    data class ChannelTypeChanged(val isBankAccountChannel: Boolean) : ChannelsUiIntent
 
-    data class OnCardNumberChanged(val cardNumber: String) : ChannelsUiIntent
+    data class CardNumberChanged(val cardNumber: String) : ChannelsUiIntent
 
-    data class OnInitialBalanceChanged(val balance: String) : ChannelsUiIntent
+    data class BalanceChanged(val balance: String) : ChannelsUiIntent
 
-    data class OnChannelNameChanged(val name: String) : ChannelsUiIntent
+    data class ChannelNameChanged(val name: String) : ChannelsUiIntent
 
-    data class OnChannelIconChanged(val icon: ChannelIconOptionUiModel) : ChannelsUiIntent
+    data class ChannelIconChanged(val icon: ChannelIconOptionUiModel) : ChannelsUiIntent
+
+    data class GetChannelById(val id: Int) : ChannelsUiIntent
+
+    data class EditChannel(val id: Int) : ChannelsUiIntent
 
     data object OnSaveChannel : ChannelsUiIntent
 
 }
 
 @Immutable
-data class AddChannelUiState(
+data class ChannelUiState(
     val isBankAccountChannel: Boolean = true,
     val channelName: String = "",
+    val channelBalance: String = "",
     val cardNumber: String = "",
-    val initialBalance: String = "",
     val channelIcon: ChannelIconOptionUiModel? = null
 ) {
     val isChannelRegisterButtonEnabled: Boolean
         get() {
             return if (isBankAccountChannel) {
-                channelName.isNotEmpty() && cardNumber.isNotEmpty() && initialBalance.isNotEmpty()
+                channelName.isNotEmpty() && cardNumber.isNotEmpty() && channelBalance.isNotEmpty()
             } else {
-                channelName.isNotEmpty() && initialBalance.isNotEmpty() && channelIcon != null
+                channelName.isNotEmpty() && channelBalance.isNotEmpty() && channelIcon != null
             }
         }
 }

@@ -6,6 +6,7 @@ import info.alihabibi.domain.local.usecases.database.category.SaveCategoryUseCas
 import info.alihabibi.domain.local.usecases.database.category.UpdateCategoryUseCase
 import info.alihabibi.domain.local.usecases.database.category.usecase.CategoryUseCases
 import info.alihabibi.domain.local.usecases.database.channel.DeleteChannelUseCase
+import info.alihabibi.domain.local.usecases.database.channel.GetChannelByIdUseCase
 import info.alihabibi.domain.local.usecases.database.channel.GetChannelsUseCase
 import info.alihabibi.domain.local.usecases.database.channel.GetTotalBalanceUseCase
 import info.alihabibi.domain.local.usecases.database.channel.SaveChannelUseCase
@@ -81,6 +82,7 @@ val domainModule = module {
             getChannelsUseCase = GetChannelsUseCase(get()),
             deleteChannelUseCase = DeleteChannelUseCase(get()),
             updateChannelUseCase = UpdateChannelUseCase(get()),
+            getChannelByIdUseCase = GetChannelByIdUseCase(get()),
             getTotalBalanceUseCase = GetTotalBalanceUseCase(get())
         )
     }

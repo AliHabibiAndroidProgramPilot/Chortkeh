@@ -41,6 +41,12 @@ class ChannelRepositoryImpl(private val dao: ChannelDao) : ChannelRepository {
         }
     }
 
+    override fun getChannelById(id: Int): Flow<Channel> {
+        return dao.getChannelById(id)
+            .map { it.asExternalModel() }
+            .flowOn(Dispatchers.IO)
+    }
+
     override fun getTotalBalance(): Flow<Long> {
         return dao.getTotalBalance()
     }

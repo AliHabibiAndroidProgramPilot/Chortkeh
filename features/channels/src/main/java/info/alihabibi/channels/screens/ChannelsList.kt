@@ -25,17 +25,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import info.alihabibi.channels.ChannelsViewModel
-import info.alihabibi.common.Utils.loog
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray7
 import info.alihabibi.model.ui_model.channel.ChannelUiModel
 import info.alihabibi.ui.buttons.AppButton
 import info.alihabibi.ui.headrs.AppHeader
 import info.alihabibi.ui.items.ListedChannelItem
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ChannelsListDestination(
-    viewModel: ChannelsViewModel,
+    viewModel: ChannelsViewModel = koinViewModel(),
     onEditChannel: (channelId: Int) -> Unit = {},
     onAddNewChannel: () -> Unit = {},
     onBackPressed: () -> Unit
@@ -69,8 +69,8 @@ private fun ChannelsListScreen(
 
         AppHeader(
             title = stringResource(id = R.string.input_channels),
-            isMenuAvailable = false,
-            onNavigationClick = onBackPressed
+            isActionAvailable = false,
+            onNavigationClicked = onBackPressed
         )
 
         if (channels.isEmpty())
@@ -116,7 +116,7 @@ private fun ChannelsListContent(
             items = channels,
             key = { it.id }
         ) { channel ->
-            channel.loog("Ali")
+
             ListedChannelItem(
                 title = channel.channelName,
                 subTitle = channel.channelBalance,

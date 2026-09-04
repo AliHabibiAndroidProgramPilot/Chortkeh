@@ -25,6 +25,9 @@ interface ChannelDao {
     @Update
     suspend fun updateChannel(channel: ChannelEntity)
 
+    @Query("SELECT * FROM ${Keys.CHANNELS_TABLE_NAME} WHERE id = :id")
+    fun getChannelById(id: Int): Flow<ChannelEntity>
+
     @Query("SELECT COALESCE(SUM(channelBalance), 0) FROM ${Keys.CHANNELS_TABLE_NAME}")
     fun getTotalBalance(): Flow<Long>
 

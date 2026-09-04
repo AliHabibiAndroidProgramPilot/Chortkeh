@@ -5,8 +5,10 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import androidx.navigation.toRoute
 import info.alihabibi.channels.screens.AddChannelDestination
 import info.alihabibi.channels.screens.ChannelsListDestination
+import info.alihabibi.channels.screens.EditChannelDestination
 import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
 
@@ -45,8 +47,19 @@ fun NavGraphBuilder.channelsGraph(navController: NavController) {
             )
         }
 
-        composable<EditChannel> {
-
+        composable<EditChannel> { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry<ChannelGraphRoute>()
+            }
+            val viewModel: ChannelsViewModel = koinViewModel(viewModelStoreOwner = parentEntry)
+            val args = backStackEntry.toRoute<EditChannel>()
+            EditChannelDestination(
+                viewModel = viewModel,
+                editingChannelId = args.editingChannelId,
+                onBackPressed = {
+                    navController.navigateUp()
+                }
+            )
         }
 
         composable<AddChannel> { backStackEntry ->

@@ -148,8 +148,8 @@ private fun AddCategoryScreen(
                     false -> stringResource(id = R.string.new_category)
                 },
                 windowInsets = TopAppBarDefaults.windowInsets.only(sides = WindowInsetsSides.Top),
-                isMenuAvailable = false,
-                onNavigationClick = onBackPressed
+                isActionAvailable = false,
+                onNavigationClicked = onBackPressed
             )
 
             Spacer(Modifier.height(height = 8.dp))

@@ -6,10 +6,10 @@ import info.alihabibi.domain.models.channel.ChannelIcon
 import info.alihabibi.model.ui_model.channel.ChannelIconOptionUiModel
 import info.alihabibi.model.ui_model.channel.ChannelUiModel
 
-fun Channel.toUiModel(): ChannelUiModel = ChannelUiModel(
+fun Channel.toUiModel(needsBalanceFormat: Boolean = true): ChannelUiModel = ChannelUiModel(
     id = id,
     channelName = channelName,
-    channelBalance = Utils.decimalFormatterPattern.format(channelBalance),
+    channelBalance = if (needsBalanceFormat) Utils.decimalFormatterPattern.format(channelBalance) else channelBalance.toString(),
     isBankCardChannel = isBankCardChannel,
     cardNumber = cardNumber.orEmpty(),
     isAppDefaultChannel = isAppDefaultChannel,
