@@ -1,5 +1,6 @@
 package info.alihabibi.channels.screens
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -51,7 +52,8 @@ internal fun BankAccountChannelContent(
     modifier: Modifier = Modifier,
     channelName: String,
     cardNumber: String,
-    initialBalance: String,
+    balance: String,
+    @DrawableRes iconResId: Int,
     onCardNumberChange: (value: String) -> Unit = {},
     onInitialBalanceChange: (value: String) -> Unit = {},
     onChannelNameChange: (value: String) -> Unit = {},
@@ -66,6 +68,14 @@ internal fun BankAccountChannelContent(
             modifier = Modifier.padding(horizontal = 4.dp),
             text = cardNumber,
             onValueChange = onCardNumberChange,
+            leadingIcon = {
+                Icon(
+                    modifier = Modifier.size(size = 28.dp),
+                    painter = painterResource(id = iconResId),
+                    contentDescription = null,
+                    tint = Color.Unspecified
+                )
+            },
             title = stringResource(id = R.string.card_number)
         )
 
@@ -73,7 +83,7 @@ internal fun BankAccountChannelContent(
 
         AppTitledPriceTextField(
             modifier = Modifier.padding(horizontal = 4.dp),
-            text = initialBalance,
+            text = balance,
             onValueChange = onInitialBalanceChange,
             title = stringResource(id = R.string.balance),
             placeHolderText = stringResource(id = R.string.toman_0)

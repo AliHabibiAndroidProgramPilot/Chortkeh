@@ -127,7 +127,8 @@ private fun EditChannelScreen(
                         .verticalScroll(state = rememberScrollState()),
                     channelName = uiState.channelName,
                     cardNumber = uiState.cardNumber,
-                    initialBalance = uiState.channelBalance,
+                    balance = uiState.channelBalance,
+                    iconResId = uiState.channelIcon?.iconResId ?: R.drawable.channel_ic_default,
                     onChannelNameChange = onChannelNameChanged,
                     onCardNumberChange = onCardNumberChange,
                     onInitialBalanceChange = onBalanceChanged

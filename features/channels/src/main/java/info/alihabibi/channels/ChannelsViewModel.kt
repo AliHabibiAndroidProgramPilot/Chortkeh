@@ -73,11 +73,16 @@ class ChannelsViewModel(
     }
 
     private fun changeCardNumber(cardNumber: String) {
-        // safe with recomposition - StateFlow won't emit duplicated values!
-        val digits = cardNumber
-            .filter(Char::isDigit)
-            .take(16)
-        _channelUiState.update { it.copy(cardNumber = digits) }
+        // For accurate icon recognition we need to call fetchBank on each value change
+        if (cardNumber.length <= 16) {
+            val digits = cardNumber.filter(Char::isDigit)
+            val bank = fetchBank(digits)
+            val possibleIcon: ChannelIconOptionUiModel? =
+                ChannelIconOptionUiModel.entries.find { it.name == bank.name }
+            _channelUiState.update {
+                it.copy(cardNumber = digits, channelIcon = possibleIcon)
+            }
+        }
     }
 
     private fun changeInitialBalance(balance: String) {
@@ -112,9 +117,7 @@ class ChannelsViewModel(
                 channelBalance = state.channelBalance,
                 isBankCardChannel = state.isBankAccountChannel,
                 cardNumber = state.cardNumber,
-                icon = state.channelIcon
-                    ?: ChannelIconOptionUiModel.entries.find { it.name == bank.name }
-                    ?: ChannelIconOptionUiModel.UNKNOWN,
+                icon = state.channelIcon ?: ChannelIconOptionUiModel.UNKNOWN,
                 bankName = if (bank == Bank.UNKNOWN) null else bank.name
             ).toDomain()
             channelsUseCases.saveChannelUseCase.invoke(channel)
@@ -140,9 +143,7 @@ class ChannelsViewModel(
                 channelBalance = state.channelBalance,
                 isBankCardChannel = state.isBankAccountChannel,
                 cardNumber = state.cardNumber,
-                icon = state.channelIcon
-                    ?: ChannelIconOptionUiModel.entries.find { it.name == bank.name }
-                    ?: ChannelIconOptionUiModel.UNKNOWN,
+                icon = state.channelIcon ?: ChannelIconOptionUiModel.UNKNOWN,
                 bankName = if (bank == Bank.UNKNOWN) null else bank.name
             ).toDomain()
             channelsUseCases.updateChannelUseCase.invoke(channel)
@@ -168,21 +169,14 @@ class ChannelsViewModel(
 
     private fun getChannelById(id: Int) {
         viewModelScope.launch {
-            val channel = channelsUseCases.getChannelByIdUseCase.invoke(id).first()
-                .toUiModel(needsBalanceFormat = false)
+            val channel = channelsUseCases.getChannelByIdUseCase.invoke(id).first().toUiModel(needsBalanceFormat = false)
             _channelUiState.update {
                 ChannelUiState(
                     isBankAccountChannel = channel.isBankCardChannel,
                     channelName = channel.channelName,
                     channelBalance = channel.channelBalance,
                     cardNumber = channel.cardNumber,
-                    /**
-                     * Won't fill the icon here if it's bank account, it will corrupt editing functionality
-                     * everytime we save/edit channel the bank account icon will be automatically fetch using `fetchBank()` function
-                     * the bank account icon selection is not on the user behalf. compose components shows it; Bank enum fetches it for save/edit
-                     * but non bank account icon is user selectable, so we fill it user might change it and that value will be saved.
-                     */
-                    channelIcon = if (channel.isBankCardChannel) null else channel.icon
+                    channelIcon = channel.icon
                 )
             }
         }
