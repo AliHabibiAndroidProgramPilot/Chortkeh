@@ -4,7 +4,7 @@ import info.alihabibi.database.entities.CategoryEntity
 import info.alihabibi.domain.models.category.Category
 
 fun CategoryEntity.asExternalModel(): Category = Category(
-    id = id.toInt(),
+    id = id,
     title = title,
     isDefault = isDefault,
     icon = icon,
@@ -12,7 +12,7 @@ fun CategoryEntity.asExternalModel(): Category = Category(
 )
 
 fun Category.asEntity(): CategoryEntity = CategoryEntity(
-    id = id.toLong(),
+    id = id,
     title = title,
     isDefault = isDefault,
     icon = icon,

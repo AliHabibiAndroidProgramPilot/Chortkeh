@@ -1,6 +1,6 @@
 package info.alihabibi.model.mapper
 
-import info.alihabibi.domain.models.TransactionType
+import info.alihabibi.domain.models.transaction.TransactionType
 import info.alihabibi.model.ui_model.TransactionTypeOptionUiModel
 
 fun TransactionType.toUiOption(): TransactionTypeOptionUiModel = when(this) {

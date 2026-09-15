@@ -15,5 +15,6 @@ object Keys {
     const val DATABASE_NAME = "Chortkeh.db"
     const val CATEGORY_TABLE_NAME = "category"
     const val CHANNELS_TABLE_NAME = "channels"
+    const val TRANSACTION_TABLE_NAME = "transaction"
 
 }

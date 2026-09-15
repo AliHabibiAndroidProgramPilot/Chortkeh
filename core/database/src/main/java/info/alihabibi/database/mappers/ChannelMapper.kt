@@ -4,7 +4,7 @@ import info.alihabibi.database.entities.ChannelEntity
 import info.alihabibi.domain.models.channel.Channel
 
 fun ChannelEntity.asExternalModel(): Channel = Channel(
-    id = id.toInt(),
+    id = id,
     channelName = channelName,
     channelBalance = channelBalance,
     isBankCardChannel = isBankCardChannel,
@@ -15,7 +15,7 @@ fun ChannelEntity.asExternalModel(): Channel = Channel(
 )
 
 fun Channel.asEntity(): ChannelEntity = ChannelEntity(
-    id = id.toLong(),
+    id = id,
     channelName = channelName,
     channelBalance = channelBalance,
     isBankCardChannel = isBankCardChannel,
