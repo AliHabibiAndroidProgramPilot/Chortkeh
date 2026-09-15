@@ -52,7 +52,7 @@ import info.alihabibi.designsystem.theme.Gray7
 import info.alihabibi.designsystem.theme.Gray8
 import info.alihabibi.designsystem.theme.Primary
 import info.alihabibi.designsystem.theme.White
-import info.alihabibi.model.ui_model.TransactionTypeOptionUiModel
+import info.alihabibi.model.ui_model.transaction.TransactionTypeOptionUiModel
 import info.alihabibi.model.ui_model.category.CategoryUiModel
 import info.alihabibi.new_transaction.NewTransactionUiIntent
 import info.alihabibi.new_transaction.NewTransactionUiState

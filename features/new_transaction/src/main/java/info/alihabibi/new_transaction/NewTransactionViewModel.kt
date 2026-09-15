@@ -5,9 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import info.alihabibi.common.PersianDateFormatter
 import info.alihabibi.domain.local.usecases.database.category.usecase.CategoryUseCases
+import info.alihabibi.domain.local.usecases.database.transaction.usecase.TransactionUseCases
 import info.alihabibi.model.mapper.toDomain
 import info.alihabibi.model.mapper.toUiModel
-import info.alihabibi.model.ui_model.TransactionTypeOptionUiModel
+import info.alihabibi.model.ui_model.transaction.TransactionTypeOptionUiModel
 import info.alihabibi.model.ui_model.category.CategoryIconOptionUiModel
 import info.alihabibi.model.ui_model.category.CategoryTypeOptionUiModel
 import info.alihabibi.model.ui_model.category.CategoryUiModel
@@ -25,7 +26,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class NewTransactionViewModel(
-    private val categoryUseCases: CategoryUseCases
+    private val categoryUseCases: CategoryUseCases,
+    private val transactionUseCases: TransactionUseCases
 ) : ViewModel() {
 
     private val _newTransactionUiState = MutableStateFlow(NewTransactionUiState())
@@ -131,7 +133,7 @@ class NewTransactionViewModel(
             if(state.categoryName.isEmpty() || state.categoryType == null || state.categoryIcon == null)
                 return@launch
             val category = CategoryUiModel(
-                id = categoryId,
+                id = categoryId.toLong(),
                 title = _categoryUiState.value.categoryName,
                 isDefault = false,
                 icon = _categoryUiState.value.categoryIcon ?: CategoryIconOptionUiModel.OTHERS,
@@ -207,7 +209,7 @@ class NewTransactionViewModel(
     }
 
     private fun fetchEditingCategory(categoryId: Int) {
-        val category = _newTransactionUiState.value.categories.firstOrNull { it.id == categoryId } ?: return
+        val category = _newTransactionUiState.value.categories.firstOrNull { it.id.toInt() == categoryId } ?: return
         _categoryUiState.update { _ ->
             CategoryUiState(
                 categoryName = category.title,
