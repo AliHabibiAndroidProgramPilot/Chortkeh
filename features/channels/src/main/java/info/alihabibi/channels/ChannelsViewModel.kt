@@ -47,7 +47,7 @@ class ChannelsViewModel(
 
             is ChannelsUiIntent.CardNumberChanged -> changeCardNumber(event.cardNumber)
 
-            is ChannelsUiIntent.BalanceChanged -> changeInitialBalance(event.balance)
+            is ChannelsUiIntent.BalanceChanged -> changeBalance(event.balance)
 
             is ChannelsUiIntent.ChannelNameChanged -> changeChannelName(event.name)
 
@@ -85,7 +85,7 @@ class ChannelsViewModel(
         }
     }
 
-    private fun changeInitialBalance(balance: String) {
+    private fun changeBalance(balance: String) {
         val balanceWithLimit = balance
             .filter(Char::isDigit)
             .take(20)
