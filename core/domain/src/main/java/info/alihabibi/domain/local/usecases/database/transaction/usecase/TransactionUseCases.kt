@@ -1,7 +1,7 @@
 package info.alihabibi.domain.local.usecases.database.transaction.usecase
 
-import info.alihabibi.domain.local.usecases.database.transaction.InsertTransactionUseCase
+import info.alihabibi.domain.local.usecases.database.transaction.SaveTransactionUseCase
 
 data class TransactionUseCases(
-    val insertTransactionUseCase: InsertTransactionUseCase
+    val saveTransactionUseCase: SaveTransactionUseCase
 )

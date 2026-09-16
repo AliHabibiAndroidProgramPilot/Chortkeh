@@ -12,7 +12,7 @@ import info.alihabibi.domain.local.usecases.database.channel.GetTotalBalanceUseC
 import info.alihabibi.domain.local.usecases.database.channel.SaveChannelUseCase
 import info.alihabibi.domain.local.usecases.database.channel.UpdateChannelUseCase
 import info.alihabibi.domain.local.usecases.database.channel.usecase.ChannelUseCases
-import info.alihabibi.domain.local.usecases.database.transaction.InsertTransactionUseCase
+import info.alihabibi.domain.local.usecases.database.transaction.SaveTransactionUseCase
 import info.alihabibi.domain.local.usecases.database.transaction.usecase.TransactionUseCases
 import info.alihabibi.domain.local.usecases.datastore.GetIsAppFirstLaunchUseCase
 import info.alihabibi.domain.local.usecases.datastore.GetIsSmsModalShownUseCase
@@ -93,11 +93,11 @@ val domainModule = module {
 
     // region Transaction
 
-    factory { InsertTransactionUseCase(get()) }
+    factory { SaveTransactionUseCase(get()) }
 
     factory {
         TransactionUseCases(
-            insertTransactionUseCase = get()
+            saveTransactionUseCase = get()
         )
     }
 

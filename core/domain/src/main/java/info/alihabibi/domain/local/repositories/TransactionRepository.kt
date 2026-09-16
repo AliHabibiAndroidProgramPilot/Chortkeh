@@ -4,6 +4,6 @@ import info.alihabibi.domain.models.transaction.Transaction
 
 interface TransactionRepository {
 
-    suspend fun insertTransaction(transaction: Transaction): Long
+    suspend fun saveTransaction(transaction: Transaction): Long
 
 }

@@ -9,7 +9,7 @@ import kotlinx.coroutines.withContext
 
 class TransactionRepositoryImpl(private val dao: TransactionDao) : TransactionRepository {
 
-    override suspend fun insertTransaction(transaction: Transaction): Long {
+    override suspend fun saveTransaction(transaction: Transaction): Long {
         return withContext(Dispatchers.IO) {
             dao.insertTransaction(transaction.asEntity())
         }

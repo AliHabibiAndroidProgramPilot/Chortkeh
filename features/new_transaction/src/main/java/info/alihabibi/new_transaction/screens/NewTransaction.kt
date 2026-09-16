@@ -33,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -45,6 +46,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
+import info.alihabibi.common.Utils
+import info.alihabibi.common_android.snackbar.SnackBarController
+import info.alihabibi.common_android.snackbar.SnackBarEvent
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Black
 import info.alihabibi.designsystem.theme.Gray11
@@ -84,6 +88,9 @@ fun NewTransactionDestination(
     val uiState by viewModel.newTransactionUiState.collectAsStateWithLifecycle()
     val formattedTransactionDate by viewModel.formattedTransactionDate.collectAsStateWithLifecycle()
 
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
     val lifecycleOwner = LocalLifecycleOwner.current
     LaunchedEffect(lifecycleOwner) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -115,7 +122,16 @@ fun NewTransactionDestination(
             viewModel.onEvent(NewTransactionUiIntent.CategoriesDeleted(categoriesToDelete))
         },
         onSaveTransaction = {
-            // TODO save transaction | call view model here, then navigate back
+            viewModel.onEvent(NewTransactionUiIntent.SaveTransaction)
+            scope.launch {
+                SnackBarController.sendEvent(
+                    SnackBarEvent(
+                        message = Utils.getStringResources(context, R.string.transaction_registered),
+                        actionTitle = Utils.getStringResources(context, R.string.undo),
+                        action = { /*delete transaction*/ }
+                    )
+                )
+            }
             onBackPressed()
         },
         onTransactionTypeChanged = { type ->

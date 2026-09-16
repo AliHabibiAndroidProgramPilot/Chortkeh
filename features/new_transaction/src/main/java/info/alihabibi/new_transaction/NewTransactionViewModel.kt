@@ -15,6 +15,7 @@ import info.alihabibi.model.ui_model.category.CategoryTypeOptionUiModel
 import info.alihabibi.model.ui_model.category.CategoryUiModel
 import info.alihabibi.model.ui_model.channel.ChannelUiModel
 import info.alihabibi.model.ui_model.transaction.TransactionTypeOptionUiModel
+import info.alihabibi.model.ui_model.transaction.TransactionUiModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -58,6 +59,8 @@ class NewTransactionViewModel(
         when (event) {
 
             is NewTransactionUiIntent.Init -> init()
+
+            is NewTransactionUiIntent.SaveTransaction -> saveTransaction()
 
             is NewTransactionUiIntent.SaveCategory -> saveCategory()
 
@@ -114,6 +117,24 @@ class NewTransactionViewModel(
                 )
             }
         }.launchIn(viewModelScope)
+    }
+
+    private fun saveTransaction() {
+        viewModelScope.launch {
+            val state = _newTransactionUiState.value
+            if (state.transactionChannel == null || state.transactionCategory == null)
+                return@launch
+
+            val transaction = TransactionUiModel(
+                transactionTypeOptionUiModel = state.transactionType,
+                amount = state.transactionPrice.toLong(),
+                channel = state.transactionChannel,
+                category = state.transactionCategory,
+                date = "${state.transactionYear}-${state.transactionMonth}-${state.transactionDay}",
+                time = "${state.transactionHour}:${state.transactionMinute}"
+            ).toDomain()
+            transactionUseCases.saveTransactionUseCase.invoke(transaction)
+        }
     }
 
     private fun saveCategory() {
@@ -261,6 +282,8 @@ class NewTransactionViewModel(
 sealed interface NewTransactionUiIntent {
 
     data object Init : NewTransactionUiIntent
+
+    data object SaveTransaction : NewTransactionUiIntent
 
     data object SaveCategory : NewTransactionUiIntent
 

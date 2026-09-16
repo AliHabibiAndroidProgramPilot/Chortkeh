@@ -76,6 +76,7 @@
     <string name="successful_save_data">ثبت اطلاعات با موفقیت انجام شد</string>
 
     // New Transaction
+    <string name="transaction_registered">تراکنش با موفقیت ثبت شد</string>
     <string name="register_transaction">ثبت تراکنش</string>
     <string name="register_category">ثبت دسته‌بندی</string>
     <string name="update_category">ویرایش دسته‌بندی</string>
