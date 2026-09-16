@@ -102,6 +102,7 @@
     <string name="category_name_error">نام دسته‌بندی نمیتواند بیشتر از 30 کاراکتر باشد</string>
 
     // Channels
+    <string name="channel">کانال</string>
     <string name="empty_channels_list_message">هنوز کانالی ثبت نکردی</string>
     <string name="register_channel">ثبت کانال ورودی</string>
     <string name="input_channel_type">نوع کانال ورودی</string>

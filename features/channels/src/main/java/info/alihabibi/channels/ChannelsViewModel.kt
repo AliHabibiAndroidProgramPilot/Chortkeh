@@ -138,7 +138,7 @@ class ChannelsViewModel(
             val bank = fetchBank(state.cardNumber)
 
             val channel = ChannelUiModel(
-                id = id,
+                id = id.toLong(),
                 channelName = state.channelName,
                 channelBalance = state.channelBalance,
                 isBankCardChannel = state.isBankAccountChannel,
@@ -156,7 +156,7 @@ class ChannelsViewModel(
         viewModelScope.launch {
             val state = _channelUiState.value
             val channel = ChannelUiModel(
-                id = id,
+                id = id.toLong(),
                 channelName = state.channelName,
                 channelBalance = state.channelBalance,
                 isBankCardChannel = state.isBankAccountChannel,

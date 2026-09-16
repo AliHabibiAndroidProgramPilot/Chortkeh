@@ -54,11 +54,13 @@ import info.alihabibi.designsystem.theme.Primary
 import info.alihabibi.designsystem.theme.White
 import info.alihabibi.model.ui_model.transaction.TransactionTypeOptionUiModel
 import info.alihabibi.model.ui_model.category.CategoryUiModel
+import info.alihabibi.model.ui_model.channel.ChannelUiModel
 import info.alihabibi.new_transaction.NewTransactionUiIntent
 import info.alihabibi.new_transaction.NewTransactionUiState
 import info.alihabibi.new_transaction.NewTransactionViewModel
 import info.alihabibi.ui.buttons.AppButton
 import info.alihabibi.ui.buttons.AppToggle
+import info.alihabibi.ui.dialogs.ChannelListedBottomSheet
 import info.alihabibi.ui.dialogs.ListedBottomSheet
 import info.alihabibi.ui.dialogs.TimePickerBottomSheetContent
 import info.alihabibi.ui.headrs.AppHeader
@@ -106,6 +108,9 @@ fun NewTransactionDestination(
         onCategoryChanged = { category ->
             viewModel.onEvent(NewTransactionUiIntent.CategoryChanged(category))
         },
+        onChannelChanged = { channel ->
+            viewModel.onEvent(NewTransactionUiIntent.ChannelChanged(channel))
+        },
         onCategoriesDelete = { categoriesToDelete ->
             viewModel.onEvent(NewTransactionUiIntent.CategoriesDeleted(categoriesToDelete))
         },
@@ -130,6 +135,7 @@ private fun NewTransactionScreen(
     onDateChanged: (year: Int, month: Int, day: Int) -> Unit = { _, _, _ -> },
     onTimeChange: (hour: Int?, minute: Int?) -> Unit = { _, _ -> },
     onCategoryChanged: (category: CategoryUiModel) -> Unit = {},
+    onChannelChanged: (channel: ChannelUiModel) -> Unit = {},
     onCategoriesDelete: (categoriesToDelete: List<CategoryUiModel>) -> Unit = {},
     onEditCategory: (categoryId: Int) -> Unit = {},
     onSaveTransaction: () -> Unit = {},
@@ -222,10 +228,28 @@ private fun NewTransactionScreen(
             },
             onDeleteItems = onCategoriesDelete,
             onEditItem = { category ->
-                onEditCategory(category.id)
+                onEditCategory(category.id.toInt())
             },
             onAddNewItem = onAddNewCategory,
             onDismissRequest = { showCategoryBottomSheet = false },
+        )
+
+    var showChannelsBottomSheet by remember { mutableStateOf(false) }
+    if (showChannelsBottomSheet)
+        ChannelListedBottomSheet(
+            items = uiState.channels,
+            itemTitle = { it.channelName },
+            itemSubTitle = { it.channelBalance },
+            itemIcon = { it.icon.iconResId },
+            itemKey = { it.id },
+            isEditChannelsAvailable = false,
+            isAddNewItemAvailable = false,
+            title = stringResource(id = R.string.channel),
+            onSelectItem = { channel ->
+                onChannelChanged(channel)
+                showChannelsBottomSheet = false
+            },
+            onDismissRequest = { showChannelsBottomSheet = false },
         )
 
     Column(
@@ -284,7 +308,7 @@ private fun NewTransactionScreen(
                     .padding(horizontal = 16.dp)
                     .border(width = 1.dp, color = Gray11, shape = RoundedCornerShape(12.dp))
                     .clip(shape = RoundedCornerShape(12.dp))
-                    .clickable {},
+                    .clickable { showChannelsBottomSheet = true },
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
@@ -299,9 +323,13 @@ private fun NewTransactionScreen(
 
                 Text(
                     modifier = Modifier.padding(horizontal = 12.dp),
-                    text = when (uiState.transactionType) {
-                        TransactionTypeOptionUiModel.OUTCOME -> stringResource(id = R.string.withdraw_from)
-                        TransactionTypeOptionUiModel.INCOME -> stringResource(id = R.string.deposit_to)
+                    text = if (uiState.transactionChannel != null)
+                        uiState.transactionChannel.channelName
+                    else {
+                        when(uiState.transactionType) {
+                            TransactionTypeOptionUiModel.OUTCOME -> stringResource(id = R.string.withdraw_from)
+                            TransactionTypeOptionUiModel.INCOME -> stringResource(id = R.string.deposit_to)
+                        }
                     },
                     style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp)
                 )
