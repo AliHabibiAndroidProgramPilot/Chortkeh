@@ -15,4 +15,10 @@ class TransactionRepositoryImpl(private val dao: TransactionDao) : TransactionRe
         }
     }
 
+    override suspend fun deleteTransaction(transaction: Transaction) {
+        return withContext(Dispatchers.IO) {
+            dao.deleteTransaction(transaction.asEntity())
+        }
+    }
+
 }
