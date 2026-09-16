@@ -5,17 +5,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import info.alihabibi.common.PersianDateFormatter
 import info.alihabibi.domain.local.usecases.database.category.usecase.CategoryUseCases
-import info.alihabibi.domain.local.usecases.database.channel.GetChannelsUseCase
 import info.alihabibi.domain.local.usecases.database.channel.usecase.ChannelUseCases
 import info.alihabibi.domain.local.usecases.database.transaction.usecase.TransactionUseCases
 import info.alihabibi.domain.models.channel.Channel
 import info.alihabibi.model.mapper.toDomain
 import info.alihabibi.model.mapper.toUiModel
-import info.alihabibi.model.ui_model.transaction.TransactionTypeOptionUiModel
 import info.alihabibi.model.ui_model.category.CategoryIconOptionUiModel
 import info.alihabibi.model.ui_model.category.CategoryTypeOptionUiModel
 import info.alihabibi.model.ui_model.category.CategoryUiModel
 import info.alihabibi.model.ui_model.channel.ChannelUiModel
+import info.alihabibi.model.ui_model.transaction.TransactionTypeOptionUiModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -24,7 +23,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -109,7 +107,12 @@ class NewTransactionViewModel(
             val uiChannels = channels
                 .map(Channel::toUiModel)
                 .filterNot { it.isAppDefaultChannel }
-            _newTransactionUiState.update { it.copy(categories = filteredCategories, channels = uiChannels) }
+            _newTransactionUiState.update {
+                it.copy(
+                    categories = filteredCategories,
+                    channels = uiChannels
+                )
+            }
         }.launchIn(viewModelScope)
     }
 
@@ -303,7 +306,15 @@ data class NewTransactionUiState(
     val transactionChannel: ChannelUiModel? = null,
     val categories: List<CategoryUiModel> = emptyList(),
     val channels: List<ChannelUiModel> = emptyList()
-)
+) {
+    val isRegisterTransactionButtonEnabled: Boolean
+        get() {
+            return transactionPrice.isNotEmpty() &&
+                    formattedTransactionTime.isNotEmpty() &&
+                    transactionCategory != null &&
+                    transactionChannel != null
+        }
+}
 
 @Immutable
 data class CategoryUiState(

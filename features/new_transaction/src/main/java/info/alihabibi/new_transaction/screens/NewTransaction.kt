@@ -446,7 +446,8 @@ private fun NewTransactionScreen(
             text = when (uiState.transactionType) {
                 TransactionTypeOptionUiModel.OUTCOME -> stringResource(id = R.string.register_outcome_transaction)
                 TransactionTypeOptionUiModel.INCOME -> stringResource(id = R.string.register_income_transaction)
-            }
+            },
+            enabled = uiState.isRegisterTransactionButtonEnabled
         )
 
     }
