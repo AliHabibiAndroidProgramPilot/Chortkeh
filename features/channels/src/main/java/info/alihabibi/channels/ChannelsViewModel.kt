@@ -47,7 +47,7 @@ class ChannelsViewModel(
 
             is ChannelsUiIntent.CardNumberChanged -> changeCardNumber(event.cardNumber)
 
-            is ChannelsUiIntent.BalanceChanged -> changeInitialBalance(event.balance)
+            is ChannelsUiIntent.BalanceChanged -> changeBalance(event.balance)
 
             is ChannelsUiIntent.ChannelNameChanged -> changeChannelName(event.name)
 
@@ -85,7 +85,7 @@ class ChannelsViewModel(
         }
     }
 
-    private fun changeInitialBalance(balance: String) {
+    private fun changeBalance(balance: String) {
         val balanceWithLimit = balance
             .filter(Char::isDigit)
             .take(20)
@@ -138,7 +138,7 @@ class ChannelsViewModel(
             val bank = fetchBank(state.cardNumber)
 
             val channel = ChannelUiModel(
-                id = id,
+                id = id.toLong(),
                 channelName = state.channelName,
                 channelBalance = state.channelBalance,
                 isBankCardChannel = state.isBankAccountChannel,
@@ -154,15 +154,7 @@ class ChannelsViewModel(
 
     private fun deleteChannel(id: Int) {
         viewModelScope.launch {
-            val state = _channelUiState.value
-            val channel = ChannelUiModel(
-                id = id,
-                channelName = state.channelName,
-                channelBalance = state.channelBalance,
-                isBankCardChannel = state.isBankAccountChannel,
-                icon = ChannelIconOptionUiModel.UNKNOWN,
-            ).toDomain()
-            channelsUseCases.deleteChannelUseCase.invoke(channel)
+            channelsUseCases.deleteChannelUseCase.invoke(id.toLong())
             resetDraft()
         }
     }

@@ -7,6 +7,11 @@ android {
 }
 
 dependencies {
+
     // Kotlinx Flow
     implementation(libs.androidx.core.ktx)
+
+    // common
+    implementation(projects.core.common)
+
 }

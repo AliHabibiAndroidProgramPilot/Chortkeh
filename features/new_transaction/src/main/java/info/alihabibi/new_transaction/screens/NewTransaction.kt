@@ -29,10 +29,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -45,6 +47,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
+import info.alihabibi.common.Utils
+import info.alihabibi.common_android.snackbar.SnackBarController
+import info.alihabibi.common_android.snackbar.SnackBarEvent
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Black
 import info.alihabibi.designsystem.theme.Gray11
@@ -52,13 +57,16 @@ import info.alihabibi.designsystem.theme.Gray7
 import info.alihabibi.designsystem.theme.Gray8
 import info.alihabibi.designsystem.theme.Primary
 import info.alihabibi.designsystem.theme.White
-import info.alihabibi.model.ui_model.TransactionTypeOptionUiModel
+import info.alihabibi.domain.local.coordinators.TransactionUndoManager
 import info.alihabibi.model.ui_model.category.CategoryUiModel
+import info.alihabibi.model.ui_model.channel.ChannelUiModel
+import info.alihabibi.model.ui_model.transaction.TransactionTypeOptionUiModel
 import info.alihabibi.new_transaction.NewTransactionUiIntent
 import info.alihabibi.new_transaction.NewTransactionUiState
 import info.alihabibi.new_transaction.NewTransactionViewModel
 import info.alihabibi.ui.buttons.AppButton
 import info.alihabibi.ui.buttons.AppToggle
+import info.alihabibi.ui.dialogs.ChannelListedBottomSheet
 import info.alihabibi.ui.dialogs.ListedBottomSheet
 import info.alihabibi.ui.dialogs.TimePickerBottomSheetContent
 import info.alihabibi.ui.headrs.AppHeader
@@ -69,6 +77,7 @@ import ir.mehrafzoon.composedatepicker.utils.MaxYear
 import ir.mehrafzoon.composedatepicker.utils.MinYear
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 import java.time.LocalTime
 
 @Composable
@@ -79,13 +88,32 @@ fun NewTransactionDestination(
     onBackPressed: () -> Unit
 ) {
 
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+
     val uiState by viewModel.newTransactionUiState.collectAsStateWithLifecycle()
     val formattedTransactionDate by viewModel.formattedTransactionDate.collectAsStateWithLifecycle()
 
-    val lifecycleOwner = LocalLifecycleOwner.current
     LaunchedEffect(lifecycleOwner) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.onEvent(NewTransactionUiIntent.Init)
+        }
+    }
+
+    val currentOnBackPressed by rememberUpdatedState(onBackPressed)
+    val transactionUndoManager: TransactionUndoManager = koinInject()
+    uiState.savedTransactionId?.let { id ->
+        LaunchedEffect(id) {
+            SnackBarController.sendEvent(
+                SnackBarEvent(
+                    message = Utils.getStringResources(context, R.string.transaction_registered),
+                    actionTitle = Utils.getStringResources(context, R.string.undo),
+                    action = {
+                        transactionUndoManager.executeUndo(id)
+                    }
+                )
+            )
+            currentOnBackPressed()
         }
     }
 
@@ -106,12 +134,14 @@ fun NewTransactionDestination(
         onCategoryChanged = { category ->
             viewModel.onEvent(NewTransactionUiIntent.CategoryChanged(category))
         },
+        onChannelChanged = { channel ->
+            viewModel.onEvent(NewTransactionUiIntent.ChannelChanged(channel))
+        },
         onCategoriesDelete = { categoriesToDelete ->
             viewModel.onEvent(NewTransactionUiIntent.CategoriesDeleted(categoriesToDelete))
         },
         onSaveTransaction = {
-            // TODO save transaction | call view model here, then navigate back
-            onBackPressed()
+            viewModel.onEvent(NewTransactionUiIntent.SaveTransaction)
         },
         onTransactionTypeChanged = { type ->
             viewModel.onEvent(NewTransactionUiIntent.TransactionTypeChanged(type))
@@ -130,7 +160,8 @@ private fun NewTransactionScreen(
     onDateChanged: (year: Int, month: Int, day: Int) -> Unit = { _, _, _ -> },
     onTimeChange: (hour: Int?, minute: Int?) -> Unit = { _, _ -> },
     onCategoryChanged: (category: CategoryUiModel) -> Unit = {},
-    onCategoriesDelete: (categoriesToDelete: List<CategoryUiModel>) -> Unit = {},
+    onChannelChanged: (channel: ChannelUiModel) -> Unit = {},
+    onCategoriesDelete: (categoriesIdsToDelete: List<Long>) -> Unit = {},
     onEditCategory: (categoryId: Int) -> Unit = {},
     onSaveTransaction: () -> Unit = {},
     onAddNewCategory: () -> Unit = {},
@@ -220,12 +251,35 @@ private fun NewTransactionScreen(
                 onCategoryChanged(category)
                 showCategoryBottomSheet = false
             },
-            onDeleteItems = onCategoriesDelete,
+            onDeleteItems = { categories ->
+                val ids = categories.map { it.id }
+                onCategoriesDelete(ids)
+            },
             onEditItem = { category ->
-                onEditCategory(category.id)
+                onEditCategory(category.id.toInt())
             },
             onAddNewItem = onAddNewCategory,
             onDismissRequest = { showCategoryBottomSheet = false },
+        )
+
+    var showChannelsBottomSheet by remember { mutableStateOf(false) }
+    if (showChannelsBottomSheet)
+        ChannelListedBottomSheet(
+            items = uiState.channels,
+            itemTitle = { it.channelName },
+            itemSubTitle = { it.channelBalance },
+            itemIcon = { it.icon.iconResId },
+            itemKey = { it.id },
+            isEditChannelsAvailable = false,
+            title = stringResource(id = R.string.channels),
+            onSelectItem = { channel ->
+                onChannelChanged(channel)
+                showChannelsBottomSheet = false
+            },
+            onAddNewItem = {
+
+            },
+            onDismissRequest = { showChannelsBottomSheet = false },
         )
 
     Column(
@@ -284,7 +338,7 @@ private fun NewTransactionScreen(
                     .padding(horizontal = 16.dp)
                     .border(width = 1.dp, color = Gray11, shape = RoundedCornerShape(12.dp))
                     .clip(shape = RoundedCornerShape(12.dp))
-                    .clickable {},
+                    .clickable { showChannelsBottomSheet = true },
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
@@ -299,9 +353,13 @@ private fun NewTransactionScreen(
 
                 Text(
                     modifier = Modifier.padding(horizontal = 12.dp),
-                    text = when (uiState.transactionType) {
-                        TransactionTypeOptionUiModel.OUTCOME -> stringResource(id = R.string.withdraw_from)
-                        TransactionTypeOptionUiModel.INCOME -> stringResource(id = R.string.deposit_to)
+                    text = if (uiState.transactionChannel != null)
+                        uiState.transactionChannel.channelName
+                    else {
+                        when(uiState.transactionType) {
+                            TransactionTypeOptionUiModel.OUTCOME -> stringResource(id = R.string.withdraw_from)
+                            TransactionTypeOptionUiModel.INCOME -> stringResource(id = R.string.deposit_to)
+                        }
                     },
                     style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp)
                 )
@@ -418,7 +476,8 @@ private fun NewTransactionScreen(
             text = when (uiState.transactionType) {
                 TransactionTypeOptionUiModel.OUTCOME -> stringResource(id = R.string.register_outcome_transaction)
                 TransactionTypeOptionUiModel.INCOME -> stringResource(id = R.string.register_income_transaction)
-            }
+            },
+            enabled = uiState.isRegisterTransactionButtonEnabled
         )
 
     }

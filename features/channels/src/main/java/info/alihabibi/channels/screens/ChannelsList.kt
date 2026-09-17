@@ -47,7 +47,7 @@ fun ChannelsListDestination(
     ChannelsListScreen(
         channels = channels,
         onEditChannel = { channel ->
-            onEditChannel(channel.id)
+            onEditChannel(channel.id.toInt())
         },
         onAddNewChannel = {
             viewModel.onEvent(ChannelsUiIntent.ResetChannelsDraft)

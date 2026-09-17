@@ -2,7 +2,7 @@ package info.alihabibi.database.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import info.alihabibi.domain.local.keys.Keys
+import info.alihabibi.domain.Keys
 import info.alihabibi.domain.models.channel.ChannelIcon
 
 @Entity(tableName = Keys.CHANNELS_TABLE_NAME)

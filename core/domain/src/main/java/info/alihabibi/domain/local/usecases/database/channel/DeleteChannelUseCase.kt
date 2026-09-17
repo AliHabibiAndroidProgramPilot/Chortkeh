@@ -7,6 +7,6 @@ class DeleteChannelUseCase(
     private val repository: ChannelRepository
 ) {
 
-    suspend operator fun invoke(channel: Channel) = repository.deleteChannel(channel)
+    suspend operator fun invoke(channelId: Long) = repository.deleteChannel(channelId)
 
 }

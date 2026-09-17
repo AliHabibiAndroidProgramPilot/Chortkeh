@@ -76,6 +76,7 @@
     <string name="successful_save_data">ثبت اطلاعات با موفقیت انجام شد</string>
 
     // New Transaction
+    <string name="transaction_registered">تراکنش با موفقیت ثبت شد</string>
     <string name="register_transaction">ثبت تراکنش</string>
     <string name="register_category">ثبت دسته‌بندی</string>
     <string name="update_category">ویرایش دسته‌بندی</string>
@@ -102,6 +103,7 @@
     <string name="category_name_error">نام دسته‌بندی نمیتواند بیشتر از 30 کاراکتر باشد</string>
 
     // Channels
+    <string name="channels">کانال‌ها</string>
     <string name="empty_channels_list_message">هنوز کانالی ثبت نکردی</string>
     <string name="register_channel">ثبت کانال ورودی</string>
     <string name="input_channel_type">نوع کانال ورودی</string>
@@ -121,7 +123,7 @@
     <string name="delete_channel_description">
         آیا از حذف کانال ورودی مطمئنی؟
         \n
-        در صورت حذف، تمام تراکنش‌های مربوط به کانال حذف خواهد شد.
+        در صورت حذف، تمام تراکنش‌های مربوط به کانال فاقد اطلاعات کانال خواهند بود.
     </string>
     <string name="delete">حذف کردن</string>
 

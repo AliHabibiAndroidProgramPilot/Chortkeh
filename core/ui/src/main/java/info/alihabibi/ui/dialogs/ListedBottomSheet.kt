@@ -247,11 +247,13 @@ fun <T> ChannelListedBottomSheet(
     itemSubTitle: (T) -> String,
     itemIcon: (T) -> Int,
     itemKey: (T) -> Any,
+    isEditChannelsAvailable: Boolean = true,
+    title: String = stringResource(id = R.string.input_channels),
     addNewItemTitle: String = stringResource(id = R.string.add_new_channel),
     onAddNewItem: () -> Unit = {},
     onDismissRequest: () -> Unit,
     onSelectItem: (item: T) -> Unit,
-    onChannelsEdit: () -> Unit
+    onChannelsEdit: () -> Unit = {}
 ) {
 
     ModalBottomSheet(
@@ -269,7 +271,7 @@ fun <T> ChannelListedBottomSheet(
                         modifier = Modifier
                             .fillMaxWidth()
                             .align(alignment = Alignment.Center),
-                        text = stringResource(id = R.string.input_channels),
+                        text = title,
                         style = MaterialTheme.typography.labelLarge.copy(
                             textAlign = TextAlign.Center,
                             fontWeight = FontWeight.Bold
@@ -283,16 +285,17 @@ fun <T> ChannelListedBottomSheet(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
 
-                        IconButton(
-                            modifier = Modifier.size(size = 24.dp),
-                            onClick = onChannelsEdit
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.edit),
-                                contentDescription = null,
-                                tint = Gray9
-                            )
-                        }
+                        if (isEditChannelsAvailable)
+                            IconButton(
+                                modifier = Modifier.size(size = 24.dp),
+                                onClick = onChannelsEdit
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.edit),
+                                    contentDescription = null,
+                                    tint = Gray9
+                                )
+                            }
 
                     }
                 }

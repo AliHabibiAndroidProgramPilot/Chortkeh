@@ -1,7 +1,7 @@
 package info.alihabibi.domain.models.channel
 
 data class Channel(
-    val id: Int = 0,
+    val id: Long = 0,
     val channelName: String,
     val channelBalance: Long,
     val isBankCardChannel: Boolean,

@@ -26,10 +26,9 @@ class ChannelRepositoryImpl(private val dao: ChannelDao) : ChannelRepository {
         }
     }
 
-    override suspend fun deleteChannel(channels: Channel) {
+    override suspend fun deleteChannel(channelId: Long) {
         withContext(Dispatchers.IO) {
-            val channelEntity = channels.asEntity()
-            dao.deleteChannel(channelEntity)
+            dao.deleteChannelById(channelId)
         }
     }
 

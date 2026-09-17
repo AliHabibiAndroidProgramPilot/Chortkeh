@@ -68,7 +68,7 @@ class MainActivity : ComponentActivity() {
                     snackBarHostState.currentSnackbarData?.dismiss()
                     val result = snackBarHostState.showSnackbar(
                         message = event.message,
-                        actionLabel = event.actionName,
+                        actionLabel = event.actionTitle,
                         duration = SnackbarDuration.Short
                     )
                     if (result == SnackbarResult.ActionPerformed)
