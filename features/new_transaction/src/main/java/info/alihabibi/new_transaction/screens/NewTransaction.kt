@@ -161,7 +161,7 @@ private fun NewTransactionScreen(
     onTimeChange: (hour: Int?, minute: Int?) -> Unit = { _, _ -> },
     onCategoryChanged: (category: CategoryUiModel) -> Unit = {},
     onChannelChanged: (channel: ChannelUiModel) -> Unit = {},
-    onCategoriesDelete: (categoriesToDelete: List<CategoryUiModel>) -> Unit = {},
+    onCategoriesDelete: (categoriesIdsToDelete: List<Long>) -> Unit = {},
     onEditCategory: (categoryId: Int) -> Unit = {},
     onSaveTransaction: () -> Unit = {},
     onAddNewCategory: () -> Unit = {},
@@ -251,7 +251,10 @@ private fun NewTransactionScreen(
                 onCategoryChanged(category)
                 showCategoryBottomSheet = false
             },
-            onDeleteItems = onCategoriesDelete,
+            onDeleteItems = { categories ->
+                val ids = categories.map { it.id }
+                onCategoriesDelete(ids)
+            },
             onEditItem = { category ->
                 onEditCategory(category.id.toInt())
             },

@@ -271,10 +271,9 @@ class NewTransactionViewModel(
         }
     }
 
-    private fun deleteCategories(categoriesToDelete: List<CategoryUiModel>) {
+    private fun deleteCategories(categoriesIdsToDelete: List<Long>) {
         viewModelScope.launch {
-            val categories = categoriesToDelete.map { it.toDomain() }
-            categoryUseCases.deleteCategoriesUseCase.invoke(categories)
+            categoryUseCases.deleteCategoriesUseCase.invoke(*categoriesIdsToDelete.toLongArray())
         }
     }
 
@@ -306,7 +305,7 @@ sealed interface NewTransactionUiIntent {
 
     data class CategoryIconChanged(val categoryIcon: CategoryIconOptionUiModel) : NewTransactionUiIntent
 
-    data class CategoriesDeleted(val categoriesToDelete: List<CategoryUiModel>) : NewTransactionUiIntent
+    data class CategoriesDeleted(val categoriesToDelete: List<Long>) : NewTransactionUiIntent
 
     data class FetchEditingCategory(val categoryId: Int) : NewTransactionUiIntent
 

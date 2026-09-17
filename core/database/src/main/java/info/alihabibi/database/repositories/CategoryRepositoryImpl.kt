@@ -33,12 +33,9 @@ class CategoryRepositoryImpl(private val dao: CategoryDao) : CategoryRepository 
         }
     }
 
-    override suspend fun deleteCategory(categories: List<Category>) {
+    override suspend fun deleteCategory(vararg categoryId: Long) {
         withContext(Dispatchers.IO) {
-            val categoryEntities = categories.map(Category::asEntity)
-            categoryEntities.forEach {
-                dao.deleteCategory(it)
-            }
+            dao.deleteCategoryById(*categoryId)
         }
     }
 

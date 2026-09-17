@@ -154,15 +154,7 @@ class ChannelsViewModel(
 
     private fun deleteChannel(id: Int) {
         viewModelScope.launch {
-            val state = _channelUiState.value
-            val channel = ChannelUiModel(
-                id = id.toLong(),
-                channelName = state.channelName,
-                channelBalance = state.channelBalance,
-                isBankCardChannel = state.isBankAccountChannel,
-                icon = ChannelIconOptionUiModel.UNKNOWN,
-            ).toDomain()
-            channelsUseCases.deleteChannelUseCase.invoke(channel)
+            channelsUseCases.deleteChannelUseCase.invoke(id.toLong())
             resetDraft()
         }
     }
