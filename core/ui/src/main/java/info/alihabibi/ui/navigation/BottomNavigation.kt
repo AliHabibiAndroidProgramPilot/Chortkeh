@@ -34,7 +34,7 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray10
 import info.alihabibi.designsystem.theme.Primary
-import info.alihabibi.designsystem.theme.White
+
 
 @Composable
 fun AppBottomNavigation(
@@ -67,7 +67,7 @@ private fun NavBar(
             .defaultMinSize(minHeight = 80.dp)
             .navigationBarsPadding()
     ) {
-        Surface(color = White) {
+        Surface(color = MaterialTheme.colorScheme.surface) {
             Column {
                 HorizontalDivider(
                     color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),

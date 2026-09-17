@@ -31,8 +31,6 @@ import com.chargemap.compose.numberpicker.FullHours
 import com.chargemap.compose.numberpicker.Hours
 import com.chargemap.compose.numberpicker.HoursNumberPicker
 import info.alihabibi.designsystem.R
-import info.alihabibi.designsystem.theme.Gray11
-import info.alihabibi.designsystem.theme.Gray12
 import info.alihabibi.ui.buttons.AppButton
 
 /**
@@ -102,9 +100,12 @@ fun TimePickerBottomSheetContent(
 
                 HoursNumberPicker(
                     modifier = Modifier.padding(horizontal = 24.dp),
-                    dividersColor = Gray12,
                     leadingZero = false,
-                    textStyle = MaterialTheme.typography.labelMedium.copy(fontSize = 16.sp),
+                    dividersColor = MaterialTheme.colorScheme.primary,
+                    textStyle = MaterialTheme.typography.labelMedium.copy(
+                        fontSize = 16.sp,
+                        color = MaterialTheme.colorScheme.onSurface
+                    ),
                     hoursDivider = {
                         Text(
                             modifier = Modifier
@@ -134,7 +135,7 @@ fun TimePickerBottomSheetContent(
             ) {
 
                 TextButton(
-                    colors = ButtonDefaults.textButtonColors(contentColor = Gray11),
+                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurface),
                     onClick = {
                         onDismissRequest(null, null)
                     },
@@ -144,7 +145,7 @@ fun TimePickerBottomSheetContent(
                             text = stringResource(id = R.string.cancel),
                             style = MaterialTheme.typography.labelLarge.copy(
                                 fontSize = 16.sp,
-                                color = Gray11
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                         )
                     }

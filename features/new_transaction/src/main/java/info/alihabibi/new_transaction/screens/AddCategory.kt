@@ -171,7 +171,7 @@ private fun AddCategoryScreen(
                     .fillMaxWidth()
                     .height(height = 50.dp)
                     .padding(horizontal = 16.dp)
-                    .border(width = 1.dp, color = Gray11, shape = RoundedCornerShape(12.dp))
+                    .border(width = 1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(12.dp))
                     .clip(shape = RoundedCornerShape(12.dp))
                     .clickable { showCategoryTypeSelectionModel = true },
                 verticalAlignment = Alignment.CenterVertically
@@ -204,7 +204,7 @@ private fun AddCategoryScreen(
                     .fillMaxWidth()
                     .height(height = 50.dp)
                     .padding(horizontal = 16.dp)
-                    .border(width = 1.dp, color = Gray11, shape = RoundedCornerShape(12.dp))
+                    .border(width = 1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(12.dp))
                     .clip(shape = RoundedCornerShape(12.dp))
                     .clickable { showCategoryIconSelectionModel = true },
                 verticalAlignment = Alignment.CenterVertically

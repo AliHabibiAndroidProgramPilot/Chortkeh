@@ -26,10 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import info.alihabibi.designsystem.R
-import info.alihabibi.designsystem.theme.Black
 import info.alihabibi.designsystem.theme.ErrorRed
-import info.alihabibi.designsystem.theme.Gray11
-import info.alihabibi.designsystem.theme.Gray9
 import info.alihabibi.designsystem.theme.Primary
 
 @Composable
@@ -92,15 +89,15 @@ fun AppTitledTextField(
             },
             shape = RoundedCornerShape(size = 12.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Primary,
-                focusedTextColor = Black,
-                cursorColor = Primary,
-                unfocusedBorderColor = Gray11,
-                unfocusedPlaceholderColor = Gray11,
-                focusedPlaceholderColor = Gray9,
-                unfocusedTextColor = Gray11,
-                errorBorderColor = ErrorRed,
-                errorTextColor = Black
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                cursorColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                errorBorderColor = MaterialTheme.colorScheme.error,
+                errorTextColor = MaterialTheme.colorScheme.error
             )
         )
 
@@ -191,22 +188,22 @@ fun AppTitledPriceTextField(
             },
             shape = RoundedCornerShape(size = 12.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Primary,
-                focusedTextColor = Black,
-                cursorColor = Primary,
-                unfocusedBorderColor = Gray11,
-                unfocusedPlaceholderColor = Gray11,
-                focusedPlaceholderColor = Gray9,
-                unfocusedTextColor = Gray11,
-                errorBorderColor = ErrorRed,
-                errorTextColor = Black
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                cursorColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                errorBorderColor = MaterialTheme.colorScheme.error,
+                errorTextColor = MaterialTheme.colorScheme.error
             ),
             prefix = if (text.isNotEmpty()) {
                 {
                     Text(
                         modifier = Modifier.padding(horizontal = 4.dp),
                         text = stringResource(id = R.string.toman),
-                        style = MaterialTheme.typography.labelLarge.copy(color = Gray11)
+                        style = MaterialTheme.typography.labelLarge.copy(color = MaterialTheme.colorScheme.onSurface)
                     )
                 }
             } else null,
@@ -277,15 +274,15 @@ fun AppTitledPhoneTextField(
             },
             shape = RoundedCornerShape(size = 12.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Primary,
-                focusedTextColor = Black,
-                cursorColor = Primary,
-                unfocusedBorderColor = Gray11,
-                unfocusedPlaceholderColor = Gray11,
-                focusedPlaceholderColor = Gray9,
-                unfocusedTextColor = Gray11,
-                errorBorderColor = ErrorRed,
-                errorTextColor = Black
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                cursorColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                errorBorderColor = MaterialTheme.colorScheme.error,
+                errorTextColor = MaterialTheme.colorScheme.error
             ),
             visualTransformation = PhoneVisualTransformation()
         )
@@ -363,11 +360,11 @@ fun AppCardNumberTextField(
             singleLine = true,
             shape = RoundedCornerShape(size = 12.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Primary,
-                focusedTextColor = Black,
-                cursorColor = Primary,
-                unfocusedBorderColor = Gray11,
-                unfocusedTextColor = Gray11,
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                cursorColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
             ),
             visualTransformation = CardNumberVisualTransformation()
         )

@@ -186,7 +186,7 @@ internal fun OtherChannelContent(
                 .fillMaxWidth()
                 .height(height = 50.dp)
                 .padding(horizontal = 16.dp)
-                .border(width = 1.dp, color = Gray11, shape = RoundedCornerShape(12.dp))
+                .border(width = 1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(12.dp))
                 .clip(shape = RoundedCornerShape(12.dp))
                 .clickable { showChannelIconSelectionModel = true },
             verticalAlignment = Alignment.CenterVertically
