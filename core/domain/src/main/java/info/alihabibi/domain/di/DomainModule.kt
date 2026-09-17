@@ -1,5 +1,6 @@
 package info.alihabibi.domain.di
 
+import info.alihabibi.domain.local.coordinators.TransactionUndoManager
 import info.alihabibi.domain.local.usecases.database.category.DeleteCategoriesUseCase
 import info.alihabibi.domain.local.usecases.database.category.GetCategoriesUseCase
 import info.alihabibi.domain.local.usecases.database.category.SaveCategoryUseCase
@@ -12,6 +13,9 @@ import info.alihabibi.domain.local.usecases.database.channel.GetTotalBalanceUseC
 import info.alihabibi.domain.local.usecases.database.channel.SaveChannelUseCase
 import info.alihabibi.domain.local.usecases.database.channel.UpdateChannelUseCase
 import info.alihabibi.domain.local.usecases.database.channel.usecase.ChannelUseCases
+import info.alihabibi.domain.local.usecases.database.transaction.DeleteTransactionUseCase
+import info.alihabibi.domain.local.usecases.database.transaction.SaveTransactionUseCase
+import info.alihabibi.domain.local.usecases.database.transaction.usecase.TransactionUseCases
 import info.alihabibi.domain.local.usecases.datastore.GetIsAppFirstLaunchUseCase
 import info.alihabibi.domain.local.usecases.datastore.GetIsSmsModalShownUseCase
 import info.alihabibi.domain.local.usecases.datastore.GetPreferredCurrencyUseCase
@@ -85,6 +89,28 @@ val domainModule = module {
             getChannelByIdUseCase = GetChannelByIdUseCase(get()),
             getTotalBalanceUseCase = GetTotalBalanceUseCase(get())
         )
+    }
+
+    // endregion
+
+    // region Transaction
+
+    factory { SaveTransactionUseCase(get()) }
+    factory { DeleteTransactionUseCase(get()) }
+
+    factory {
+        TransactionUseCases(
+            saveTransactionUseCase = get(),
+            deleteTransactionUseCase = get()
+        )
+    }
+
+    // endregion
+
+    // region coordinators
+
+    single {
+        TransactionUndoManager(get(), get())
     }
 
     // endregion

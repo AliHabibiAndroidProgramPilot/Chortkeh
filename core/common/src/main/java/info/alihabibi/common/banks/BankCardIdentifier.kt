@@ -5,11 +5,11 @@ object BankCardIdentifier {
     private data class PrefixEntry(val prefix: String, val bank: Bank)
 
     private val cardNumberPrefixes: List<PrefixEntry> = listOf(
-        PrefixEntry("621986", Bank.SAMAN),
         PrefixEntry("603799", Bank.MELLI),
-        PrefixEntry("603770", Bank.KESHAVARZI),
+        PrefixEntry("621986", Bank.SAMAN),
         PrefixEntry("610433", Bank.MELLAT),
         PrefixEntry("991975", Bank.MELLAT),
+        PrefixEntry("603770", Bank.KESHAVARZI),
         PrefixEntry("589210", Bank.SEPAH),
         PrefixEntry("627353", Bank.TEJARAT),
         PrefixEntry("504706", Bank.SHAHR),

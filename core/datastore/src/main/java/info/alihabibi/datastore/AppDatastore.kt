@@ -6,8 +6,8 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import info.alihabibi.domain.local.keys.Keys
-import info.alihabibi.domain.local.keys.Keys.APP_PREFERENCES
+import info.alihabibi.domain.Keys
+import info.alihabibi.domain.Keys.APP_PREFERENCES
 import info.alihabibi.domain.models.Currencies
 import info.alihabibi.domain.models.Genders
 import info.alihabibi.domain.models.UserAccountInfo

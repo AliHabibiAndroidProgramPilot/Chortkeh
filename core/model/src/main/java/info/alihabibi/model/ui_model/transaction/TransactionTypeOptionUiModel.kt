@@ -1,4 +1,4 @@
-package info.alihabibi.model.ui_model
+package info.alihabibi.model.ui_model.transaction
 
 import androidx.annotation.StringRes
 import info.alihabibi.designsystem.R

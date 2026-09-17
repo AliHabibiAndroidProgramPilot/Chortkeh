@@ -7,6 +7,6 @@ class DeleteCategoriesUseCase(
     private val repository: CategoryRepository
 ) {
 
-    suspend operator fun invoke(categoriesToDelete: List<Category>) = repository.deleteCategory(categoriesToDelete)
+    suspend operator fun invoke(vararg categoryId: Long) = repository.deleteCategory(*categoryId)
 
 }

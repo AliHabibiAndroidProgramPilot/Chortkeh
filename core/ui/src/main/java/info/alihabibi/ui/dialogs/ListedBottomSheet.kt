@@ -43,9 +43,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import info.alihabibi.designsystem.R
-import info.alihabibi.designsystem.theme.Gray9
 import info.alihabibi.designsystem.theme.Primary
-import info.alihabibi.designsystem.theme.White
 import info.alihabibi.ui.items.ListedBottomSheetItem
 import info.alihabibi.ui.items.ListedChannelItem
 
@@ -72,7 +70,7 @@ fun <T> ListedBottomSheet(
 
     ModalBottomSheet(
         sheetState = sheetState,
-        containerColor = White,
+        containerColor = MaterialTheme.colorScheme.surface,
         onDismissRequest = onDismissRequest
     ) {
 
@@ -119,7 +117,7 @@ fun <T> ListedBottomSheet(
                                 Icon(
                                     painter = painterResource(id = R.drawable.trash),
                                     contentDescription = null,
-                                    tint = Gray9
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
 
                             }
@@ -149,7 +147,7 @@ fun <T> ListedBottomSheet(
                                 Icon(
                                     painter = painterResource(id = R.drawable.edit),
                                     contentDescription = null,
-                                    tint = Gray9
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
 
                             }
@@ -222,7 +220,7 @@ fun <T> ListedBottomSheet(
                                 modifier = Modifier.padding(end = 12.dp),
                                 painter = painterResource(id = R.drawable.add_square),
                                 contentDescription = null,
-                                tint = Primary
+                                tint = MaterialTheme.colorScheme.primary
                             )
 
                         }
@@ -247,15 +245,17 @@ fun <T> ChannelListedBottomSheet(
     itemSubTitle: (T) -> String,
     itemIcon: (T) -> Int,
     itemKey: (T) -> Any,
+    isEditChannelsAvailable: Boolean = true,
+    title: String = stringResource(id = R.string.input_channels),
     addNewItemTitle: String = stringResource(id = R.string.add_new_channel),
     onAddNewItem: () -> Unit = {},
     onDismissRequest: () -> Unit,
     onSelectItem: (item: T) -> Unit,
-    onChannelsEdit: () -> Unit
+    onChannelsEdit: () -> Unit = {}
 ) {
 
     ModalBottomSheet(
-        containerColor = White,
+        containerColor = MaterialTheme.colorScheme.surface,
         onDismissRequest = onDismissRequest
     ) {
 
@@ -269,7 +269,7 @@ fun <T> ChannelListedBottomSheet(
                         modifier = Modifier
                             .fillMaxWidth()
                             .align(alignment = Alignment.Center),
-                        text = stringResource(id = R.string.input_channels),
+                        text = title,
                         style = MaterialTheme.typography.labelLarge.copy(
                             textAlign = TextAlign.Center,
                             fontWeight = FontWeight.Bold
@@ -283,16 +283,17 @@ fun <T> ChannelListedBottomSheet(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
 
-                        IconButton(
-                            modifier = Modifier.size(size = 24.dp),
-                            onClick = onChannelsEdit
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.edit),
-                                contentDescription = null,
-                                tint = Gray9
-                            )
-                        }
+                        if (isEditChannelsAvailable)
+                            IconButton(
+                                modifier = Modifier.size(size = 24.dp),
+                                onClick = onChannelsEdit
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.edit),
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
 
                     }
                 }
@@ -342,7 +343,7 @@ fun <T> ChannelListedBottomSheet(
                                 modifier = Modifier.padding(end = 12.dp),
                                 painter = painterResource(id = R.drawable.add_square),
                                 contentDescription = null,
-                                tint = Primary
+                                tint = MaterialTheme.colorScheme.primary
                             )
 
                         }

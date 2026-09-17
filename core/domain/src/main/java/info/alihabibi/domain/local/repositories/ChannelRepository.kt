@@ -9,7 +9,7 @@ interface ChannelRepository {
 
     suspend fun saveChannel(channel: Channel): Long
 
-    suspend fun deleteChannel(channels: Channel)
+    suspend fun deleteChannel(channelId: Long)
 
     suspend fun updateChannel(channel: Channel)
 
