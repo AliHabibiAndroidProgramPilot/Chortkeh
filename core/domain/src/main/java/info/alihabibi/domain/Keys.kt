@@ -1,4 +1,4 @@
-package info.alihabibi.domain.local.keys
+package info.alihabibi.domain
 
 object Keys {
 
@@ -13,7 +13,8 @@ object Keys {
 
     // Database
     const val DATABASE_NAME = "Chortkeh.db"
-    const val CATEGORY_TABLE_NAME = "category"
+    const val CATEGORY_TABLE_NAME = "categories"
     const val CHANNELS_TABLE_NAME = "channels"
+    const val TRANSACTION_TABLE_NAME = "transactions"
 
 }

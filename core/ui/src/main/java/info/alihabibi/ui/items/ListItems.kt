@@ -167,7 +167,7 @@ fun ListedChannelItem(
                 .height(height = 65.dp)
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 4.dp)
-                .border(width = 1.dp, color = Gray3, shape = shape)
+                .border(width = 1.dp, color = MaterialTheme.colorScheme.outline, shape = shape)
                 .clip(shape = shape)
                 .clickable(onClick = onClick),
             verticalAlignment = Alignment.CenterVertically,

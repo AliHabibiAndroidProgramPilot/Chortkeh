@@ -56,14 +56,6 @@ import androidx.compose.ui.window.DialogProperties
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.ErrorExtraRedLight
 import info.alihabibi.designsystem.theme.ErrorRed
-import info.alihabibi.designsystem.theme.Gray1
-import info.alihabibi.designsystem.theme.Gray2
-import info.alihabibi.designsystem.theme.Gray3
-import info.alihabibi.designsystem.theme.Gray6
-import info.alihabibi.designsystem.theme.Gray9
-import info.alihabibi.designsystem.theme.MoonRaker
-import info.alihabibi.designsystem.theme.Primary
-import info.alihabibi.designsystem.theme.White
 import info.alihabibi.ui.buttons.AppButton
 import info.alihabibi.ui.buttons.AppOutlinedButton
 
@@ -110,7 +102,7 @@ fun AppSimpleBottomSheet(
     ModalBottomSheet(
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         tonalElevation = 10.dp,
-        containerColor = Gray1,
+        containerColor = MaterialTheme.colorScheme.surface,
         onDismissRequest = onDismissRequest
     ) {
 
@@ -143,9 +135,9 @@ fun AppSimpleBottomSheet(
 
             AppButton(
                 onClick = onConfirmClicked,
-                contentColor = Primary,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 text = confirmButtonText,
-                color = MoonRaker
+                color = MaterialTheme.colorScheme.primaryContainer
             )
 
         }
@@ -171,7 +163,7 @@ fun <T> AppRadioSelectionBottomSheet(
 
         ModalBottomSheet(
             sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-            containerColor = Gray1,
+            containerColor = MaterialTheme.colorScheme.surface,
             onDismissRequest = onDismissRequest
         ) {
 
@@ -201,8 +193,8 @@ fun <T> AppRadioSelectionBottomSheet(
                             onClick = { onRadioOptionSelected(item) },
                             enabled = index != disabledIndex,
                             colors = RadioButtonDefaults.colors(
-                                selectedColor = Primary,
-                                unselectedColor = Gray6
+                                selectedColor = MaterialTheme.colorScheme.primary,
+                                unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         )
 
@@ -215,7 +207,7 @@ fun <T> AppRadioSelectionBottomSheet(
                     }
 
                     if (index != radioOptions.lastIndex) {
-                        HorizontalDivider(color = Gray3)
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                     }
 
                 }
@@ -225,8 +217,8 @@ fun <T> AppRadioSelectionBottomSheet(
             AppButton(
                 modifier = Modifier.padding(horizontal = 24.dp),
                 onClick = onConfirmClicked,
-                color = MoonRaker,
-                contentColor = Primary,
+                color = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 text = stringResource(id = R.string.confirm)
             )
 
@@ -248,7 +240,7 @@ fun <T> AppIconSelectionBottomSheet(
 
     ModalBottomSheet(
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-        containerColor = Gray1,
+        containerColor = MaterialTheme.colorScheme.surface,
         onDismissRequest = onDismissRequest
     ) {
 
@@ -269,7 +261,7 @@ fun <T> AppIconSelectionBottomSheet(
                 .heightIn(max = 350.dp)
                 .padding(top = 12.dp, end = 16.dp, start = 16.dp)
                 .clip(shape = RoundedCornerShape(size = 12.dp))
-                .background(color = Gray2),
+                .background(color = MaterialTheme.colorScheme.surfaceVariant),
             columns = GridCells.Fixed(5),
             horizontalArrangement = Arrangement.Absolute.Center,
             verticalArrangement = Arrangement.Center
@@ -326,7 +318,7 @@ private fun DialogContent(
                 .widthIn(max = 360.dp),
             shape = RoundedCornerShape(20.dp),
             shadowElevation = 20.dp,
-            color = White
+            color = MaterialTheme.colorScheme.surface
         ) {
 
             Box(
@@ -369,7 +361,7 @@ private fun DialogContent(
 
                                 Icon(
                                     painter = painterResource(id = R.drawable.close_circle),
-                                    tint = Gray9,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                     contentDescription = null
                                 )
 
@@ -397,7 +389,7 @@ private fun DialogContent(
                             modifier = Modifier.width(140.dp),
                             onClick = onConfirmClicked,
                             text = confirmButtonText,
-                            borderColor = Primary
+                            borderColor = MaterialTheme.colorScheme.primary
                         )
 
                         Spacer(modifier = Modifier.width(14.dp))
