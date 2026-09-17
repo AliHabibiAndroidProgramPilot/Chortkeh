@@ -29,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,9 +57,10 @@ import info.alihabibi.designsystem.theme.Gray7
 import info.alihabibi.designsystem.theme.Gray8
 import info.alihabibi.designsystem.theme.Primary
 import info.alihabibi.designsystem.theme.White
-import info.alihabibi.model.ui_model.transaction.TransactionTypeOptionUiModel
+import info.alihabibi.domain.local.coordinators.TransactionUndoManager
 import info.alihabibi.model.ui_model.category.CategoryUiModel
 import info.alihabibi.model.ui_model.channel.ChannelUiModel
+import info.alihabibi.model.ui_model.transaction.TransactionTypeOptionUiModel
 import info.alihabibi.new_transaction.NewTransactionUiIntent
 import info.alihabibi.new_transaction.NewTransactionUiState
 import info.alihabibi.new_transaction.NewTransactionViewModel
@@ -75,6 +77,7 @@ import ir.mehrafzoon.composedatepicker.utils.MaxYear
 import ir.mehrafzoon.composedatepicker.utils.MinYear
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 import java.time.LocalTime
 
 @Composable
@@ -85,16 +88,32 @@ fun NewTransactionDestination(
     onBackPressed: () -> Unit
 ) {
 
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+
     val uiState by viewModel.newTransactionUiState.collectAsStateWithLifecycle()
     val formattedTransactionDate by viewModel.formattedTransactionDate.collectAsStateWithLifecycle()
 
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-
-    val lifecycleOwner = LocalLifecycleOwner.current
     LaunchedEffect(lifecycleOwner) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.onEvent(NewTransactionUiIntent.Init)
+        }
+    }
+
+    val currentOnBackPressed by rememberUpdatedState(onBackPressed)
+    val transactionUndoManager: TransactionUndoManager = koinInject()
+    uiState.savedTransactionId?.let { id ->
+        LaunchedEffect(id) {
+            SnackBarController.sendEvent(
+                SnackBarEvent(
+                    message = Utils.getStringResources(context, R.string.transaction_registered),
+                    actionTitle = Utils.getStringResources(context, R.string.undo),
+                    action = {
+                        transactionUndoManager.executeUndo(id)
+                    }
+                )
+            )
+            currentOnBackPressed()
         }
     }
 
@@ -123,16 +142,6 @@ fun NewTransactionDestination(
         },
         onSaveTransaction = {
             viewModel.onEvent(NewTransactionUiIntent.SaveTransaction)
-            scope.launch {
-                SnackBarController.sendEvent(
-                    SnackBarEvent(
-                        message = Utils.getStringResources(context, R.string.transaction_registered),
-                        actionTitle = Utils.getStringResources(context, R.string.undo),
-                        action = { /*delete transaction*/ }
-                    )
-                )
-            }
-            onBackPressed()
         },
         onTransactionTypeChanged = { type ->
             viewModel.onEvent(NewTransactionUiIntent.TransactionTypeChanged(type))
@@ -259,11 +268,13 @@ private fun NewTransactionScreen(
             itemIcon = { it.icon.iconResId },
             itemKey = { it.id },
             isEditChannelsAvailable = false,
-            isAddNewItemAvailable = false,
-            title = stringResource(id = R.string.channel),
+            title = stringResource(id = R.string.channels),
             onSelectItem = { channel ->
                 onChannelChanged(channel)
                 showChannelsBottomSheet = false
+            },
+            onAddNewItem = {
+
             },
             onDismissRequest = { showChannelsBottomSheet = false },
         )

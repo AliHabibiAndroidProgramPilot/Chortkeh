@@ -9,7 +9,7 @@ import info.alihabibi.database.repositories.ChannelRepositoryImpl
 import info.alihabibi.database.repositories.TransactionRepositoryImpl
 import info.alihabibi.database.seeding.CategorySeedCallback
 import info.alihabibi.database.seeding.ChannelSeedCallback
-import info.alihabibi.domain.local.keys.Keys
+import info.alihabibi.domain.Keys
 import info.alihabibi.domain.local.repositories.CategoryRepository
 import info.alihabibi.domain.local.repositories.ChannelRepository
 import info.alihabibi.domain.local.repositories.TransactionRepository

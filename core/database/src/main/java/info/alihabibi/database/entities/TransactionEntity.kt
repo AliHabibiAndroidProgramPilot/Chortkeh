@@ -6,7 +6,7 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
-import info.alihabibi.domain.local.keys.Keys
+import info.alihabibi.domain.Keys
 import info.alihabibi.domain.models.transaction.TransactionType
 
 @Entity(

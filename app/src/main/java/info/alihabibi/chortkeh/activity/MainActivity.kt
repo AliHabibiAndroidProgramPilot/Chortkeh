@@ -69,7 +69,7 @@ class MainActivity : ComponentActivity() {
                     val result = snackBarHostState.showSnackbar(
                         message = event.message,
                         actionLabel = event.actionTitle,
-                        duration = SnackbarDuration.Long
+                        duration = SnackbarDuration.Short
                     )
                     if (result == SnackbarResult.ActionPerformed)
                         event.action?.invoke()

@@ -1,5 +1,6 @@
 package info.alihabibi.domain.di
 
+import info.alihabibi.domain.local.coordinators.TransactionUndoManager
 import info.alihabibi.domain.local.usecases.database.category.DeleteCategoriesUseCase
 import info.alihabibi.domain.local.usecases.database.category.GetCategoriesUseCase
 import info.alihabibi.domain.local.usecases.database.category.SaveCategoryUseCase
@@ -102,6 +103,14 @@ val domainModule = module {
             saveTransactionUseCase = get(),
             deleteTransactionUseCase = get()
         )
+    }
+
+    // endregion
+
+    // region coordinators
+
+    single {
+        TransactionUndoManager(get(), get())
     }
 
     // endregion

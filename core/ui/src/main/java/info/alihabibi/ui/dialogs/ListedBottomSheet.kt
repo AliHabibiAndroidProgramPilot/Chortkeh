@@ -248,7 +248,6 @@ fun <T> ChannelListedBottomSheet(
     itemIcon: (T) -> Int,
     itemKey: (T) -> Any,
     isEditChannelsAvailable: Boolean = true,
-    isAddNewItemAvailable: Boolean = true,
     title: String = stringResource(id = R.string.input_channels),
     addNewItemTitle: String = stringResource(id = R.string.add_new_channel),
     onAddNewItem: () -> Unit = {},
@@ -323,36 +322,35 @@ fun <T> ChannelListedBottomSheet(
 
                     }
 
-                    if (isAddNewItemAvailable)
-                        item(key = "ADD_NEW") {
+                    item(key = "ADD_NEW") {
 
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(height = 50.dp)
-                                    .padding(horizontal = 16.dp)
-                                    .clip(shape = RoundedCornerShape(12.dp))
-                                    .clickable(onClick = onAddNewItem),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.End
-                            ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(height = 50.dp)
+                                .padding(horizontal = 16.dp)
+                                .clip(shape = RoundedCornerShape(12.dp))
+                                .clickable(onClick = onAddNewItem),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.End
+                        ) {
 
-                                Text(
-                                    modifier = Modifier.padding(end = 10.dp),
-                                    text = addNewItemTitle,
-                                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 14.sp)
-                                )
+                            Text(
+                                modifier = Modifier.padding(end = 10.dp),
+                                text = addNewItemTitle,
+                                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 14.sp)
+                            )
 
-                                Icon(
-                                    modifier = Modifier.padding(end = 12.dp),
-                                    painter = painterResource(id = R.drawable.add_square),
-                                    contentDescription = null,
-                                    tint = Primary
-                                )
-
-                            }
+                            Icon(
+                                modifier = Modifier.padding(end = 12.dp),
+                                painter = painterResource(id = R.drawable.add_square),
+                                contentDescription = null,
+                                tint = Primary
+                            )
 
                         }
+
+                    }
 
                 }
 

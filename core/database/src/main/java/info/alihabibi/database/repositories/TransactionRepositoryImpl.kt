@@ -15,9 +15,9 @@ class TransactionRepositoryImpl(private val dao: TransactionDao) : TransactionRe
         }
     }
 
-    override suspend fun deleteTransaction(transaction: Transaction) {
+    override suspend fun deleteTransaction(transactionId: Long) {
         return withContext(Dispatchers.IO) {
-            dao.deleteTransaction(transaction.asEntity())
+            dao.deleteTransactionById(transactionId)
         }
     }
 

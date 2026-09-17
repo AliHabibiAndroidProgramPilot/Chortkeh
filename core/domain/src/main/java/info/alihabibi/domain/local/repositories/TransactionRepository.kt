@@ -6,6 +6,6 @@ interface TransactionRepository {
 
     suspend fun saveTransaction(transaction: Transaction): Long
 
-    suspend fun deleteTransaction(transaction: Transaction)
+    suspend fun deleteTransaction(transactionId: Long)
 
 }

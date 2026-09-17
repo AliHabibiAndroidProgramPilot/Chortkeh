@@ -133,7 +133,8 @@ class NewTransactionViewModel(
                 date = "${state.transactionYear}-${state.transactionMonth}-${state.transactionDay}",
                 time = "${state.transactionHour}:${state.transactionMinute}"
             ).toDomain()
-            transactionUseCases.saveTransactionUseCase.invoke(transaction)
+            val id = transactionUseCases.saveTransactionUseCase.invoke(transaction)
+            _newTransactionUiState.update { it.copy(savedTransactionId = id) }
         }
     }
 
@@ -328,7 +329,8 @@ data class NewTransactionUiState(
     val transactionCategory: CategoryUiModel? = null,
     val transactionChannel: ChannelUiModel? = null,
     val categories: List<CategoryUiModel> = emptyList(),
-    val channels: List<ChannelUiModel> = emptyList()
+    val channels: List<ChannelUiModel> = emptyList(),
+    val savedTransactionId: Long? = null
 ) {
     val isRegisterTransactionButtonEnabled: Boolean
         get() {
