@@ -100,9 +100,12 @@ fun TimePickerBottomSheetContent(
 
                 HoursNumberPicker(
                     modifier = Modifier.padding(horizontal = 24.dp),
-                    dividersColor = MaterialTheme.colorScheme.outlineVariant,
                     leadingZero = false,
-                    textStyle = MaterialTheme.typography.labelMedium.copy(fontSize = 16.sp),
+                    dividersColor = MaterialTheme.colorScheme.primary,
+                    textStyle = MaterialTheme.typography.labelMedium.copy(
+                        fontSize = 16.sp,
+                        color = MaterialTheme.colorScheme.onSurface
+                    ),
                     hoursDivider = {
                         Text(
                             modifier = Modifier

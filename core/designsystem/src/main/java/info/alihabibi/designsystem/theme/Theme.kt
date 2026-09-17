@@ -7,7 +7,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Perano,
+    primary = Primary,
     onPrimary = Haiti,
     primaryContainer = BayOfMany,
     onPrimaryContainer = MoonRaker,

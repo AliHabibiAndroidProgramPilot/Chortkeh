@@ -51,11 +51,7 @@ import info.alihabibi.common.Utils
 import info.alihabibi.common_android.snackbar.SnackBarController
 import info.alihabibi.common_android.snackbar.SnackBarEvent
 import info.alihabibi.designsystem.R
-import info.alihabibi.designsystem.theme.Black
-import info.alihabibi.designsystem.theme.Gray11
-import info.alihabibi.designsystem.theme.Gray7
 import info.alihabibi.designsystem.theme.Gray8
-import info.alihabibi.designsystem.theme.Primary
 import info.alihabibi.designsystem.theme.White
 import info.alihabibi.domain.local.coordinators.TransactionUndoManager
 import info.alihabibi.model.ui_model.category.CategoryUiModel
@@ -183,21 +179,32 @@ private fun NewTransactionScreen(
                 .wrapContentHeight(),
             controller = datePickerController,
             sheetState = dateBottomSheetState,
-            minYear = MinYear.On(1400),
-            maxYear = MaxYear.On(1425),
+            minYear = MinYear.On(1404),
+            maxYear = MaxYear.On(1406),
             titleBottomSheet = stringResource(id = R.string.date),
             titleStyle = MaterialTheme.typography.labelLarge.copy(
                 textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Bold
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
             ),
             titleModifier = Modifier.fillMaxWidth(),
             font = R.font.iran_yekanx_normal,
             textButtonStyle = MaterialTheme.typography.labelLarge.copy(
                 fontSize = 16.sp,
-                color = Primary
+                color = White
             ),
-            unSelectedStyle = MaterialTheme.typography.labelMedium.copy(color = Gray7),
-            selectedStyle = MaterialTheme.typography.labelMedium.copy(color = Black),
+            unSelectedStyle = MaterialTheme.typography.labelMedium.copy(
+                fontSize = 16.sp,
+                color = MaterialTheme.colorScheme.onSurface
+            ),
+            selectedStyle = MaterialTheme.typography.labelMedium.copy(
+                fontSize = 16.sp,
+                color = MaterialTheme.colorScheme.primary
+            ),
+            lineColor = MaterialTheme.colorScheme.primary,
+            buttonColor = MaterialTheme.colorScheme.primary,
+            containerColor = MaterialTheme.colorScheme.surface,
             onDismissRequest = {
                 scope.launch { dateBottomSheetState.hide() }
             },
@@ -211,10 +218,11 @@ private fun NewTransactionScreen(
                 onDateChanged(year, month, day)
             }
         )
+
     if (timeBottomSheetState.isVisible)
         ModalBottomSheet(
             sheetState = timeBottomSheetState,
-            containerColor = White,
+            containerColor = MaterialTheme.colorScheme.surface,
             onDismissRequest = {
                 scope.launch { timeBottomSheetState.hide() }
             },
