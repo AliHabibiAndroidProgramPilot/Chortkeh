@@ -336,7 +336,7 @@ private fun NewTransactionScreen(
                     .fillMaxWidth()
                     .height(height = 50.dp)
                     .padding(horizontal = 16.dp)
-                    .border(width = 1.dp, color = Gray11, shape = RoundedCornerShape(12.dp))
+                    .border(width = 1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(12.dp))
                     .clip(shape = RoundedCornerShape(12.dp))
                     .clickable { showChannelsBottomSheet = true },
                 verticalAlignment = Alignment.CenterVertically
@@ -373,7 +373,7 @@ private fun NewTransactionScreen(
                     .fillMaxWidth()
                     .height(height = 50.dp)
                     .padding(horizontal = 16.dp)
-                    .border(width = 1.dp, color = Gray11, shape = RoundedCornerShape(12.dp))
+                    .border(width = 1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(12.dp))
                     .clip(shape = RoundedCornerShape(size = 12.dp))
                     .clickable { showCategoryBottomSheet = true },
                 verticalAlignment = Alignment.CenterVertically
@@ -406,7 +406,7 @@ private fun NewTransactionScreen(
                     .fillMaxWidth()
                     .height(height = 50.dp)
                     .padding(horizontal = 16.dp)
-                    .border(width = 1.dp, color = Gray11, shape = RoundedCornerShape(size = 12.dp))
+                    .border(width = 1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(size = 12.dp))
                     .clip(shape = RoundedCornerShape(size = 12.dp))
                     .clickable {
                         scope.launch { dateBottomSheetState.show() }
@@ -438,7 +438,7 @@ private fun NewTransactionScreen(
                     .fillMaxWidth()
                     .height(height = 50.dp)
                     .padding(horizontal = 16.dp)
-                    .border(width = 1.dp, color = Gray11, shape = RoundedCornerShape(size = 12.dp))
+                    .border(width = 1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(size = 12.dp))
                     .clip(shape = RoundedCornerShape(size = 12.dp))
                     .clickable {
                         scope.launch { timeBottomSheetState.show() }
