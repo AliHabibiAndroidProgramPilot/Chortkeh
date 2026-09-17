@@ -45,7 +45,8 @@ private val LightColorScheme = lightColorScheme(
     surface = White,
     onSurface = Haiti,
     surfaceVariant = MoonRaker,
-    onSurfaceVariant = Haiti
+    onSurfaceVariant = Haiti,
+    outlineVariant = Gray3
 )
 
 /**
