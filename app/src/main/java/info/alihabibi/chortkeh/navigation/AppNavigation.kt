@@ -96,7 +96,13 @@ fun DemoNavHost(
 
         profileGraph(navController = navController)
 
-        newTransactionGraph(navController = navController)
+        newTransactionGraph(
+            navController = navController,
+            onAddNewChannel = {
+                navController.navigate(ChannelGraphRoute)
+                navController.navigate(AddChannel)
+            }
+        )
 
         channelsGraph(navController = navController)
 

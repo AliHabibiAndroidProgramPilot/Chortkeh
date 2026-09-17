@@ -80,6 +80,7 @@ import java.time.LocalTime
 fun NewTransactionDestination(
     viewModel: NewTransactionViewModel = koinViewModel(),
     onAddNewCategory: () -> Unit = {},
+    onAddNewChannel: () -> Unit = {},
     onEditCategory: (categoryId: Int) -> Unit = {},
     onBackPressed: () -> Unit
 ) {
@@ -117,6 +118,7 @@ fun NewTransactionDestination(
         uiState = uiState,
         formattedTransactionDate = formattedTransactionDate,
         onAddNewCategory = onAddNewCategory,
+        onAddNewChannel = onAddNewChannel,
         onEditCategory = onEditCategory,
         onPriceChanged = { price ->
             viewModel.onEvent(NewTransactionUiIntent.PriceChanged(price))
@@ -161,6 +163,7 @@ private fun NewTransactionScreen(
     onEditCategory: (categoryId: Int) -> Unit = {},
     onSaveTransaction: () -> Unit = {},
     onAddNewCategory: () -> Unit = {},
+    onAddNewChannel: () -> Unit = {},
     onTransactionTypeChanged: (type: TransactionTypeOptionUiModel) -> Unit = {},
     onBackPressed: () -> Unit
 ) {
@@ -284,9 +287,7 @@ private fun NewTransactionScreen(
                 onChannelChanged(channel)
                 showChannelsBottomSheet = false
             },
-            onAddNewItem = {
-
-            },
+            onAddNewItem = onAddNewChannel,
             onDismissRequest = { showChannelsBottomSheet = false },
         )
 
