@@ -24,7 +24,9 @@ private val DarkColorScheme = darkColorScheme(
     surface = Gray13,
     onSurface = Gray2,
     surfaceVariant = Gray11,
-    onSurfaceVariant = Gray5
+    onSurfaceVariant = Gray5,
+    error = ErrorRed,
+    errorContainer = ErrorDark
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -46,7 +48,9 @@ private val LightColorScheme = lightColorScheme(
     onSurface = Haiti,
     surfaceVariant = MoonRaker,
     onSurfaceVariant = Haiti,
-    outlineVariant = Gray3
+    outlineVariant = Gray3,
+    error = ErrorRed,
+    errorContainer = ErrorLight
 )
 
 /**
