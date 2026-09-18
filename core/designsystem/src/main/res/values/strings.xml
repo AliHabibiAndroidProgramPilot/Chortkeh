@@ -28,6 +28,9 @@
     <string name="exit">خروج</string>
     <string name="confirm">تایید</string>
     <string name="cancel">لغو</string>
+    <string name="left_over_balance">مانده</string>
+    <string name="good_balance_state">اوضاع خوبه؛ هنوز تو منطقه سبزیم</string>
+    <string name="bad_balance_state">هشدار! بیشتر از دخلت خرج کردی</string>
 
     // Home
     <string name="bookkeeping">حساب کتاب</string>
