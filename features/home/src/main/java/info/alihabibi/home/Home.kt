@@ -6,8 +6,10 @@ import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -38,6 +40,8 @@ import info.alihabibi.common_android.RequestSMSPermission
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Primary
 import info.alihabibi.ui.buttons.AppOutlinedButton
+import info.alihabibi.ui.charts.GaugeChart
+import info.alihabibi.ui.charts.GaugeChartData
 import info.alihabibi.ui.dialogs.ChannelListedBottomSheet
 import info.alihabibi.ui.headrs.HomePageHeader
 import org.koin.androidx.compose.koinViewModel
@@ -148,6 +152,22 @@ private fun HomeScreen(
             )
 
         }
+
+        Spacer(modifier = Modifier.height(height = 16.dp))
+
+        GaugeChart(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp),
+            progress = 140f,
+            textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
+            data = GaugeChartData(
+                totalIncome = uiState.formattedTotalBalance,
+                remainedBalance = "12,200,000",
+                bottomMessage = stringResource(id = R.string.bad_balance_state),
+                iconResId = R.drawable.warnign_red_2
+            )
+        )
 
     }
 

@@ -2,6 +2,7 @@ package info.alihabibi.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import info.alihabibi.common.Utils
 import info.alihabibi.domain.local.usecases.database.channel.usecase.ChannelUseCases
 import info.alihabibi.domain.local.usecases.datastore.usecase.DatastoreUseCases
 import info.alihabibi.model.mapper.toUiModel
@@ -37,6 +38,7 @@ class HomeViewModel(
             }
             HomeUiState(
                 isSmsModalShown = isSmsModalShown,
+                formattedTotalBalance = Utils.decimalFormatterPattern.format(totalBalance),
                 channels = uiChannels
             )
         }
@@ -69,5 +71,6 @@ sealed interface HomeUiIntent {
 
 data class HomeUiState(
     val isSmsModalShown: Boolean = false,
+    val formattedTotalBalance: String = "",
     val channels: List<ChannelUiModel> = emptyList()
 )

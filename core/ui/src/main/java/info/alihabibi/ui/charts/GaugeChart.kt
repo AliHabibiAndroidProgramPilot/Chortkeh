@@ -6,9 +6,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -28,7 +25,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import info.alihabibi.designsystem.R
@@ -61,9 +57,9 @@ import kotlin.math.sin
 fun GaugeChart(
     data: GaugeChartData,
     progress: Float,
+    textStyle: TextStyle,
     centerTitle: String = stringResource(id = R.string.left_over_balance),
     modifier: Modifier = Modifier,
-    textStyle: TextStyle = MaterialTheme.typography.bodyLarge,
 ) {
 
     val textMeasurer = rememberTextMeasurer()
@@ -215,24 +211,5 @@ fun GaugeChart(
             }
         }
 
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun GaugeChartPreview() {
-    Surface {
-        Column(modifier = Modifier.padding(24.dp)) {
-            GaugeChart(
-                data = GaugeChartData(
-                    totalIncome = "۶۵٪",
-                    remainedBalance = "۲,۵۰۰,۰۰۰ تومان",
-                    bottomMessage = "بیشتر خرج کردی",
-                    iconResId = R.drawable.blue_tick
-                ),
-                progress = 87f,
-                modifier = Modifier.fillMaxWidth(),
-            )
-        }
     }
 }
