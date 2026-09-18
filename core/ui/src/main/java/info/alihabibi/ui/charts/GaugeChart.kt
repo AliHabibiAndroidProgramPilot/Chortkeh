@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.ErrorRed
 import info.alihabibi.designsystem.theme.Gray5
+import info.alihabibi.designsystem.theme.Gray8
 import info.alihabibi.designsystem.theme.GreenSuccess
 import kotlin.math.cos
 import kotlin.math.min
@@ -134,6 +135,8 @@ fun GaugeChart(
                     color = if (progress >= 90) {
                         val x: Float = ((progress / 10) * 1.5 + 1).toFloat()
                         if (i <= x) ErrorRed else Gray5
+                    } else if (progress == 0f) {
+                        Gray5
                     } else {
                         val x: Float = ((progress / 10) * 1.5 + 1).toFloat()
                         if (i <= x) GreenSuccess else Gray5
@@ -151,7 +154,7 @@ fun GaugeChart(
             drawLine(
                 color = ErrorRed,
                 start = Offset(center.x, topMarkerCenter.y + markerRadius),
-                end = Offset(center.x, center.y - (radius - 26)),
+                end = Offset(center.x, center.y - (radius - 20)),
                 strokeWidth = markerStroke,
             )
 
@@ -182,8 +185,8 @@ fun GaugeChart(
                         fontSize = 14.sp,
                         textAlign = TextAlign.Center,
                         textDirection = TextDirection.Rtl,
-                        color = if (progress >= 90) ErrorRed else GreenSuccess
-                    ),
+                        color = if (progress >= 90) ErrorRed else if (progress == 0f) Gray8 else GreenSuccess
+                    )
                 )
                 val totalWidth = textLayout.size.width + spacingPx + iconSizePx
                 val startX = center.x - totalWidth / 2f
@@ -204,7 +207,9 @@ fun GaugeChart(
                     with(bottomMessageIcon) {
                         draw(
                             size = Size(iconSizePx, iconSizePx),
-                            colorFilter = ColorFilter.tint(if (progress >= 90) ErrorRed else GreenSuccess)
+                            colorFilter = ColorFilter.tint(
+                                if (progress >= 90) ErrorRed else if (progress == 0f) Gray8 else GreenSuccess
+                            )
                         )
                     }
                 }

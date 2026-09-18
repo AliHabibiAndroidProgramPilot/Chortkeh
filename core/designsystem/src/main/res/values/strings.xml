@@ -31,6 +31,7 @@
     <string name="left_over_balance">مانده</string>
     <string name="good_balance_state">اوضاع خوبه؛ هنوز تو منطقه سبزیم</string>
     <string name="bad_balance_state">هشدار! بیشتر از دخلت خرج کردی</string>
+    <string name="empty_balance_state">هنوز دریافت و پرداختی ثبت نکردی</string>
 
     // Home
     <string name="bookkeeping">حساب کتاب</string>

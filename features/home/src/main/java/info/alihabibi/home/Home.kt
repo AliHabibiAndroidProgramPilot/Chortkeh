@@ -3,6 +3,7 @@ package info.alihabibi.home
 import android.Manifest
 import android.annotation.SuppressLint
 import android.os.Build
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,7 +12,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CardElevation
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -23,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -38,6 +45,8 @@ import info.alihabibi.common.Utils
 import info.alihabibi.common_android.RequestNotificationPermission
 import info.alihabibi.common_android.RequestSMSPermission
 import info.alihabibi.designsystem.R
+import info.alihabibi.designsystem.theme.Gray1
+import info.alihabibi.designsystem.theme.Gray5
 import info.alihabibi.designsystem.theme.Primary
 import info.alihabibi.ui.buttons.AppOutlinedButton
 import info.alihabibi.ui.charts.GaugeChart
@@ -155,19 +164,31 @@ private fun HomeScreen(
 
         Spacer(modifier = Modifier.height(height = 16.dp))
 
-        GaugeChart(
+        Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp),
-            progress = 140f,
-            textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
-            data = GaugeChartData(
-                totalIncome = uiState.formattedTotalBalance,
-                remainedBalance = "12,200,000",
-                bottomMessage = stringResource(id = R.string.bad_balance_state),
-                iconResId = R.drawable.warnign_red_2
+                .padding(horizontal = 16.dp),
+            shape = RoundedCornerShape(topStartPercent = 6, topEndPercent = 6),
+            border = BorderStroke(width = 1.4.dp, color = Color(0xFFECECEC)),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)
+        ) {
+
+            GaugeChart(
+                modifier = Modifier
+                    .size(size = 230.dp)
+                    .align(alignment = Alignment.CenterHorizontally)
+                    .padding(top = 12.dp),
+                progress = 0f,
+                textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
+                data = GaugeChartData(
+                    totalIncome = "0",
+                    remainedBalance = "0",
+                    bottomMessage = stringResource(id = R.string.empty_balance_state),
+                    iconResId = R.drawable.warnign_red_2
+                )
             )
-        )
+
+        }
 
     }
 
