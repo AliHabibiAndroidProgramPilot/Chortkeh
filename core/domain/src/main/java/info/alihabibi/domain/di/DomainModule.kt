@@ -119,7 +119,7 @@ val domainModule = module {
     // region coordinators
 
     single {
-        TransactionUndoManager(get(), get())
+        TransactionUndoManager(get(), get(), get())
     }
 
     // endregion
