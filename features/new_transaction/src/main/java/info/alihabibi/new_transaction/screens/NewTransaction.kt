@@ -86,15 +86,12 @@ fun NewTransactionDestination(
 ) {
 
     val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
 
     val uiState by viewModel.newTransactionUiState.collectAsStateWithLifecycle()
     val formattedTransactionDate by viewModel.formattedTransactionDate.collectAsStateWithLifecycle()
 
-    LaunchedEffect(lifecycleOwner) {
-        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            viewModel.onEvent(NewTransactionUiIntent.Init)
-        }
+    LaunchedEffect(Unit) {
+        viewModel.onEvent(NewTransactionUiIntent.Init)
     }
 
     val currentOnBackPressed by rememberUpdatedState(onBackPressed)

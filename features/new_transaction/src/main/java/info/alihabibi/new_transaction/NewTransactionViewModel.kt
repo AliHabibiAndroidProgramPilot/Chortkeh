@@ -46,7 +46,7 @@ class NewTransactionViewModel(
         newTransactionUiState.map { it.transactionMonth },
         newTransactionUiState.map { it.transactionDay }
     ) { year, month, day ->
-        if (year != null && month != null && day != null)
+        if (year > 0 && month > 0 && day > 0)
             PersianDateFormatter.format(year, month, day)
         else ""
     }.stateIn(
@@ -130,12 +130,24 @@ class NewTransactionViewModel(
                 amount = state.transactionPrice.toLong(),
                 channel = state.transactionChannel,
                 category = state.transactionCategory,
-                date = "${state.transactionYear}-${state.transactionMonth}-${state.transactionDay}",
+                year = state.transactionYear,
+                month = state.transactionMonth,
+                day = state.transactionDay,
                 time = "${state.transactionHour}:${state.transactionMinute}"
             ).toDomain()
             val id = transactionUseCases.saveTransactionUseCase.invoke(transaction)
+
+            updateChannelBalanceAfterTransaction(
+                state.transactionChannel.id,
+                state.transactionPrice.toLong(),
+                state.transactionType == TransactionTypeOptionUiModel.INCOME
+            )
             _newTransactionUiState.update { it.copy(savedTransactionId = id) }
         }
+    }
+
+    private suspend fun updateChannelBalanceAfterTransaction(channelId: Long, balance: Long, isIncome: Boolean) {
+        channelsUseCase.updateChannelBalanceUseCase.invoke(channelId, balance, isIncome)
     }
 
     private fun saveCategory() {
@@ -322,9 +334,9 @@ data class NewTransactionUiState(
     val formattedTransactionTime: String = "",
     val transactionHour: Int? = null,
     val transactionMinute: Int? = null,
-    val transactionYear: Int? = null,
-    val transactionMonth: Int? = null,
-    val transactionDay: Int? = null,
+    val transactionYear: Int = 0,
+    val transactionMonth: Int = 0,
+    val transactionDay: Int = 0,
     val transactionCategory: CategoryUiModel? = null,
     val transactionChannel: ChannelUiModel? = null,
     val categories: List<CategoryUiModel> = emptyList(),
@@ -336,7 +348,10 @@ data class NewTransactionUiState(
             return transactionPrice.isNotEmpty() &&
                     formattedTransactionTime.isNotEmpty() &&
                     transactionCategory != null &&
-                    transactionChannel != null
+                    transactionChannel != null &&
+                    transactionYear > 0 &&
+                    transactionMonth > 0 &&
+                    transactionDay > 0
         }
 }
 

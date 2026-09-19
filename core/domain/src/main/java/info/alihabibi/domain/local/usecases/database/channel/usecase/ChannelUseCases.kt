@@ -13,5 +13,6 @@ data class ChannelUseCases(
     val deleteChannelUseCase: DeleteChannelUseCase,
     val updateChannelUseCase: UpdateChannelUseCase,
     val getChannelByIdUseCase: GetChannelByIdUseCase,
-    val getTotalBalanceUseCase: GetTotalBalanceUseCase
+    val getTotalBalanceUseCase: GetTotalBalanceUseCase,
+    val updateChannelBalanceUseCase: UpdateChannelBalanceUseCase
 )

@@ -13,7 +13,10 @@ import info.alihabibi.domain.local.usecases.database.channel.GetTotalBalanceUseC
 import info.alihabibi.domain.local.usecases.database.channel.SaveChannelUseCase
 import info.alihabibi.domain.local.usecases.database.channel.UpdateChannelUseCase
 import info.alihabibi.domain.local.usecases.database.channel.usecase.ChannelUseCases
+import info.alihabibi.domain.local.usecases.database.channel.usecase.UpdateChannelBalanceUseCase
 import info.alihabibi.domain.local.usecases.database.transaction.DeleteTransactionUseCase
+import info.alihabibi.domain.local.usecases.database.transaction.GetMonthTotalExpenses
+import info.alihabibi.domain.local.usecases.database.transaction.GetMonthTotalIncome
 import info.alihabibi.domain.local.usecases.database.transaction.SaveTransactionUseCase
 import info.alihabibi.domain.local.usecases.database.transaction.usecase.TransactionUseCases
 import info.alihabibi.domain.local.usecases.datastore.GetIsAppFirstLaunchUseCase
@@ -79,6 +82,7 @@ val domainModule = module {
     factory { DeleteChannelUseCase(get()) }
     factory { GetChannelsUseCase(get()) }
     factory { UpdateChannelUseCase(get()) }
+    factory { UpdateChannelBalanceUseCase(get()) }
 
     factory {
         ChannelUseCases(
@@ -87,7 +91,8 @@ val domainModule = module {
             deleteChannelUseCase = DeleteChannelUseCase(get()),
             updateChannelUseCase = UpdateChannelUseCase(get()),
             getChannelByIdUseCase = GetChannelByIdUseCase(get()),
-            getTotalBalanceUseCase = GetTotalBalanceUseCase(get())
+            getTotalBalanceUseCase = GetTotalBalanceUseCase(get()),
+            updateChannelBalanceUseCase = UpdateChannelBalanceUseCase(get())
         )
     }
 
@@ -97,11 +102,15 @@ val domainModule = module {
 
     factory { SaveTransactionUseCase(get()) }
     factory { DeleteTransactionUseCase(get()) }
+    factory { GetMonthTotalIncome(get()) }
+    factory { GetMonthTotalExpenses(get()) }
 
     factory {
         TransactionUseCases(
             saveTransactionUseCase = get(),
-            deleteTransactionUseCase = get()
+            deleteTransactionUseCase = get(),
+            getMonthTotalIncome = get(),
+            getMonthTotalExpenses = get()
         )
     }
 

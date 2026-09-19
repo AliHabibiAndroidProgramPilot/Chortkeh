@@ -17,4 +17,8 @@ interface ChannelRepository {
 
     fun getTotalBalance(): Flow<Long>
 
+    suspend fun increaseChannelBalance(id: Long, balance: Long)
+
+    suspend fun decreaseChannelBalance(id: Long, balance: Long)
+
 }
