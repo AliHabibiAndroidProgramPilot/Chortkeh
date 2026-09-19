@@ -10,7 +10,9 @@ fun DetailedTransaction.asExternalModel(): Transaction = Transaction(
     amount = transaction.amount,
     channel = channel.asExternalModel(),
     category = category.asExternalModel(),
-    date = transaction.date,
+    year = transaction.year,
+    month = transaction.month,
+    day = transaction.day,
     time = transaction.time
 )
 
@@ -20,6 +22,8 @@ fun Transaction.asEntity(): TransactionEntity = TransactionEntity(
     transactionType = transactionType,
     transactionChannelId = channel.id,
     transactionCategoryId = category.id,
-    date = date,
+    year = year,
+    month = month,
+    day = day,
     time = time
 )

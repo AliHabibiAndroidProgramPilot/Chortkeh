@@ -4,7 +4,6 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.os.Build
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,9 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -46,12 +43,9 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.permissions.rememberPermissionState
-import info.alihabibi.common.Utils
 import info.alihabibi.common_android.RequestNotificationPermission
 import info.alihabibi.common_android.RequestSMSPermission
 import info.alihabibi.designsystem.R
-import info.alihabibi.designsystem.theme.Gray1
-import info.alihabibi.designsystem.theme.Gray5
 import info.alihabibi.designsystem.theme.Gray8
 import info.alihabibi.designsystem.theme.NeutralGray
 import info.alihabibi.designsystem.theme.Primary
@@ -114,8 +108,6 @@ private fun HomeScreen(
             onSmsModalShown = onSmsModalShowed
         )
 
-    val currentMonth = remember { Utils.getCurrentPersianMonth() }
-
     var showChannelsBottomSheet by remember { mutableStateOf(false) }
     if (showChannelsBottomSheet)
         ChannelListedBottomSheet(
@@ -167,7 +159,7 @@ private fun HomeScreen(
             )
 
             Text(
-                text = "${stringResource(id = R.string.bookkeeping)} $currentMonth",
+                text = "${stringResource(id = R.string.bookkeeping)} ${uiState.persianMonthName}",
                 style = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp),
                 overflow = TextOverflow.Ellipsis
             )
@@ -190,11 +182,11 @@ private fun HomeScreen(
                     .size(size = 230.dp)
                     .align(alignment = Alignment.CenterHorizontally)
                     .padding(top = 12.dp),
-                progress = 79f,
+                progress = 0f,
                 textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
                 data = GaugeChartData(
-                    totalIncome = "0",
-                    remainedBalance = "0",
+                    totalIncome = uiState.monthTotalIncome.ifEmpty { "0" },
+                    remainedBalance = uiState.remainedBalance.ifEmpty { "0" },
                     bottomMessage = stringResource(id = R.string.empty_balance_state),
                     iconResId = R.drawable.warnign_red_2
                 )
@@ -254,7 +246,7 @@ private fun HomeScreen(
                         Spacer(modifier = Modifier.padding(horizontal = 3.dp))
 
                         Text(
-                            text = "0",
+                            text = uiState.monthTotalExpenses.ifEmpty { "0" },
                             style = MaterialTheme.typography.labelLarge.copy(fontSize = 14.sp)
                         )
 
@@ -304,7 +296,7 @@ private fun HomeScreen(
                         Spacer(modifier = Modifier.padding(horizontal = 3.dp))
 
                         Text(
-                            text = "0",
+                            text = uiState.monthTotalIncome.ifEmpty { "0" },
                             style = MaterialTheme.typography.labelLarge.copy(fontSize = 14.sp)
                         )
 

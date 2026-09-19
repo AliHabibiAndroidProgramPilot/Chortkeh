@@ -56,18 +56,24 @@ object Utils {
         return intArrayOf(jy, jm, jd)
     }
 
-    fun getCurrentPersianMonth(): String {
+    fun getCurrentPersianMonth(): Pair<String, Int> {
         val cal = Calendar.getInstance()
-        val (_, jm, _) = gregorianToPersianDate(
+        val (_, month, _) = gregorianToPersianDate(
             cal.get(Calendar.YEAR),
             cal.get(Calendar.MONTH) + 1,
             cal.get(Calendar.DAY_OF_MONTH)
         )
-        val month = listOf(
-            "فروردین ماه", "اردیبهشت ماه", "خرداد ماه", "تیر ماه", "مرداد ماه", "شهریور ماه",
-            "مهر ماه", "آبان ماه", "آذر ماه", "دی ماه", "بهمن ماه", "اسفند ماه"
+        return Pair(PersianDateFormatter.persianMonths[month - 1], month)
+    }
+
+    fun getCurrentPersianYear(): Int {
+        val cal = Calendar.getInstance()
+        val (year, _, _) = gregorianToPersianDate(
+            cal.get(Calendar.YEAR),
+            cal.get(Calendar.MONTH) + 1,
+            cal.get(Calendar.DAY_OF_MONTH)
         )
-        return month[jm - 1]
+        return year
     }
 
     fun getAppVersionName(context: Context): String =

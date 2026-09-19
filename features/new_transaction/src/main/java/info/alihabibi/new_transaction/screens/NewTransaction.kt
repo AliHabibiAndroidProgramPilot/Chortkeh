@@ -103,7 +103,13 @@ fun NewTransactionDestination(
                     message = Utils.getStringResources(context, R.string.transaction_registered),
                     actionTitle = Utils.getStringResources(context, R.string.undo),
                     action = {
-                        transactionUndoManager.executeUndo(id)
+                        val channelId = uiState.transactionChannel?.id ?: return@SnackBarEvent
+                        transactionUndoManager.executeUndo(
+                            id,
+                            channelId,
+                            uiState.transactionPrice,
+                            uiState.transactionType == TransactionTypeOptionUiModel.INCOME
+                        )
                     }
                 )
             )

@@ -35,7 +35,9 @@ data class TransactionEntity(
     val amount: Long,
     val transactionChannelId: Long?,
     val transactionCategoryId: Long?,
-    val date: String,
+    val year: Int,
+    val month: Int,
+    val day: Int,
     val time: String
 )
 

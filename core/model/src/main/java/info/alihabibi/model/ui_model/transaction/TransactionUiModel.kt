@@ -9,6 +9,8 @@ data class TransactionUiModel(
     val amount: Long,
     val channel: ChannelUiModel,
     val category: CategoryUiModel,
-    val date: String,
+    val year: Int,
+    val month: Int,
+    val day: Int,
     val time: String
 )
