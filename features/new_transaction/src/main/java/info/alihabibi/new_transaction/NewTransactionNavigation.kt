@@ -20,7 +20,10 @@ object NewTransaction
 @Serializable
 data class AddCategory(val editingCategoryId: Int? = null)
 
-fun NavGraphBuilder.newTransactionGraph(navController: NavController) {
+fun NavGraphBuilder.newTransactionGraph(
+    navController: NavController,
+    onAddNewChannel: () -> Unit = {}
+) {
 
     navigation<NewTransactionGraphRoute>(startDestination = NewTransaction) {
 
@@ -29,11 +32,13 @@ fun NavGraphBuilder.newTransactionGraph(navController: NavController) {
                 navController.getBackStackEntry<NewTransactionGraphRoute>()
             }
             val viewModel: NewTransactionViewModel = koinViewModel(viewModelStoreOwner = parentEntry)
+
             NewTransactionDestination(
                 viewModel = viewModel,
                 onAddNewCategory = {
                     navController.navigate(AddCategory(editingCategoryId = null))
                 },
+                onAddNewChannel = onAddNewChannel,
                 onEditCategory = { categoryId ->
                     navController.navigate(AddCategory(editingCategoryId = categoryId))
                 },
@@ -49,6 +54,7 @@ fun NavGraphBuilder.newTransactionGraph(navController: NavController) {
             }
             val viewModel: NewTransactionViewModel = koinViewModel(viewModelStoreOwner = parentEntry)
             val args = backStackEntry.toRoute<AddCategory>()
+
             AddCategoryDestination(
                 viewModel = viewModel,
                 editingCategoryId = args.editingCategoryId,

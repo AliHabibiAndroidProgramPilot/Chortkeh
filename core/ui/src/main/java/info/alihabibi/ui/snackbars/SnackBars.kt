@@ -20,7 +20,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import info.alihabibi.designsystem.R
-import info.alihabibi.designsystem.theme.White
 
 @Composable
 fun AppSnackBar(
@@ -33,8 +32,9 @@ fun AppSnackBar(
 
         Snackbar(
             modifier = Modifier.padding(all = 8.dp),
-            actionContentColor = White,
-            contentColor = White,
+            containerColor = MaterialTheme.colorScheme.onSurface,
+            actionContentColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.surface,
             action = {
                 if (isUndoAvailable) {
                     Row(

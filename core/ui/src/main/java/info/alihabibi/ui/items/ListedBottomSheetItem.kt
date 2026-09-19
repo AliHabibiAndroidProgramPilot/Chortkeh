@@ -40,7 +40,7 @@ fun ListedBottomSheetItem(
 ) {
 
     val borderColor by animateColorAsState(
-        targetValue = if (isSelected) Primary else MaterialTheme.colorScheme.outline,
+        targetValue = if (isSelected) Primary else MaterialTheme.colorScheme.outlineVariant,
         animationSpec = tween(
             durationMillis = 300,
             delayMillis = 50,

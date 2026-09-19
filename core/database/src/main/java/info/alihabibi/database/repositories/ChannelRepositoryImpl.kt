@@ -48,4 +48,16 @@ class ChannelRepositoryImpl(private val dao: ChannelDao) : ChannelRepository {
         return dao.getTotalBalance()
     }
 
+    override suspend fun increaseChannelBalance(id: Long, amount: Long) {
+        withContext(Dispatchers.IO) {
+            dao.increaseChannelBalance(id, amount)
+        }
+    }
+
+    override suspend fun decreaseChannelBalance(id: Long, amount: Long) {
+        withContext(Dispatchers.IO) {
+            dao.decreaseChannelBalance(id, amount)
+        }
+    }
+
 }

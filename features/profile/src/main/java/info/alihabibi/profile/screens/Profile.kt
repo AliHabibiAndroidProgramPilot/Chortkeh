@@ -1,6 +1,7 @@
 package info.alihabibi.profile.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +22,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -34,7 +37,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import info.alihabibi.common.Utils
 import info.alihabibi.designsystem.R
-import info.alihabibi.designsystem.theme.Gray7
 import info.alihabibi.model.ui_model.CurrenciesOptionUiModel
 import info.alihabibi.profile.ProfileUiIntent
 import info.alihabibi.profile.ProfileUiState
@@ -78,6 +80,20 @@ private fun ProfileScreen(
     onPreferredCurrencySelection: (currency: CurrenciesOptionUiModel) -> Unit = {}
 ) {
 
+    val invertAsMatrix = remember {
+        val contrast = 0.9f
+        val scale = -contrast
+        val offset = 127f * contrast + 128f
+        ColorMatrix(
+            floatArrayOf(
+                scale, 0f, 0f, 0f, offset,
+                0f, scale, 0f, 0f, offset,
+                0f, 0f, scale, 0f, offset,
+                0f, 0f, 0f, 1f, 0f
+            )
+        )
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -96,7 +112,9 @@ private fun ProfileScreen(
                 modifier = Modifier.fillMaxWidth(),
                 painter = painterResource(id = R.drawable.profile_header_background),
                 contentDescription = null,
-                contentScale = ContentScale.FillBounds
+                contentScale = ContentScale.FillBounds,
+                colorFilter = if (isSystemInDarkTheme())
+                    ColorFilter.colorMatrix(invertAsMatrix) else null
             )
 
             Column(
@@ -113,7 +131,8 @@ private fun ProfileScreen(
                     text = stringResource(id = R.string.profile),
                     style = MaterialTheme.typography.bodyMedium.copy(
                         textAlign = TextAlign.Center,
-                        fontSize = 16.sp
+                        fontSize = 16.sp,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 )
 
@@ -137,6 +156,7 @@ private fun ProfileScreen(
                     style = MaterialTheme.typography.labelLarge.copy(
                         fontSize = 16.sp,
                         textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.onSurface,
                         textDirection = TextDirection.ContentOrRtl
                     )
                 )
@@ -145,7 +165,7 @@ private fun ProfileScreen(
                     Text(
                         modifier = Modifier.padding(bottom = 4.dp),
                         text = uiState.userAccountInfo.phone,
-                        style = MaterialTheme.typography.labelMedium.copy(color = Gray7)
+                        style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
                     )
 
             }
@@ -172,7 +192,6 @@ private fun ProfileScreen(
                 )
 
             var showCurrencySelectionModal by remember { mutableStateOf(false) }
-
             if (showCurrencySelectionModal)
                 AppRadioSelectionBottomSheet(
                     title = stringResource(id = R.string.currency),

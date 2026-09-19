@@ -80,20 +80,18 @@ import java.time.LocalTime
 fun NewTransactionDestination(
     viewModel: NewTransactionViewModel = koinViewModel(),
     onAddNewCategory: () -> Unit = {},
+    onAddNewChannel: () -> Unit = {},
     onEditCategory: (categoryId: Int) -> Unit = {},
     onBackPressed: () -> Unit
 ) {
 
     val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
 
     val uiState by viewModel.newTransactionUiState.collectAsStateWithLifecycle()
     val formattedTransactionDate by viewModel.formattedTransactionDate.collectAsStateWithLifecycle()
 
-    LaunchedEffect(lifecycleOwner) {
-        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            viewModel.onEvent(NewTransactionUiIntent.Init)
-        }
+    LaunchedEffect(Unit) {
+        viewModel.onEvent(NewTransactionUiIntent.Init)
     }
 
     val currentOnBackPressed by rememberUpdatedState(onBackPressed)
@@ -105,7 +103,13 @@ fun NewTransactionDestination(
                     message = Utils.getStringResources(context, R.string.transaction_registered),
                     actionTitle = Utils.getStringResources(context, R.string.undo),
                     action = {
-                        transactionUndoManager.executeUndo(id)
+                        val channelId = uiState.transactionChannel?.id ?: return@SnackBarEvent
+                        transactionUndoManager.executeUndo(
+                            id,
+                            channelId,
+                            uiState.transactionPrice,
+                            uiState.transactionType == TransactionTypeOptionUiModel.INCOME
+                        )
                     }
                 )
             )
@@ -117,6 +121,7 @@ fun NewTransactionDestination(
         uiState = uiState,
         formattedTransactionDate = formattedTransactionDate,
         onAddNewCategory = onAddNewCategory,
+        onAddNewChannel = onAddNewChannel,
         onEditCategory = onEditCategory,
         onPriceChanged = { price ->
             viewModel.onEvent(NewTransactionUiIntent.PriceChanged(price))
@@ -161,6 +166,7 @@ private fun NewTransactionScreen(
     onEditCategory: (categoryId: Int) -> Unit = {},
     onSaveTransaction: () -> Unit = {},
     onAddNewCategory: () -> Unit = {},
+    onAddNewChannel: () -> Unit = {},
     onTransactionTypeChanged: (type: TransactionTypeOptionUiModel) -> Unit = {},
     onBackPressed: () -> Unit
 ) {
@@ -284,9 +290,7 @@ private fun NewTransactionScreen(
                 onChannelChanged(channel)
                 showChannelsBottomSheet = false
             },
-            onAddNewItem = {
-
-            },
+            onAddNewItem = onAddNewChannel,
             onDismissRequest = { showChannelsBottomSheet = false },
         )
 

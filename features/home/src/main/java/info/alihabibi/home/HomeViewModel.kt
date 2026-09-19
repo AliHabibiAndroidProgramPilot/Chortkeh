@@ -2,7 +2,9 @@ package info.alihabibi.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import info.alihabibi.common.Utils
 import info.alihabibi.domain.local.usecases.database.channel.usecase.ChannelUseCases
+import info.alihabibi.domain.local.usecases.database.transaction.usecase.TransactionUseCases
 import info.alihabibi.domain.local.usecases.datastore.usecase.DatastoreUseCases
 import info.alihabibi.model.mapper.toUiModel
 import info.alihabibi.model.ui_model.channel.ChannelUiModel
@@ -11,12 +13,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
     private val dataStoreUseCases: DatastoreUseCases,
+    private val transactionUseCases: TransactionUseCases,
     channelsUseCase: ChannelUseCases
 ) : ViewModel() {
 
@@ -35,13 +37,33 @@ class HomeViewModel(
                 else
                     it.toUiModel()
             }
-            HomeUiState(
-                isSmsModalShown = isSmsModalShown,
-                channels = uiChannels
-            )
-        }
-            .onEach { state -> _uiState.update { state } }
-            .launchIn(viewModelScope)
+            _uiState.update {
+                it.copy(
+                    isSmsModalShown = isSmsModalShown,
+                    formattedTotalBalance = Utils.decimalFormatterPattern.format(totalBalance),
+                    channels = uiChannels
+                )
+            }
+        }.launchIn(viewModelScope)
+
+        val year = Utils.getCurrentPersianYear()
+        val month = Utils.getCurrentPersianMonth()
+        combine(
+            transactionUseCases.getMonthTotalIncome.invoke(year, month.second),
+            transactionUseCases.getMonthTotalExpenses.invoke(year, month.second)
+        ) { totalIncome, totalExpenses ->
+            val formattedIncome = Utils.decimalFormatterPattern.format(totalIncome)
+            val formattedExpenses = Utils.decimalFormatterPattern.format(totalExpenses)
+            val formattedRemainedBalance = Utils.decimalFormatterPattern.format(totalIncome - totalExpenses)
+            _uiState.update {
+                it.copy(
+                    monthTotalIncome = formattedIncome,
+                    monthTotalExpenses = formattedExpenses,
+                    remainedBalance = formattedRemainedBalance,
+                    persianMonthName = month.first
+                )
+            }
+        }.launchIn(viewModelScope)
     }
 
     fun onEvent(event: HomeUiIntent) {
@@ -63,11 +85,17 @@ class HomeViewModel(
 
 sealed interface HomeUiIntent {
 
+
     data class SaveSmsPermissionModalShownState(val value: Boolean) : HomeUiIntent
 
 }
 
 data class HomeUiState(
+    val monthTotalIncome: String = "",
+    val monthTotalExpenses: String = "",
+    val remainedBalance: String = "",
+    val persianMonthName: String = "",
     val isSmsModalShown: Boolean = false,
+    val formattedTotalBalance: String = "",
     val channels: List<ChannelUiModel> = emptyList()
 )

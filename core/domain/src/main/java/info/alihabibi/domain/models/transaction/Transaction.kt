@@ -9,6 +9,8 @@ data class Transaction(
     val amount: Long,
     val channel: Channel,
     val category: Category,
-    val date: String,
+    val year: Int,
+    val month: Int,
+    val day: Int,
     val time: String
 )

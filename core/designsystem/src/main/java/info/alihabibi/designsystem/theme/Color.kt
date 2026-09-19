@@ -21,8 +21,10 @@ val Azure = Color(0xFF345484)
  * Neutral colors
  */
 
-val White = Color.White
 val Black = Color.Black
+val White = Color.White
+val NeutralGray = Color(0xFFECECEC)
+val WhiteLow = Color(0x8AF8F8F8)
 val Gray1 = Color(0xFFFAFAFA)
 val Gray2 = Color(0xFFF5F5F5)
 val Gray3 = Color(0xFFEDEDED)
@@ -45,5 +47,5 @@ val GreenSuccessLight = Color(0xFF00BA87)
 val WarningYellow = Color(0xFFA9791C)
 val WarningYellowLight = Color(0xFFF4B740)
 val ErrorRed = Color(0xFFC30000)
-val ErrorRedLight = Color(0xFFED2E2E)
-val ErrorExtraRedLight = Color(0xFFFFF2F2)
+val ErrorLight = Color(0xFFFFF2F2)
+val ErrorDark = Color(0x3E850808)

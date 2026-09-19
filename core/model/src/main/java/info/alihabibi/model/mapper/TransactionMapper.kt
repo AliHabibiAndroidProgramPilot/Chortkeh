@@ -11,7 +11,9 @@ fun Transaction.toUiModel(): TransactionUiModel = TransactionUiModel(
     amount = amount,
     channel = channel.toUiModel(needsBalanceFormat = false),
     category = category.toUiModel(),
-    date = date,
+    year = year,
+    month = month,
+    day = day,
     time = time
 )
 
@@ -21,7 +23,9 @@ fun TransactionUiModel.toDomain(): Transaction = Transaction(
     amount = amount,
     channel = channel.toDomain(),
     category = category.toDomain(),
-    date = date,
+    year = year,
+    month = month,
+    day = day,
     time = time
 )
 

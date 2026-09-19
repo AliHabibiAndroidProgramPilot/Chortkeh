@@ -91,7 +91,7 @@ fun AppSimpleListItem(
         HorizontalDivider(
             modifier = Modifier.padding(horizontal = 10.dp),
             thickness = 1.dp,
-            color = Gray3
+            color = MaterialTheme.colorScheme.outlineVariant
         )
     }
 
@@ -167,7 +167,7 @@ fun ListedChannelItem(
                 .height(height = 65.dp)
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 4.dp)
-                .border(width = 1.dp, color = MaterialTheme.colorScheme.outline, shape = shape)
+                .border(width = 1.dp, color = MaterialTheme.colorScheme.outlineVariant, shape = shape)
                 .clip(shape = shape)
                 .clickable(onClick = onClick),
             verticalAlignment = Alignment.CenterVertically,
