@@ -21,7 +21,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 defaultConfig {
                     targetSdk = 36
                     versionCode = 1
-                    versionName = "1.0"
+                    versionName = "0.1-MVP"
                 }
 
                 buildTypes {
