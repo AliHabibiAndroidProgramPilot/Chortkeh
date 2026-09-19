@@ -6,8 +6,8 @@ class UpdateChannelBalanceUseCase(
     private val repository: ChannelRepository
 ) {
 
-    suspend operator fun invoke(id: Long, balance: Long, isIncome: Boolean) =
-        if (isIncome) repository.increaseChannelBalance(id, balance)
-        else repository.decreaseChannelBalance(id, balance)
+    suspend operator fun invoke(id: Long, amount: Long, isIncome: Boolean) =
+        if (isIncome) repository.increaseChannelBalance(id, amount)
+        else repository.decreaseChannelBalance(id, amount)
 
 }

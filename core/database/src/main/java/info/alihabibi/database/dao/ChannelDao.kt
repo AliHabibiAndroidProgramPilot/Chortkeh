@@ -32,17 +32,19 @@ interface ChannelDao {
 
     @Query("""
     UPDATE ${Keys.CHANNELS_TABLE_NAME}
-    SET channelBalance = channelBalance + :balance
+    SET channelBalance = channelBalance + :amount
     WHERE id = :id
 """)
-    suspend fun increaseChannelBalance(id: Long, balance: Long)
+    suspend fun increaseChannelBalance(id: Long, amount: Long)
 
-    @Query("""
+    @Query(
+        """
     UPDATE ${Keys.CHANNELS_TABLE_NAME}
-    SET channelBalance = channelBalance - :balance
+    SET channelBalance = channelBalance - :amount
     WHERE id = :id
-""")
-    suspend fun decreaseChannelBalance(id: Long, balance: Long)
+"""
+    )
+    suspend fun decreaseChannelBalance(id: Long, amount: Long)
 
 
 }
