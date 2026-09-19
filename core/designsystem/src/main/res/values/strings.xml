@@ -91,6 +91,8 @@
     <string name="price_outcome">مبلغ هزینه</string>
     <string name="income">دریافت</string>
     <string name="outcome">پرداخت</string>
+    <string name="income2">دریافتی</string>
+    <string name="outcome2">پرداختی</string>
     <string name="withdraw_from">برداشت از</string>
     <string name="deposit_to">انتقال به</string>
     <string name="date">تاریخ</string>

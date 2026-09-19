@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.os.Build
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,9 +20,11 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CardElevation
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,6 +50,7 @@ import info.alihabibi.common_android.RequestSMSPermission
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray1
 import info.alihabibi.designsystem.theme.Gray5
+import info.alihabibi.designsystem.theme.Gray8
 import info.alihabibi.designsystem.theme.Primary
 import info.alihabibi.ui.buttons.AppOutlinedButton
 import info.alihabibi.ui.charts.GaugeChart
@@ -178,7 +182,7 @@ private fun HomeScreen(
                     .size(size = 230.dp)
                     .align(alignment = Alignment.CenterHorizontally)
                     .padding(top = 12.dp),
-                progress = 0f,
+                progress = 175f,
                 textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
                 data = GaugeChartData(
                     totalIncome = "0",
@@ -187,6 +191,120 @@ private fun HomeScreen(
                     iconResId = R.drawable.warnign_red_2
                 )
             )
+
+        }
+
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            shape = RoundedCornerShape(bottomStartPercent = 8, bottomEndPercent = 8),
+            border = BorderStroke(width = 1.4.dp, color = Color(0xFFECECEC)),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)
+        ) {
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                Column(
+                    modifier = Modifier.weight(weight = 1f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Top
+                ) {
+
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+
+                        Text(
+                            text = stringResource(id = R.string.outcome2),
+                            style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp)
+                        )
+
+                        Spacer(modifier = Modifier.padding(horizontal = 3.dp))
+
+                        Icon(
+                            modifier = Modifier.size(size = 24.dp),
+                            painter = painterResource(id = R.drawable.card_send),
+                            contentDescription = null,
+                            tint = Color.Unspecified
+                        )
+
+                    }
+
+                    Spacer(modifier = Modifier.padding(vertical = 4.dp))
+
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+
+                        Text(
+                            text = stringResource(id = R.string.toman),
+                            style = MaterialTheme.typography.bodyLarge.copy(color = Gray8, fontSize = 16.sp)
+                        )
+
+                        Spacer(modifier = Modifier.padding(horizontal = 3.dp))
+
+                        Text(
+                            text = "0",
+                            style = MaterialTheme.typography.labelLarge.copy(fontSize = 14.sp)
+                        )
+
+                    }
+
+                }
+
+                VerticalDivider(
+                    modifier = Modifier.height(32.dp),
+                    thickness = 1.dp,
+                    color = Color(0xFFECECEC)
+                )
+
+                Column(
+                    modifier = Modifier.weight(weight = 1f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Top
+                ) {
+
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+
+                        Text(
+                            text = stringResource(id = R.string.income2),
+                            style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp)
+                        )
+
+                        Spacer(modifier = Modifier.padding(horizontal = 3.dp))
+
+                        Icon(
+                            modifier = Modifier.size(size = 24.dp),
+                            painter = painterResource(id = R.drawable.card_receive),
+                            contentDescription = null,
+                            tint = Color.Unspecified
+                        )
+
+                    }
+
+                    Spacer(modifier = Modifier.padding(vertical = 4.dp))
+
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+
+                        Text(
+                            text = stringResource(id = R.string.toman),
+                            style = MaterialTheme.typography.bodyLarge.copy(color = Gray8, fontSize = 16.sp)
+                        )
+
+                        Spacer(modifier = Modifier.padding(horizontal = 3.dp))
+
+                        Text(
+                            text = "0",
+                            style = MaterialTheme.typography.labelLarge.copy(fontSize = 14.sp)
+                        )
+
+                    }
+
+                }
+
+            }
 
         }
 
