@@ -15,7 +15,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CardElevation
@@ -51,7 +53,10 @@ import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray1
 import info.alihabibi.designsystem.theme.Gray5
 import info.alihabibi.designsystem.theme.Gray8
+import info.alihabibi.designsystem.theme.NeutralGray
 import info.alihabibi.designsystem.theme.Primary
+import info.alihabibi.ui.buttons.AppFeatureBotton
+import info.alihabibi.ui.buttons.AppFeatures
 import info.alihabibi.ui.buttons.AppOutlinedButton
 import info.alihabibi.ui.charts.GaugeChart
 import info.alihabibi.ui.charts.GaugeChartData
@@ -127,8 +132,11 @@ private fun HomeScreen(
             }
         )
 
+    val scrollState = rememberScrollState()
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(state = scrollState),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
@@ -173,7 +181,7 @@ private fun HomeScreen(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
             shape = RoundedCornerShape(topStartPercent = 6, topEndPercent = 6),
-            border = BorderStroke(width = 1.4.dp, color = Color(0xFFECECEC)),
+            border = BorderStroke(width = 1.4.dp, color = NeutralGray),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)
         ) {
 
@@ -182,7 +190,7 @@ private fun HomeScreen(
                     .size(size = 230.dp)
                     .align(alignment = Alignment.CenterHorizontally)
                     .padding(top = 12.dp),
-                progress = 175f,
+                progress = 79f,
                 textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
                 data = GaugeChartData(
                     totalIncome = "0",
@@ -199,7 +207,7 @@ private fun HomeScreen(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
             shape = RoundedCornerShape(bottomStartPercent = 8, bottomEndPercent = 8),
-            border = BorderStroke(width = 1.4.dp, color = Color(0xFFECECEC)),
+            border = BorderStroke(width = 1.4.dp, color = NeutralGray),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)
         ) {
 
@@ -257,7 +265,7 @@ private fun HomeScreen(
                 VerticalDivider(
                     modifier = Modifier.height(32.dp),
                     thickness = 1.dp,
-                    color = Color(0xFFECECEC)
+                    color = NeutralGray
                 )
 
                 Column(
@@ -304,6 +312,32 @@ private fun HomeScreen(
 
                 }
 
+            }
+
+        }
+
+        Spacer(modifier = Modifier.height(height = 16.dp))
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+
+            AppFeatures.appFeatures.forEach { item ->
+                AppFeatureBotton(
+                    modifier = Modifier
+                        .weight(weight = 1f)
+                        .align(Alignment.CenterVertically)
+                        .padding(horizontal = 4.dp)
+                        .width(width = 175.dp)
+                        .height(height = 140.dp),
+                    iconResId = item.iconResId,
+                    title = stringResource(id = item.title),
+                    subtitle = stringResource(id = item.subTitle),
+                    isEnabled = item.isEnabled
+                )
             }
 
         }

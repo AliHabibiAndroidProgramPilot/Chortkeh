@@ -23,6 +23,7 @@ val Azure = Color(0xFF345484)
 
 val Black = Color.Black
 val White = Color.White
+val NeutralGray = Color(0xFFECECEC)
 val WhiteLow = Color(0x8AF8F8F8)
 val Gray1 = Color(0xFFFAFAFA)
 val Gray2 = Color(0xFFF5F5F5)
