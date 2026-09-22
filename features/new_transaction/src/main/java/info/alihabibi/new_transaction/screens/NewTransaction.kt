@@ -43,10 +43,7 @@ import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.repeatOnLifecycle
 import info.alihabibi.common.Utils
 import info.alihabibi.common_android.snackbar.SnackBarController
 import info.alihabibi.common_android.snackbar.SnackBarEvent
@@ -89,10 +86,6 @@ fun NewTransactionDestination(
 
     val uiState by viewModel.newTransactionUiState.collectAsStateWithLifecycle()
     val formattedTransactionDate by viewModel.formattedTransactionDate.collectAsStateWithLifecycle()
-
-    LaunchedEffect(Unit) {
-        viewModel.onEvent(NewTransactionUiIntent.Init)
-    }
 
     val currentOnBackPressed by rememberUpdatedState(onBackPressed)
     val transactionUndoManager: TransactionUndoManager = koinInject()

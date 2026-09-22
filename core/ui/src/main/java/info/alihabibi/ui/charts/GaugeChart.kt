@@ -61,11 +61,11 @@ import kotlin.math.sin
  */
 @Composable
 fun GaugeChart(
+    modifier: Modifier = Modifier,
     data: GaugeChartData,
     progress: Float,
     textStyle: TextStyle,
     centerTitle: String = stringResource(id = R.string.left_over_balance),
-    modifier: Modifier = Modifier,
 ) {
 
     val textMeasurer = rememberTextMeasurer()

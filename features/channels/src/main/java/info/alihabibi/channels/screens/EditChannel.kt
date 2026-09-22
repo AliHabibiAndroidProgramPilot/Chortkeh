@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,7 +38,7 @@ fun EditChannelDestination(
 
     val uiState by viewModel.channelUiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(editingChannelId) {
+    SideEffect(editingChannelId) {
         editingChannelId?.let {
             viewModel.onEvent(ChannelsUiIntent.GetChannelById(editingChannelId))
         }
@@ -108,7 +108,7 @@ private fun EditChannelScreen(
         Column(
             modifier = Modifier.weight(weight = 1f),
             horizontalAlignment = Alignment.CenterHorizontally
-        ){
+        ) {
 
             AppHeader(
                 title = stringResource(id = R.string.edit_channel),

@@ -35,8 +35,7 @@ class NewTransactionViewModel(
 ) : ViewModel() {
 
     private val _newTransactionUiState = MutableStateFlow(NewTransactionUiState())
-    val newTransactionUiState: StateFlow<NewTransactionUiState> =
-        _newTransactionUiState.asStateFlow()
+    val newTransactionUiState: StateFlow<NewTransactionUiState> = _newTransactionUiState.asStateFlow()
 
     private val _categoryUiState = MutableStateFlow(CategoryUiState())
     val categoryUiState: StateFlow<CategoryUiState> = _categoryUiState.asStateFlow()
@@ -55,10 +54,34 @@ class NewTransactionViewModel(
         started = SharingStarted.WhileSubscribed(5_000, 10_000)
     )
 
+    init {
+        combine(
+            categoryUseCases.getCategoriesUseCase.invoke(),
+            channelsUseCase.getChannelsUseCase.invoke().distinctUntilChanged(),
+            _newTransactionUiState.map { it.transactionType }.distinctUntilChanged()
+        ) { categories, channels, transactionType ->
+            val filteredCategories = categories
+                .map { it.toUiModel() }
+                .filter {
+                    when (transactionType) {
+                        TransactionTypeOptionUiModel.OUTCOME -> it.type == CategoryTypeOptionUiModel.OUTCOME
+                        TransactionTypeOptionUiModel.INCOME -> it.type == CategoryTypeOptionUiModel.INCOME
+                    }
+                }
+            val uiChannels = channels
+                .map(Channel::toUiModel)
+                .filterNot { it.isAppDefaultChannel }
+            _newTransactionUiState.update {
+                it.copy(
+                    categories = filteredCategories,
+                    channels = uiChannels
+                )
+            }
+        }.launchIn(viewModelScope)
+    }
+
     fun onEvent(event: NewTransactionUiIntent) {
         when (event) {
-
-            is NewTransactionUiIntent.Init -> init()
 
             is NewTransactionUiIntent.SaveTransaction -> saveTransaction()
 
@@ -91,32 +114,6 @@ class NewTransactionViewModel(
             is NewTransactionUiIntent.TransactionTypeChanged -> changeTransactionType(event.type)
 
         }
-    }
-
-    private fun init() {
-        combine(
-            categoryUseCases.getCategoriesUseCase.invoke(),
-            channelsUseCase.getChannelsUseCase.invoke().distinctUntilChanged(),
-            _newTransactionUiState.map { it.transactionType }.distinctUntilChanged()
-        ) { categories, channels, transactionType ->
-            val filteredCategories = categories
-                .map { it.toUiModel() }
-                .filter {
-                    when (transactionType) {
-                        TransactionTypeOptionUiModel.OUTCOME -> it.type == CategoryTypeOptionUiModel.OUTCOME
-                        TransactionTypeOptionUiModel.INCOME -> it.type == CategoryTypeOptionUiModel.INCOME
-                    }
-                }
-            val uiChannels = channels
-                .map(Channel::toUiModel)
-                .filterNot { it.isAppDefaultChannel }
-            _newTransactionUiState.update {
-                it.copy(
-                    categories = filteredCategories,
-                    channels = uiChannels
-                )
-            }
-        }.launchIn(viewModelScope)
     }
 
     private fun saveTransaction() {
@@ -292,8 +289,6 @@ class NewTransactionViewModel(
 }
 
 sealed interface NewTransactionUiIntent {
-
-    data object Init : NewTransactionUiIntent
 
     data object SaveTransaction : NewTransactionUiIntent
 
