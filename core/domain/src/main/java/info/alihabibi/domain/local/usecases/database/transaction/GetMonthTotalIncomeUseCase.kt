@@ -3,7 +3,7 @@ package info.alihabibi.domain.local.usecases.database.transaction
 import info.alihabibi.domain.local.repositories.TransactionRepository
 import kotlinx.coroutines.flow.Flow
 
-class GetMonthTotalIncome(
+class GetMonthTotalIncomeUseCase(
     private val repository: TransactionRepository
 ) {
 

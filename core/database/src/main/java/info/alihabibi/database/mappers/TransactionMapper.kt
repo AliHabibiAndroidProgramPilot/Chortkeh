@@ -1,7 +1,9 @@
 package info.alihabibi.database.mappers
 
+import info.alihabibi.database.entities.CategoryTransactionExpensesData
 import info.alihabibi.database.entities.DetailedTransaction
 import info.alihabibi.database.entities.TransactionEntity
+import info.alihabibi.domain.models.transaction.CategoryTransactionExpenses
 import info.alihabibi.domain.models.transaction.Transaction
 
 fun DetailedTransaction.asExternalModel(): Transaction = Transaction(
@@ -26,4 +28,10 @@ fun Transaction.asEntity(): TransactionEntity = TransactionEntity(
     month = month,
     day = day,
     time = time
+)
+
+fun CategoryTransactionExpensesData.asExternalModel(): CategoryTransactionExpenses = CategoryTransactionExpenses(
+    categoryId = categoryId,
+    categoryTitle = categoryTitle,
+    totalAmount = totalAmount
 )

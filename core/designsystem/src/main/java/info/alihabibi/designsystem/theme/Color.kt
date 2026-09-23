@@ -2,11 +2,6 @@ package info.alihabibi.designsystem.theme
 
 import androidx.compose.ui.graphics.Color
 
-/**
- * Chortkeh primary color schema
- * @author Ali Habibi
- * Original color names!
- */
 val Primary = Color(0xFF4169E1)
 val MoonRaker = Color(0xFFD9E1F9)
 val Perano = Color(0xFFB3C3F3)
@@ -17,9 +12,6 @@ val Haiti = Color(0xFF0D152D)
 val Azure = Color(0xFF345484)
 //val Tint4 = Color(0xFF6787E7)
 
-/**
- * Neutral colors
- */
 
 val Black = Color.Black
 val White = Color.White
@@ -39,9 +31,6 @@ val Gray11 = Color(0xFF353535)
 val Gray12 = Color(0xFF212121)
 val Gray13 = Color(0xFF121212)
 
-/**
- * State colors
- */
 val GreenSuccess = Color(0xFF00966D)
 val GreenSuccessLight = Color(0xFF00BA87)
 val WarningYellow = Color(0xFFA9791C)

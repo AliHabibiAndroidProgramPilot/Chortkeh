@@ -75,7 +75,7 @@ fun GaugeChart(
     LaunchedEffect(Unit) {
         animatedProgress.animateTo(
             targetValue = progress,
-            animationSpec = tween(2000, delayMillis = 200, easing = LinearOutSlowInEasing)
+            animationSpec = tween(durationMillis = 2000, delayMillis = 200, easing = LinearOutSlowInEasing)
         )
     }
 

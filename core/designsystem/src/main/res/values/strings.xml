@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     // Components
     <string name="undo">برگردون</string>
@@ -22,6 +22,7 @@
     <string name="reminder">یادآور</string>
     <string name="reports">گزارشات</string>
     <string name="home">خانه</string>
+    <string name="month">ماه</string>
     <string name="user_account_info">اطلاعات حساب کاربری</string>
     <string name="privacy_policy">امنیت و حریم خصوصی</string>
     <string name="currency">واحد پول</string>
@@ -35,6 +36,7 @@
 
     // Home
     <string name="bookkeeping">حساب کتاب</string>
+    <string name="last_actions">فعالیت‌های اخیر</string>
     <string name="all_accounts">همه حساب‌ها</string>
     <string name="input_channels">کانال‌های ورودی</string>
     <string name="budgeting_subtitle">مدیریت مالی</string>
@@ -47,7 +49,7 @@
     <string name="enter_app">ورود به اپلیکیشن</string>
     <string name="budgeting">بودجه بندی</string>
     <string name="budgeting_description">با کیف پول های جدا دیگه نگران دخل و خرجت نباش</string>
-    <string name="stairs">پله پله</string>
+    <string name="stairs" tools:ignore="Typos">پله پله</string>
     <string name="stairs_description">پله هات رو برای رسیدن به آرزو هات بچین</string>
 
     // Otp

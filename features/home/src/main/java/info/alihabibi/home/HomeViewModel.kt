@@ -1,13 +1,17 @@
 package info.alihabibi.home
 
+import androidx.compose.ui.util.fastFilter
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import info.alihabibi.common.Utils
 import info.alihabibi.domain.local.usecases.database.channel.usecase.ChannelUseCases
 import info.alihabibi.domain.local.usecases.database.transaction.usecase.TransactionUseCases
 import info.alihabibi.domain.local.usecases.datastore.usecase.DatastoreUseCases
+import info.alihabibi.domain.models.transaction.CategoryTransactionExpenses
 import info.alihabibi.model.mapper.toUiModel
+import info.alihabibi.model.mapper.toUiOption
 import info.alihabibi.model.ui_model.channel.ChannelUiModel
+import info.alihabibi.model.ui_model.transaction.CategoryTransactionExpensesUiModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,7 +22,7 @@ import kotlinx.coroutines.launch
 
 class HomeViewModel(
     private val dataStoreUseCases: DatastoreUseCases,
-    private val transactionUseCases: TransactionUseCases,
+    transactionUseCases: TransactionUseCases,
     channelsUseCase: ChannelUseCases
 ) : ViewModel() {
 
@@ -29,7 +33,7 @@ class HomeViewModel(
         combine(
             dataStoreUseCases.getIsSmsModalShownUseCase.invoke(),
             channelsUseCase.getChannelsUseCase.invoke(),
-            channelsUseCase.getTotalBalanceUseCase.invoke()
+            channelsUseCase.getTotalBalanceUseCase.invoke(),
         ) { isSmsModalShown, channels, totalBalance ->
             val uiChannels = channels.map {
                 if (it.isAppDefaultChannel)
@@ -49,17 +53,25 @@ class HomeViewModel(
         val year = Utils.getCurrentPersianYear()
         val month = Utils.getCurrentPersianMonth()
         combine(
-            transactionUseCases.getMonthTotalIncome.invoke(year, month.second),
-            transactionUseCases.getMonthTotalExpenses.invoke(year, month.second)
-        ) { totalIncome, totalExpenses ->
+            transactionUseCases.getMonthTotalIncomeUseCase.invoke(year, month.second),
+            transactionUseCases.getMonthTotalExpensesUseCase.invoke(year, month.second),
+            transactionUseCases.hasOutcomeTransactionUseCase.invoke(),
+            transactionUseCases.getMonthExpensesByAllCategoriesUseCase.invoke(year, month.second)
+        ) { totalIncome, totalExpenses, hasOutcomeTransaction, categoryTransactionExpenses ->
             val formattedIncome = Utils.decimalFormatterPattern.format(totalIncome)
             val formattedExpenses = Utils.decimalFormatterPattern.format(totalExpenses)
             val formattedRemainedBalance = Utils.decimalFormatterPattern.format(totalIncome - totalExpenses)
+            val categoryTransactionExpensesUiModel = categoryTransactionExpenses
+                // remove categories without transaction or unimportant expens values
+                .fastFilter { it.totalAmount > 1000 }
+                .map(CategoryTransactionExpenses::toUiOption)
             _uiState.update {
                 it.copy(
+                    hasOutcomeTransaction = hasOutcomeTransaction,
                     monthTotalIncome = formattedIncome,
                     monthTotalExpenses = formattedExpenses,
                     remainedBalance = formattedRemainedBalance,
+                    expensesByCategories = categoryTransactionExpensesUiModel,
                     persianMonthName = month.first
                 )
             }
@@ -95,7 +107,9 @@ data class HomeUiState(
     val monthTotalExpenses: String = "",
     val remainedBalance: String = "",
     val persianMonthName: String = "",
-    val isSmsModalShown: Boolean = false,
+    val hasOutcomeTransaction: Boolean = false,
     val formattedTotalBalance: String = "",
+    val isSmsModalShown: Boolean = false,
+    val expensesByCategories: List<CategoryTransactionExpensesUiModel> = emptyList(),
     val channels: List<ChannelUiModel> = emptyList()
 )

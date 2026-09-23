@@ -1,10 +1,10 @@
 package info.alihabibi.database.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import info.alihabibi.database.entities.CategoryTransactionExpensesData
 import info.alihabibi.database.entities.TransactionEntity
 import info.alihabibi.domain.Keys
 import kotlinx.coroutines.flow.Flow
@@ -35,5 +35,23 @@ interface TransactionDao {
       AND month = :month
 """)
     fun getMonthTotalExpenses(year: Int, month: Int): Flow<Long>
+
+    @Query("SELECT EXISTS( SELECT 1 FROM ${Keys.TRANSACTION_TABLE_NAME} WHERE transactionType = 'OUTCOME')")
+    fun hasOutcomeTransaction(): Flow<Boolean>
+
+    @Query("""
+    SELECT
+        c.id AS categoryId,
+        c.title AS categoryTitle,
+        COALESCE(SUM(t.amount), 0) AS totalAmount
+    FROM ${Keys.CATEGORY_TABLE_NAME} c
+    LEFT JOIN ${Keys.TRANSACTION_TABLE_NAME} t
+        ON t.transactionCategoryId = c.id
+        AND t.year = :year
+        AND t.month = :month
+        WHERE c.type = 'OUTCOME'
+    GROUP BY c.id
+""")
+    fun getMonthExpensesByAllCategories(year: Int, month: Int): Flow<List<CategoryTransactionExpensesData>>
 
 }

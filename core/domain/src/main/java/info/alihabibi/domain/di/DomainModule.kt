@@ -15,8 +15,10 @@ import info.alihabibi.domain.local.usecases.database.channel.UpdateChannelUseCas
 import info.alihabibi.domain.local.usecases.database.channel.usecase.ChannelUseCases
 import info.alihabibi.domain.local.usecases.database.channel.usecase.UpdateChannelBalanceUseCase
 import info.alihabibi.domain.local.usecases.database.transaction.DeleteTransactionUseCase
-import info.alihabibi.domain.local.usecases.database.transaction.GetMonthTotalExpenses
-import info.alihabibi.domain.local.usecases.database.transaction.GetMonthTotalIncome
+import info.alihabibi.domain.local.usecases.database.transaction.GetMonthExpensesByAllCategoriesUseCase
+import info.alihabibi.domain.local.usecases.database.transaction.GetMonthTotalExpensesUseCase
+import info.alihabibi.domain.local.usecases.database.transaction.GetMonthTotalIncomeUseCase
+import info.alihabibi.domain.local.usecases.database.transaction.HasOutcomeTransactionUseCase
 import info.alihabibi.domain.local.usecases.database.transaction.SaveTransactionUseCase
 import info.alihabibi.domain.local.usecases.database.transaction.usecase.TransactionUseCases
 import info.alihabibi.domain.local.usecases.datastore.GetIsAppFirstLaunchUseCase
@@ -102,15 +104,19 @@ val domainModule = module {
 
     factory { SaveTransactionUseCase(get()) }
     factory { DeleteTransactionUseCase(get()) }
-    factory { GetMonthTotalIncome(get()) }
-    factory { GetMonthTotalExpenses(get()) }
+    factory { GetMonthTotalIncomeUseCase(get()) }
+    factory { GetMonthTotalExpensesUseCase(get()) }
+    factory { HasOutcomeTransactionUseCase(get()) }
+    factory { GetMonthExpensesByAllCategoriesUseCase(get()) }
 
     factory {
         TransactionUseCases(
             saveTransactionUseCase = get(),
             deleteTransactionUseCase = get(),
-            getMonthTotalIncome = get(),
-            getMonthTotalExpenses = get()
+            getMonthTotalIncomeUseCase = get(),
+            getMonthTotalExpensesUseCase = get(),
+            hasOutcomeTransactionUseCase = get(),
+            getMonthExpensesByAllCategoriesUseCase = get()
         )
     }
 

@@ -27,7 +27,11 @@ import info.alihabibi.domain.models.transaction.TransactionType
             onUpdate = ForeignKey.CASCADE
         )
     ],
-    indices = [Index("transactionChannelId"), Index("transactionCategoryId")]
+    indices = [
+        Index("transactionChannelId"),
+        Index("transactionCategoryId"),
+        Index(value = ["year", "month", "transactionCategoryId"])
+    ]
 )
 data class TransactionEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
@@ -45,4 +49,10 @@ data class DetailedTransaction(
     @Embedded val transaction: TransactionEntity,
     @Relation(parentColumn = "transactionChannelId", entityColumn = "id") val channel: ChannelEntity,
     @Relation(parentColumn = "transactionCategoryId", entityColumn = "id") val category: CategoryEntity
+)
+
+data class CategoryTransactionExpensesData(
+    val categoryId: Long,
+    val categoryTitle: String,
+    val totalAmount: Long
 )

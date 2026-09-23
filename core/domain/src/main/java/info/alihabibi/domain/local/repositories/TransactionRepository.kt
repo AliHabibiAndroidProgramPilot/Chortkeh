@@ -1,5 +1,6 @@
 package info.alihabibi.domain.local.repositories
 
+import info.alihabibi.domain.models.transaction.CategoryTransactionExpenses
 import info.alihabibi.domain.models.transaction.Transaction
 import kotlinx.coroutines.flow.Flow
 
@@ -12,5 +13,9 @@ interface TransactionRepository {
     fun getMonthTotalIncome(year: Int, month: Int): Flow<Long>
 
     fun getMonthTotalExpenses(year: Int, month: Int): Flow<Long>
+
+    fun hasOutcomeTransaction(): Flow<Boolean>
+
+    fun getMonthExpensesByAllCategories(year: Int, month: Int): Flow<List<CategoryTransactionExpenses>>
 
 }

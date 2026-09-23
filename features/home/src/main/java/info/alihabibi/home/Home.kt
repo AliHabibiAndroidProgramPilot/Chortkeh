@@ -4,7 +4,9 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.os.Build
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -32,17 +34,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.fastMapIndexed
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.permissions.rememberPermissionState
+import info.alihabibi.common_android.AndroidUtils
 import info.alihabibi.common_android.RequestNotificationPermission
 import info.alihabibi.common_android.RequestSMSPermission
 import info.alihabibi.designsystem.R
@@ -52,8 +58,10 @@ import info.alihabibi.designsystem.theme.Primary
 import info.alihabibi.ui.buttons.AppFeatureBotton
 import info.alihabibi.ui.buttons.AppFeatures
 import info.alihabibi.ui.buttons.AppOutlinedButton
+import info.alihabibi.ui.charts.AppPieChart
 import info.alihabibi.ui.charts.GaugeChart
 import info.alihabibi.ui.charts.GaugeChartData
+import info.alihabibi.ui.charts.PieChartData
 import info.alihabibi.ui.dialogs.ChannelListedBottomSheet
 import info.alihabibi.ui.headrs.HomePageHeader
 import org.koin.androidx.compose.koinViewModel
@@ -240,7 +248,10 @@ private fun HomeScreen(
 
                         Text(
                             text = stringResource(id = R.string.toman),
-                            style = MaterialTheme.typography.bodyLarge.copy(color = Gray8, fontSize = 16.sp)
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                color = Gray8,
+                                fontSize = 16.sp
+                            )
                         )
 
                         Spacer(modifier = Modifier.padding(horizontal = 3.dp))
@@ -290,7 +301,10 @@ private fun HomeScreen(
 
                         Text(
                             text = stringResource(id = R.string.toman),
-                            style = MaterialTheme.typography.bodyLarge.copy(color = Gray8, fontSize = 16.sp)
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                color = Gray8,
+                                fontSize = 16.sp
+                            )
                         )
 
                         Spacer(modifier = Modifier.padding(horizontal = 3.dp))
@@ -314,15 +328,20 @@ private fun HomeScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
+            verticalAlignment = Alignment.CenterVertically
         ) {
 
-            AppFeatures.appFeatures.forEach { item ->
+            AppFeatures.appFeatures.forEachIndexed { index, item ->
                 AppFeatureBotton(
                     modifier = Modifier
                         .weight(weight = 1f)
                         .align(Alignment.CenterVertically)
-                        .padding(horizontal = 4.dp)
+                        .padding(
+                            start = when (index) {
+                                1, 2 -> 4.dp
+                                else -> 0.dp
+                            }
+                        )
                         .width(width = 175.dp)
                         .height(height = 140.dp),
                     iconResId = item.iconResId,
@@ -330,6 +349,72 @@ private fun HomeScreen(
                     subtitle = stringResource(id = item.subTitle),
                     isEnabled = item.isEnabled
                 )
+            }
+
+        }
+
+        Spacer(modifier = Modifier.height(height = 16.dp))
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+        ) {
+
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = "${stringResource(id = R.string.last_actions)} ${uiState.persianMonthName}",
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontSize = 18.sp,
+                        textAlign = TextAlign.Right
+                    ),
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                Spacer(modifier = Modifier.height(height = 8.dp))
+
+                if (!uiState.hasOutcomeTransaction)
+                    Image(
+                        modifier = Modifier
+                            .size(width = 154.dp, height = 184.dp)
+                            .padding(top = 24.dp, bottom = 40.dp),
+                        painter = painterResource(id = R.drawable.empty_transaction),
+                        contentDescription = null,
+                        contentScale = ContentScale.FillBounds
+                    )
+                else
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(percent = 8),
+                        border = BorderStroke(width = 1.5.dp, color = NeutralGray),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                    ) {
+
+                        val data = remember(key1 = uiState.expensesByCategories) {
+                            val colorsList = AndroidUtils.generateDistinctColors(uiState.expensesByCategories.size)
+                            uiState.expensesByCategories.fastMapIndexed { index, category ->
+                                PieChartData(
+                                    category.categoryTitle,
+                                    category.totalAmount,
+                                    colorsList[index]
+                                )
+                            }
+                        }
+
+                        AppPieChart(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(all = 8.dp),
+                            segments = data
+                        )
+
+                    }
+
             }
 
         }
