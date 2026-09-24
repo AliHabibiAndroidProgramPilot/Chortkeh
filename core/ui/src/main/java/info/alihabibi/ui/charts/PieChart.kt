@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
@@ -51,7 +53,8 @@ fun AppPieChart(
         PieChart(
             modifier = Modifier
                 .weight(weight = 1f)
-                .size(size = 200.dp)
+                .width(width = 200.dp)
+                .heightIn(min = 80.dp)
                 .aspectRatio(ratio = 1f),
             segments = segments,
             strokeWidth = strokeWidth,
@@ -94,7 +97,7 @@ private fun PieChart(
         }
     }
 
-    Canvas(modifier = modifier) {
+    Canvas(modifier = modifier.padding(all = 8.dp)) {
         val stroke = strokeWidth.toPx()
         val outerR = size.minDimension / 2f
         val innerR = outerR - stroke
