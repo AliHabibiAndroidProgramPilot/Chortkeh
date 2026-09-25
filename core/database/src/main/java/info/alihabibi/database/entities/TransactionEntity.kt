@@ -42,13 +42,14 @@ data class TransactionEntity(
     val year: Int,
     val month: Int,
     val day: Int,
+    val dayOfWeekName: String,
     val time: String
 )
 
 data class DetailedTransaction(
     @Embedded val transaction: TransactionEntity,
-    @Relation(parentColumn = "transactionChannelId", entityColumn = "id") val channel: ChannelEntity,
-    @Relation(parentColumn = "transactionCategoryId", entityColumn = "id") val category: CategoryEntity
+    @Relation(parentColumn = "transactionChannelId", entityColumn = "id") val channel: ChannelEntity?,
+    @Relation(parentColumn = "transactionCategoryId", entityColumn = "id") val category: CategoryEntity?
 )
 
 data class CategoryTransactionExpensesData(

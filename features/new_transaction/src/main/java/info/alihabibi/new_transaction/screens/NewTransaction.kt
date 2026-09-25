@@ -151,7 +151,7 @@ private fun NewTransactionScreen(
     uiState: NewTransactionUiState,
     formattedTransactionDate: String = "",
     onPriceChanged: (price: String) -> Unit = {},
-    onDateChanged: (year: Int, month: Int, day: Int) -> Unit = { _, _, _ -> },
+    onDateChanged: (year: Int, month: Int, day: Pair<Int, String>) -> Unit = { _, _, _ -> },
     onTimeChange: (hour: Int?, minute: Int?) -> Unit = { _, _ -> },
     onCategoryChanged: (category: CategoryUiModel) -> Unit = {},
     onChannelChanged: (channel: ChannelUiModel) -> Unit = {},
@@ -207,14 +207,12 @@ private fun NewTransactionScreen(
             onDismissRequest = {
                 scope.launch { dateBottomSheetState.hide() }
             },
-            onDateChanged = { year, month, day ->
-                onDateChanged(year, month, day)
-            },
             onSubmitClick = {
                 val year = datePickerController.getPersianYear()
                 val month = datePickerController.getPersianMonth()
                 val day = datePickerController.getPersianDay()
-                onDateChanged(year, month, day)
+                val dayName = datePickerController.getPersianDayOfWeekName()
+                onDateChanged(year, month, Pair(day, dayName))
             }
         )
 

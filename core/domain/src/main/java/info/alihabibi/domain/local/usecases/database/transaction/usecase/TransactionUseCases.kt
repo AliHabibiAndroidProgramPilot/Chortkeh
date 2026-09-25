@@ -1,6 +1,7 @@
 package info.alihabibi.domain.local.usecases.database.transaction.usecase
 
 import info.alihabibi.domain.local.usecases.database.transaction.DeleteTransactionUseCase
+import info.alihabibi.domain.local.usecases.database.transaction.GetLastTransactions
 import info.alihabibi.domain.local.usecases.database.transaction.GetMonthExpensesByAllCategoriesUseCase
 import info.alihabibi.domain.local.usecases.database.transaction.GetMonthTotalExpensesUseCase
 import info.alihabibi.domain.local.usecases.database.transaction.GetMonthTotalIncomeUseCase
@@ -13,5 +14,6 @@ data class TransactionUseCases(
     val getMonthTotalIncomeUseCase: GetMonthTotalIncomeUseCase,
     val getMonthTotalExpensesUseCase: GetMonthTotalExpensesUseCase,
     val hasOutcomeTransactionUseCase: HasOutcomeTransactionUseCase,
-    val getMonthExpensesByAllCategoriesUseCase: GetMonthExpensesByAllCategoriesUseCase
+    val getMonthExpensesByAllCategoriesUseCase: GetMonthExpensesByAllCategoriesUseCase,
+    val getLastTransactions: GetLastTransactions
 )

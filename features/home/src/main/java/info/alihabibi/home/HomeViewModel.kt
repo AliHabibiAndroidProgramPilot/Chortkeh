@@ -1,6 +1,8 @@
 package info.alihabibi.home
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.util.fastFilter
+import androidx.compose.ui.util.fastMap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import info.alihabibi.common.Utils
@@ -8,10 +10,13 @@ import info.alihabibi.domain.local.usecases.database.channel.usecase.ChannelUseC
 import info.alihabibi.domain.local.usecases.database.transaction.usecase.TransactionUseCases
 import info.alihabibi.domain.local.usecases.datastore.usecase.DatastoreUseCases
 import info.alihabibi.domain.models.transaction.CategoryTransactionExpenses
+import info.alihabibi.domain.models.transaction.Transaction
 import info.alihabibi.model.mapper.toUiModel
 import info.alihabibi.model.mapper.toUiOption
 import info.alihabibi.model.ui_model.channel.ChannelUiModel
 import info.alihabibi.model.ui_model.transaction.CategoryTransactionExpensesUiModel
+import info.alihabibi.model.ui_model.transaction.TransactionTypeOptionUiModel
+import info.alihabibi.model.ui_model.transaction.TransactionUiModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -34,17 +39,20 @@ class HomeViewModel(
             dataStoreUseCases.getIsSmsModalShownUseCase.invoke(),
             channelsUseCase.getChannelsUseCase.invoke(),
             channelsUseCase.getTotalBalanceUseCase.invoke(),
-        ) { isSmsModalShown, channels, totalBalance ->
+            transactionUseCases.getLastTransactions.invoke(5, TransactionTypeOptionUiModel.OUTCOME.name)
+        ) { isSmsModalShown, channels, totalBalance, lastTransactions ->
             val uiChannels = channels.map {
                 if (it.isAppDefaultChannel)
                     it.copy(channelBalance = totalBalance).toUiModel()
                 else
                     it.toUiModel()
             }
+            val uiLastTransactions = lastTransactions.fastMap(Transaction::toUiModel)
             _uiState.update {
                 it.copy(
                     isSmsModalShown = isSmsModalShown,
                     formattedTotalBalance = Utils.decimalFormatterPattern.format(totalBalance),
+                    lastTransactions = uiLastTransactions,
                     channels = uiChannels
                 )
             }
@@ -102,6 +110,7 @@ sealed interface HomeUiIntent {
 
 }
 
+@Immutable
 data class HomeUiState(
     val monthTotalIncome: String = "",
     val monthTotalExpenses: String = "",
@@ -110,6 +119,7 @@ data class HomeUiState(
     val hasOutcomeTransaction: Boolean = false,
     val formattedTotalBalance: String = "",
     val isSmsModalShown: Boolean = false,
+    val lastTransactions: List<TransactionUiModel> = emptyList(),
     val expensesByCategories: List<CategoryTransactionExpensesUiModel> = emptyList(),
     val channels: List<ChannelUiModel> = emptyList()
 )

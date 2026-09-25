@@ -15,6 +15,7 @@ import info.alihabibi.domain.local.usecases.database.channel.UpdateChannelUseCas
 import info.alihabibi.domain.local.usecases.database.channel.usecase.ChannelUseCases
 import info.alihabibi.domain.local.usecases.database.channel.usecase.UpdateChannelBalanceUseCase
 import info.alihabibi.domain.local.usecases.database.transaction.DeleteTransactionUseCase
+import info.alihabibi.domain.local.usecases.database.transaction.GetLastTransactions
 import info.alihabibi.domain.local.usecases.database.transaction.GetMonthExpensesByAllCategoriesUseCase
 import info.alihabibi.domain.local.usecases.database.transaction.GetMonthTotalExpensesUseCase
 import info.alihabibi.domain.local.usecases.database.transaction.GetMonthTotalIncomeUseCase
@@ -108,6 +109,7 @@ val domainModule = module {
     factory { GetMonthTotalExpensesUseCase(get()) }
     factory { HasOutcomeTransactionUseCase(get()) }
     factory { GetMonthExpensesByAllCategoriesUseCase(get()) }
+    factory { GetLastTransactions(get()) }
 
     factory {
         TransactionUseCases(
@@ -116,7 +118,8 @@ val domainModule = module {
             getMonthTotalIncomeUseCase = get(),
             getMonthTotalExpensesUseCase = get(),
             hasOutcomeTransactionUseCase = get(),
-            getMonthExpensesByAllCategoriesUseCase = get()
+            getMonthExpensesByAllCategoriesUseCase = get(),
+            getLastTransactions = get()
         )
     }
 

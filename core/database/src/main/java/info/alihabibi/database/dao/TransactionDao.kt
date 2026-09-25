@@ -4,7 +4,9 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import info.alihabibi.database.entities.CategoryTransactionExpensesData
+import info.alihabibi.database.entities.DetailedTransaction
 import info.alihabibi.database.entities.TransactionEntity
 import info.alihabibi.domain.Keys
 import kotlinx.coroutines.flow.Flow
@@ -53,5 +55,9 @@ interface TransactionDao {
     GROUP BY c.id
 """)
     fun getMonthExpensesByAllCategories(year: Int, month: Int): Flow<List<CategoryTransactionExpensesData>>
+
+    @Transaction
+    @Query("SELECT * FROM ${Keys.TRANSACTION_TABLE_NAME} WHERE transactionType = :type ORDER BY id DESC LIMIT :count")
+    fun getLastTransactions(count: Int, type: String): Flow<List<DetailedTransaction>>
 
 }

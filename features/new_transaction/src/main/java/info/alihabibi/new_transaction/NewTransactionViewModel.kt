@@ -45,8 +45,8 @@ class NewTransactionViewModel(
         newTransactionUiState.map { it.transactionMonth },
         newTransactionUiState.map { it.transactionDay }
     ) { year, month, day ->
-        if (year > 0 && month > 0 && day > 0)
-            PersianDateFormatter.format(year, month, day)
+        if (year > 0 && month > 0 && day.first > 0)
+            PersianDateFormatter.format(year, month, day.first)
         else ""
     }.stateIn(
         scope = viewModelScope,
@@ -124,12 +124,13 @@ class NewTransactionViewModel(
 
             val transaction = TransactionUiModel(
                 transactionTypeOptionUiModel = state.transactionType,
-                amount = state.transactionPrice.toLong(),
+                amount = state.transactionPrice,
                 channel = state.transactionChannel,
                 category = state.transactionCategory,
                 year = state.transactionYear,
                 month = state.transactionMonth,
-                day = state.transactionDay,
+                day = state.transactionDay.first,
+                dayOfWeekName = state.transactionDay.second,
                 time = "${state.transactionHour}:${state.transactionMinute}"
             ).toDomain()
             val id = transactionUseCases.saveTransactionUseCase.invoke(transaction)
@@ -220,7 +221,7 @@ class NewTransactionViewModel(
         }
     }
 
-    private fun changeDate(year: Int, month: Int, day: Int) {
+    private fun changeDate(year: Int, month: Int, day: Pair<Int, String>) {
         _newTransactionUiState.update {
             it.copy(
                 transactionYear = year,
@@ -298,7 +299,7 @@ sealed interface NewTransactionUiIntent {
 
     data class PriceChanged(val price: String) : NewTransactionUiIntent
 
-    data class DateChanged(val year: Int, val month: Int, val day: Int) : NewTransactionUiIntent
+    data class DateChanged(val year: Int, val month: Int, val day: Pair<Int, String>) : NewTransactionUiIntent
 
     data class TimeChanged(val hour: Int?, val minute: Int?) : NewTransactionUiIntent
 
@@ -331,7 +332,7 @@ data class NewTransactionUiState(
     val transactionMinute: Int? = null,
     val transactionYear: Int = 0,
     val transactionMonth: Int = 0,
-    val transactionDay: Int = 0,
+    val transactionDay: Pair<Int, String> = Pair(0, ""),
     val transactionCategory: CategoryUiModel? = null,
     val transactionChannel: ChannelUiModel? = null,
     val categories: List<CategoryUiModel> = emptyList(),
@@ -346,7 +347,7 @@ data class NewTransactionUiState(
                     transactionChannel != null &&
                     transactionYear > 0 &&
                     transactionMonth > 0 &&
-                    transactionDay > 0
+                    transactionDay.first > 0
         }
 }
 

@@ -48,6 +48,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.permissions.rememberPermissionState
+import info.alihabibi.common.PersianDateFormatter
 import info.alihabibi.common_android.AndroidUtils
 import info.alihabibi.common_android.RequestNotificationPermission
 import info.alihabibi.common_android.RequestSMSPermission
@@ -64,6 +65,7 @@ import info.alihabibi.ui.charts.GaugeChartData
 import info.alihabibi.ui.charts.PieChartData
 import info.alihabibi.ui.dialogs.ChannelListedBottomSheet
 import info.alihabibi.ui.headrs.HomePageHeader
+import info.alihabibi.ui.items.TransactionItem
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -415,6 +417,32 @@ private fun HomeScreen(
 
                     }
 
+            }
+
+        }
+
+        Spacer(modifier = Modifier.height(height = 16.dp))
+
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            val lastTransactions = uiState.lastTransactions
+            repeat(lastTransactions.size) { index ->
+                TransactionItem(
+                    title = lastTransactions[index].category?.title.orEmpty(),
+                    transactionAmount = lastTransactions[index].amount,
+                    subTitle = PersianDateFormatter.format(
+                        lastTransactions[index].year,
+                        lastTransactions[index].month,
+                        lastTransactions[index].dayOfWeekName,
+                        lastTransactions[index].day,
+                        lastTransactions[index].time
+                    ),
+                    iconResId = lastTransactions[index].category?.icon?.iconResId ?: R.drawable.category_ic_others,
+                    clickable = false
+                )
             }
 
         }
