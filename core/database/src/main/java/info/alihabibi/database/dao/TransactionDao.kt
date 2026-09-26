@@ -60,4 +60,8 @@ interface TransactionDao {
     @Query("SELECT * FROM ${Keys.TRANSACTION_TABLE_NAME} WHERE transactionType = :type ORDER BY id DESC LIMIT :count")
     fun getLastTransactions(count: Int, type: String): Flow<List<DetailedTransaction>>
 
+    @Transaction
+    @Query("SELECT * FROM ${Keys.TRANSACTION_TABLE_NAME} ORDER BY id DESC")
+    suspend fun getAllTransactions(): List<DetailedTransaction>
+
 }

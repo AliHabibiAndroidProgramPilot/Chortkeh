@@ -5,7 +5,7 @@ import info.alihabibi.model.ui_model.channel.ChannelUiModel
 
 data class TransactionUiModel(
     val id: Long = 0L,
-    val transactionTypeOptionUiModel: TransactionTypeOptionUiModel,
+    val type: TransactionTypeOptionUiModel,
     val amount: String,
     val channel: ChannelUiModel?,
     val category: CategoryUiModel?,

@@ -1,4 +1,4 @@
-package info.alihabibi.home
+package info.alihabibi.home.screens
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -19,12 +19,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -56,6 +58,9 @@ import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray8
 import info.alihabibi.designsystem.theme.NeutralGray
 import info.alihabibi.designsystem.theme.Primary
+import info.alihabibi.home.HomeUiIntent
+import info.alihabibi.home.HomeUiState
+import info.alihabibi.home.HomeViewModel
 import info.alihabibi.ui.buttons.AppFeatureBotton
 import info.alihabibi.ui.buttons.AppFeatures
 import info.alihabibi.ui.buttons.AppOutlinedButton
@@ -75,6 +80,7 @@ fun HomeDestination(
     onAnnouncements: () -> Unit = {},
     onNewChannel: () -> Unit = {},
     onChannels: () -> Unit = {},
+    onTransactionsList: () -> Unit = {}
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -86,7 +92,8 @@ fun HomeDestination(
         },
         onAnnouncements = onAnnouncements,
         onNewChannel = onNewChannel,
-        onChannels = onChannels
+        onChannels = onChannels,
+        onTransactionsList = onTransactionsList
     )
 
 }
@@ -100,6 +107,7 @@ private fun HomeScreen(
     onAnnouncements: () -> Unit = {},
     onNewChannel: () -> Unit = {},
     onChannels: () -> Unit = {},
+    onTransactionsList: () -> Unit = {}
 ) {
 
     val notificationPermission =
@@ -450,9 +458,27 @@ private fun HomeScreen(
                         lastTransactions[index].day,
                         lastTransactions[index].time
                     ),
-                    iconResId = lastTransactions[index].category?.icon?.iconResId ?: R.drawable.category_ic_others,
-                    clickable = false
+                    iconResId = lastTransactions[index].category?.icon?.iconResId ?: R.drawable.category_ic_others
                 )
+            }
+
+            TextButton(
+                modifier = Modifier
+                    .fillMaxWidth(fraction = 0.7f)
+                    .padding(vertical = 8.dp),
+                onClick = onTransactionsList,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Transparent,
+                    contentColor = MaterialTheme.colorScheme.secondary
+                )
+            ) {
+
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = stringResource(id = R.string.all_transactions),
+                    style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center)
+                )
+
             }
 
         }

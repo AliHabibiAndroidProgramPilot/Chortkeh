@@ -42,6 +42,7 @@
     <string name="budgeting_subtitle">مدیریت مالی</string>
     <string name="piggy_bank_subtitle">ذخیره پس‌انداز</string>
     <string name="stairs_subtitle">هدف‌گذاری مالی</string>
+    <string name="all_transactions">همه تراکنش ها</string>
 
     // On Boarding
     <string name="piggy_bank">قلک</string>

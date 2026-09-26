@@ -1,6 +1,7 @@
 package info.alihabibi.ui.items
 
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -38,6 +40,9 @@ fun TransactionItem(
     subTitle: String = "",
     @DrawableRes iconResId: Int,
     clickable: Boolean = false,
+    needsTypeTag: Boolean = false,
+    tag: String = "",
+    tagColor: Color = Color.Unspecified,
     onClick: () -> Unit = {}
 ) {
 
@@ -82,11 +87,28 @@ fun TransactionItem(
 
             Column(horizontalAlignment = Alignment.End) {
 
-                Text(
-                    modifier = Modifier.padding(end = 10.dp, bottom = 8.dp),
-                    text = title,
-                    style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.End)
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(space = 4.dp)
+                ) {
+
+                    if (needsTypeTag)
+                        Text(
+                            modifier = Modifier
+                                .padding(end = 10.dp, bottom = 8.dp)
+                                .background(color = tagColor, shape = RoundedCornerShape(percent = 22))
+                                .padding(vertical = 4.dp, horizontal = 6.dp),
+                            text = tag,
+                            style = MaterialTheme.typography.labelMedium.copy(textAlign = TextAlign.End)
+                        )
+
+                    Text(
+                        modifier = Modifier.padding(end = 10.dp, bottom = 8.dp),
+                        text = title,
+                        style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.End)
+                    )
+
+                }
 
                 Text(
                     modifier = Modifier.padding(end = 10.dp),

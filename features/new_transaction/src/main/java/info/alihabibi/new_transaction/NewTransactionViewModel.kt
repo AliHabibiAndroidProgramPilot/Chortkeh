@@ -123,7 +123,7 @@ class NewTransactionViewModel(
                 return@launch
 
             val transaction = TransactionUiModel(
-                transactionTypeOptionUiModel = state.transactionType,
+                type = state.transactionType,
                 amount = state.transactionPrice,
                 channel = state.transactionChannel,
                 category = state.transactionCategory,

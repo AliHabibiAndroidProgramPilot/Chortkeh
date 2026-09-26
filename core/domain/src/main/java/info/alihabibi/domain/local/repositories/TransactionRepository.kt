@@ -20,4 +20,6 @@ interface TransactionRepository {
 
     fun getLastTransactions(count: Int, type: String): Flow<List<Transaction>>
 
+    suspend fun getAllTransactions(): List<Transaction>
+
 }

@@ -10,7 +10,7 @@ import info.alihabibi.model.ui_model.transaction.TransactionUiModel
 
 fun Transaction.toUiModel(): TransactionUiModel = TransactionUiModel(
     id = id,
-    transactionTypeOptionUiModel = transactionType.toUiOption(),
+    type = transactionType.toUiOption(),
     amount = Utils.decimalFormatterPattern.format(amount),
     channel = channel?.toUiModel(false),
     category = category?.toUiModel(),
@@ -23,7 +23,7 @@ fun Transaction.toUiModel(): TransactionUiModel = TransactionUiModel(
 
 fun TransactionUiModel.toDomain(): Transaction = Transaction(
     id = id,
-    transactionType = transactionTypeOptionUiModel.toDomain(),
+    transactionType = type.toDomain(),
     amount = amount.toLongOrNull() ?: 0L,
     channel = channel?.toDomain(),
     category = category?.toDomain(),
