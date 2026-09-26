@@ -62,6 +62,7 @@ import info.alihabibi.ui.buttons.AppOutlinedButton
 import info.alihabibi.ui.charts.AppPieChart
 import info.alihabibi.ui.charts.GaugeChart
 import info.alihabibi.ui.charts.GaugeChartData
+import info.alihabibi.ui.charts.GaugeChartState
 import info.alihabibi.ui.charts.PieChartData
 import info.alihabibi.ui.dialogs.ChannelListedBottomSheet
 import info.alihabibi.ui.headrs.HomePageHeader
@@ -192,13 +193,20 @@ private fun HomeScreen(
                     .size(size = 230.dp)
                     .align(alignment = Alignment.CenterHorizontally)
                     .padding(top = 12.dp),
-                progress = 0f,
+                progress = uiState.gaugeChartProgress,
                 textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
                 data = GaugeChartData(
                     totalIncome = uiState.monthTotalIncome.ifEmpty { "0" },
                     remainedBalance = uiState.remainedBalance.ifEmpty { "0" },
-                    bottomMessage = stringResource(id = R.string.empty_balance_state),
-                    iconResId = R.drawable.warnign_red_2
+                    bottomMessage = when(uiState.gaugeChartState) {
+                        GaugeChartState.EMPTY -> stringResource(id = R.string.empty_balance_state)
+                        GaugeChartState.GREEN -> stringResource(id = R.string.good_balance_state)
+                        GaugeChartState.RED -> stringResource(id = R.string.bad_balance_state)
+                    },
+                    iconResId = when(uiState.gaugeChartState) {
+                        GaugeChartState.EMPTY, GaugeChartState.RED -> R.drawable.warnign_red_2
+                        GaugeChartState.GREEN -> R.drawable.green_tick
+                    }
                 )
             )
 
@@ -424,7 +432,9 @@ private fun HomeScreen(
         Spacer(modifier = Modifier.height(height = 16.dp))
 
         Column(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 

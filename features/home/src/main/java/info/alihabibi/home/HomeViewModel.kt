@@ -6,6 +6,7 @@ import androidx.compose.ui.util.fastMap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import info.alihabibi.common.Utils
+import info.alihabibi.common.Utils.loog
 import info.alihabibi.domain.local.usecases.database.channel.usecase.ChannelUseCases
 import info.alihabibi.domain.local.usecases.database.transaction.usecase.TransactionUseCases
 import info.alihabibi.domain.local.usecases.datastore.usecase.DatastoreUseCases
@@ -17,6 +18,7 @@ import info.alihabibi.model.ui_model.channel.ChannelUiModel
 import info.alihabibi.model.ui_model.transaction.CategoryTransactionExpensesUiModel
 import info.alihabibi.model.ui_model.transaction.TransactionTypeOptionUiModel
 import info.alihabibi.model.ui_model.transaction.TransactionUiModel
+import info.alihabibi.ui.charts.GaugeChartState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -71,10 +73,14 @@ class HomeViewModel(
             val formattedRemainedBalance = Utils.decimalFormatterPattern.format(totalIncome - totalExpenses)
             val categoryTransactionExpensesUiModel = categoryTransactionExpenses
                 // remove categories without transaction or unimportant expens values
-                .fastFilter { it.totalAmount > 1000 }
+                .fastFilter { it.totalAmount > 10 }
                 .map(CategoryTransactionExpenses::toUiOption)
+            val gaugeChartProgress = calculateGaugeChartProgress(totalExpenses.toFloat(), totalIncome.toFloat())
+            val gaugeChartState = calculateGaugeChartState(totalExpenses.toFloat(), totalIncome.toFloat(), hasOutcomeTransaction)
             _uiState.update {
                 it.copy(
+                    gaugeChartProgress = gaugeChartProgress,
+                    gaugeChartState = gaugeChartState,
                     hasOutcomeTransaction = hasOutcomeTransaction,
                     monthTotalIncome = formattedIncome,
                     monthTotalExpenses = formattedExpenses,
@@ -101,10 +107,26 @@ class HomeViewModel(
         }
     }
 
+    private fun calculateGaugeChartProgress(totalExpense: Float, totalIncome: Float, ): Float {
+        if (totalIncome == 0.0f && totalExpense == 0.0f) return 0f
+        val spendRatio = if (totalIncome > 0f) (totalExpense / totalIncome).coerceIn(0.0f, 2.0f) else 2.0f
+        val progress = (spendRatio * 90.0f).coerceIn(0.0f, 180.0f)
+        progress.loog("Ali", "progress -----> ")
+        return progress
+    }
+
+    private fun calculateGaugeChartState(
+        totalExpense: Float,
+        totalIncome: Float,
+        hasTransaction: Boolean
+    ): GaugeChartState {
+        if (!hasTransaction) return GaugeChartState.EMPTY
+        return if (totalExpense >= totalIncome) GaugeChartState.RED else GaugeChartState.GREEN
+    }
+
 }
 
 sealed interface HomeUiIntent {
-
 
     data class SaveSmsPermissionModalShownState(val value: Boolean) : HomeUiIntent
 
@@ -119,6 +141,8 @@ data class HomeUiState(
     val hasOutcomeTransaction: Boolean = false,
     val formattedTotalBalance: String = "",
     val isSmsModalShown: Boolean = false,
+    val gaugeChartState: GaugeChartState = GaugeChartState.EMPTY,
+    val gaugeChartProgress: Float = 0f,
     val lastTransactions: List<TransactionUiModel> = emptyList(),
     val expensesByCategories: List<CategoryTransactionExpensesUiModel> = emptyList(),
     val channels: List<ChannelUiModel> = emptyList()

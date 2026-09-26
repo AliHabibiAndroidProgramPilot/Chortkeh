@@ -1,5 +1,6 @@
 package info.alihabibi.ui.charts
 
+import androidx.compose.animation.Animatable
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -72,9 +73,9 @@ fun GaugeChart(
     val bottomMessageIcon = painterResource(id = data.iconResId)
 
     val animatedProgress = remember { Animatable(initialValue = 0f) }
-    LaunchedEffect(Unit) {
+    LaunchedEffect(progress) {
         animatedProgress.animateTo(
-            targetValue = progress,
+            targetValue = progress.coerceIn(0.0f..180.0f),
             animationSpec = tween(durationMillis = 2000, delayMillis = 200, easing = LinearOutSlowInEasing)
         )
     }
@@ -100,7 +101,7 @@ fun GaugeChart(
                 .fillMaxWidth()
                 .aspectRatio(1.55f)
         ) {
-            val strokeWidth = size.width * 0.085f
+            val strokeWidth = size.width * 0.100f
             val topSpacing = size.height * 0.10f // room for the top marker + connecting line
             val bottomSpacing = strokeWidth / 1f  // room for the round-cap bulge at the ends
 
@@ -137,6 +138,7 @@ fun GaugeChart(
             // --- dotted progress arc, inset inside the track ---
             val dotRadius = strokeWidth * 0.13f
             val dotTrackRadius = radius - strokeWidth / 2f - dotRadius * 2.2f
+            val currentProgress = animatedProgress.value
             for (i in 0 until 29) {
                 val t = i / (29 - 1).toFloat()
                 val angleRad = Math.toRadians((180f + t * 180f).toDouble()).toFloat()
@@ -145,13 +147,13 @@ fun GaugeChart(
                     y = center.y + dotTrackRadius * sin(angleRad),
                 )
                 drawCircle(
-                    color = if (progress >= 90) {
-                        val x: Float = ((progress / 10) * 1.5 + 1).toFloat()
+                    color = if (currentProgress >= 90) {
+                        val x: Float = ((currentProgress / 10) * 1.5 + 1).toFloat()
                         if (i <= x) ErrorRed else Gray5
-                    } else if (progress == 0f) {
+                    } else if (currentProgress == 0f) {
                         Gray5
                     } else {
-                        val x: Float = ((progress / 10) * 1.5 + 1).toFloat()
+                        val x: Float = ((currentProgress / 10) * 1.5 + 1).toFloat()
                         if (i <= x) GreenSuccess else Gray5
                     },
                     radius = dotRadius,

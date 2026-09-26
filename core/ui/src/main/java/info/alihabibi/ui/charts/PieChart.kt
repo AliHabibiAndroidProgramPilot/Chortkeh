@@ -64,8 +64,10 @@ fun AppPieChart(
         Spacer(modifier = Modifier.width(24.dp))
 
         LegendLabels(
-            labelItems = segments,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier
+                .weight(1f)
+                .padding(vertical = 8.dp),
+            labelItems = segments
         )
 
     }
