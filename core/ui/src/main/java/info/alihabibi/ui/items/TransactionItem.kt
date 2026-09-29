@@ -99,7 +99,10 @@ fun TransactionItem(
                                 .background(color = tagColor, shape = RoundedCornerShape(percent = 22))
                                 .padding(vertical = 4.dp, horizontal = 6.dp),
                             text = tag,
-                            style = MaterialTheme.typography.labelMedium.copy(textAlign = TextAlign.End)
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                textAlign = TextAlign.End,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
                         )
 
                     Text(

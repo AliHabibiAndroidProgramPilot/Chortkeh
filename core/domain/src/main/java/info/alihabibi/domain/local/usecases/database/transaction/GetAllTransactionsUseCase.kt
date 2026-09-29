@@ -2,11 +2,12 @@ package info.alihabibi.domain.local.usecases.database.transaction
 
 import info.alihabibi.domain.local.repositories.TransactionRepository
 import info.alihabibi.domain.models.transaction.Transaction
+import kotlinx.coroutines.flow.Flow
 
 class GetAllTransactionsUseCase(
     private val repository: TransactionRepository
 ) {
 
-    suspend operator fun invoke(): List<Transaction> = repository.getAllTransactions()
+    operator fun invoke(): Flow<List<Transaction>> = repository.getAllTransactions()
 
 }

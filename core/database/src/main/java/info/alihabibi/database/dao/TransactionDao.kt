@@ -66,7 +66,7 @@ interface TransactionDao {
 
     @Transaction
     @Query("SELECT * FROM ${Keys.TRANSACTION_TABLE_NAME} ORDER BY id DESC")
-    suspend fun getAllTransactions(): List<DetailedTransaction>
+    fun getAllTransactions(): Flow<List<DetailedTransaction>>
 
     @Transaction
     @Query("SELECT * FROM ${Keys.TRANSACTION_TABLE_NAME} WHERE id = :id")

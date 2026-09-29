@@ -352,19 +352,11 @@ class NewTransactionViewModel(
                 val oldAmount = transactionSnapshot.amount.toLongOrNull() ?: 0L
                 val oldIsIncome = transactionSnapshot.type == TransactionTypeOptionUiModel.INCOME
                 // Revert the old transaction effect on the old channel
-                channelsUseCase.updateChannelBalanceUseCase.invoke(
-                    id = oldChannel.id,
-                    amount = oldAmount,
-                    isIncome = !oldIsIncome
-                )
+                channelsUseCase.updateChannelBalanceUseCase.invoke(oldChannel.id, oldAmount,!oldIsIncome)
             }
         }
         // Apply the new transaction effect on the target channel
-        channelsUseCase.updateChannelBalanceUseCase.invoke(
-            id = channelId,
-            amount = balance,
-            isIncome = isIncome
-        )
+        channelsUseCase.updateChannelBalanceUseCase.invoke(channelId, balance, isIncome)
     }
 
 }

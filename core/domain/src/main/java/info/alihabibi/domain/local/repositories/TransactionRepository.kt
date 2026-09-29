@@ -22,7 +22,7 @@ interface TransactionRepository {
 
     fun getLastTransactions(count: Int, type: String): Flow<List<Transaction>>
 
-    suspend fun getAllTransactions(): List<Transaction>
+    fun getAllTransactions(): Flow<List<Transaction>>
 
     suspend fun getTransactionById(id: Long): Transaction
 

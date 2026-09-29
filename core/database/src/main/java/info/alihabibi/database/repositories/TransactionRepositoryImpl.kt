@@ -34,15 +34,15 @@ class TransactionRepositoryImpl(private val dao: TransactionDao) : TransactionRe
     }
 
     override fun getMonthTotalIncome(year: Int, month: Int): Flow<Long> {
-        return dao.getMonthTotalIncome(year, month)
+        return dao.getMonthTotalIncome(year, month).flowOn(Dispatchers.IO)
     }
 
     override fun getMonthTotalExpenses(year: Int, month: Int): Flow<Long> {
-        return dao.getMonthTotalExpenses(year, month)
+        return dao.getMonthTotalExpenses(year, month).flowOn(Dispatchers.IO)
     }
 
     override fun hasOutcomeTransaction(): Flow<Boolean> {
-        return dao.hasOutcomeTransaction()
+        return dao.hasOutcomeTransaction().flowOn(Dispatchers.IO)
     }
 
     override fun getMonthExpensesByAllCategories(year: Int, month: Int): Flow<List<CategoryTransactionExpenses>> {
@@ -57,10 +57,14 @@ class TransactionRepositoryImpl(private val dao: TransactionDao) : TransactionRe
         return dao.getLastTransactions(count, type).map { transactionDataList ->
             transactionDataList.map(DetailedTransaction::asExternalModel)
         }
+            .flowOn(Dispatchers.IO)
     }
 
-    override suspend fun getAllTransactions(): List<Transaction> {
-        return dao.getAllTransactions().map(DetailedTransaction::asExternalModel)
+    override fun getAllTransactions(): Flow<List<Transaction>> {
+        return dao.getAllTransactions().map { transactions ->
+            transactions.map(DetailedTransaction::asExternalModel)
+        }
+            .flowOn(Dispatchers.IO)
     }
 
     override suspend fun getTransactionById(id: Long): Transaction {
