@@ -27,6 +27,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun AllTransactionsDestination(
     viewModel: AllTransactionsViewModel = koinViewModel(),
+    onEditTransaction: (id: Long) -> Unit = {},
     onBackPressed: () -> Unit
 ) {
 
@@ -34,6 +35,7 @@ fun AllTransactionsDestination(
 
     AllTransactionsScreen(
         transactions = transactions,
+        onEditTransaction = onEditTransaction,
         onBackPressed = onBackPressed
     )
 
@@ -42,6 +44,7 @@ fun AllTransactionsDestination(
 @Composable
 private fun AllTransactionsScreen(
     transactions: List<TransactionUiModel>,
+    onEditTransaction: (id: Long) -> Unit = {},
     onBackPressed: () -> Unit
 ) {
 
@@ -85,7 +88,10 @@ private fun AllTransactionsScreen(
                         GreenSuccessLight.copy(alpha = 0.25f)
                     else
                         ErrorRed.copy(alpha = 0.25f),
-                    clickable = true
+                    clickable = true,
+                    onClick = {
+                        onEditTransaction(transaction.id)
+                    }
                 )
 
             }

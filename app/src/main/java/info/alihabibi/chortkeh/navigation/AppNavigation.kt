@@ -12,6 +12,7 @@ import info.alihabibi.channels.ChannelGraphRoute
 import info.alihabibi.channels.channelsGraph
 import info.alihabibi.home.screens.AllTransactionsDestination
 import info.alihabibi.home.screens.HomeDestination
+import info.alihabibi.new_transaction.NewTransactionGraphRoute
 import info.alihabibi.new_transaction.newTransactionGraph
 import info.alihabibi.onboarding.OnBoardingDestination
 import info.alihabibi.profile.Profile
@@ -95,6 +96,9 @@ fun DemoNavHost(
 
         composable<AllTransactions> {
             AllTransactionsDestination(
+                onEditTransaction = { transactionId ->
+                    navController.navigate(NewTransactionGraphRoute(transactionId))
+                },
                 onBackPressed = {
                     navController.navigateUp()
                 }

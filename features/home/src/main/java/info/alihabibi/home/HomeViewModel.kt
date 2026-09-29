@@ -6,7 +6,6 @@ import androidx.compose.ui.util.fastMap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import info.alihabibi.common.Utils
-import info.alihabibi.common.Utils.loog
 import info.alihabibi.domain.local.usecases.database.channel.usecase.ChannelUseCases
 import info.alihabibi.domain.local.usecases.database.transaction.usecase.TransactionUseCases
 import info.alihabibi.domain.local.usecases.datastore.usecase.DatastoreUseCases
@@ -111,7 +110,6 @@ class HomeViewModel(
         if (totalIncome == 0.0f && totalExpense == 0.0f) return 0f
         val spendRatio = if (totalIncome > 0f) (totalExpense / totalIncome).coerceIn(0.0f, 2.0f) else 2.0f
         val progress = (spendRatio * 90.0f).coerceIn(0.0f, 180.0f)
-        progress.loog("Ali", "progress -----> ")
         return progress
     }
 
@@ -140,7 +138,7 @@ data class HomeUiState(
     val persianMonthName: String = "",
     val hasOutcomeTransaction: Boolean = false,
     val formattedTotalBalance: String = "",
-    val isSmsModalShown: Boolean = false,
+    val isSmsModalShown: Boolean? = null,
     val gaugeChartState: GaugeChartState = GaugeChartState.EMPTY,
     val gaugeChartProgress: Float = 0f,
     val lastTransactions: List<TransactionUiModel> = emptyList(),

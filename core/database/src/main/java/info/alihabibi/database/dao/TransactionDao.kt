@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 import info.alihabibi.database.entities.CategoryTransactionExpensesData
 import info.alihabibi.database.entities.DetailedTransaction
 import info.alihabibi.database.entities.TransactionEntity
@@ -16,6 +17,9 @@ interface TransactionDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertTransaction(transaction: TransactionEntity): Long
+
+    @Update
+    suspend fun updateTransaction(transaction: TransactionEntity)
 
     @Query("DELETE FROM ${Keys.TRANSACTION_TABLE_NAME} WHERE id = :id")
     suspend fun deleteTransactionById(id: Long)
@@ -63,5 +67,9 @@ interface TransactionDao {
     @Transaction
     @Query("SELECT * FROM ${Keys.TRANSACTION_TABLE_NAME} ORDER BY id DESC")
     suspend fun getAllTransactions(): List<DetailedTransaction>
+
+    @Transaction
+    @Query("SELECT * FROM ${Keys.TRANSACTION_TABLE_NAME} WHERE id = :id")
+    suspend fun getTransactionById(id: Long): DetailedTransaction
 
 }

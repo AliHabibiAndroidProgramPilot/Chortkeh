@@ -143,7 +143,7 @@ private fun AddCategoryScreen(
 
             AppHeader(
                 title = when(isEditingCategory) {
-                    true -> stringResource(id = R.string.update_category)
+                    true -> stringResource(id = R.string.edit_category)
                     false -> stringResource(id = R.string.new_category)
                 },
                 windowInsets = TopAppBarDefaults.windowInsets.only(sides = WindowInsetsSides.Top),
@@ -243,7 +243,7 @@ private fun AddCategoryScreen(
             enabled = uiState.isCategoryRegisterButtonEnabled,
             onClick = onRegisterCategory,
             text = when(isEditingCategory) {
-                true -> stringResource(id = R.string.update_category)
+                true -> stringResource(id = R.string.edit_category)
                 false -> stringResource(id = R.string.register_category)
             }
         )

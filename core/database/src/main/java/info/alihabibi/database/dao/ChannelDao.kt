@@ -46,5 +46,4 @@ interface ChannelDao {
     )
     suspend fun decreaseChannelBalance(id: Long, amount: Long)
 
-
 }

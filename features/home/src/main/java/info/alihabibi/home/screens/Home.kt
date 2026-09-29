@@ -121,7 +121,7 @@ private fun HomeScreen(
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !notificationPermission.status.isGranted)
         RequestNotificationPermission(notificationPermission = notificationPermission)
-    if (!uiState.isSmsModalShown && !smsPermissions.allPermissionsGranted)
+    if (uiState.isSmsModalShown == false && !smsPermissions.allPermissionsGranted)
         RequestSMSPermission(
             smsPermissions = smsPermissions,
             onSmsModalShown = onSmsModalShowed

@@ -8,10 +8,10 @@ import info.alihabibi.model.ui_model.transaction.CategoryTransactionExpensesUiMo
 import info.alihabibi.model.ui_model.transaction.TransactionTypeOptionUiModel
 import info.alihabibi.model.ui_model.transaction.TransactionUiModel
 
-fun Transaction.toUiModel(): TransactionUiModel = TransactionUiModel(
+fun Transaction.toUiModel(needsAmountFormat: Boolean = true): TransactionUiModel = TransactionUiModel(
     id = id,
     type = transactionType.toUiOption(),
-    amount = Utils.decimalFormatterPattern.format(amount),
+    amount = if (needsAmountFormat) Utils.decimalFormatterPattern.format(amount) else amount.toString(),
     channel = channel?.toUiModel(false),
     category = category?.toUiModel(),
     year = year,

@@ -23,6 +23,10 @@ class TransactionRepositoryImpl(private val dao: TransactionDao) : TransactionRe
         }
     }
 
+    override suspend fun updateTransaction(transaction: Transaction) {
+        dao.updateTransaction(transaction.asEntity())
+    }
+
     override suspend fun deleteTransaction(transactionId: Long) {
         return withContext(Dispatchers.IO) {
             dao.deleteTransactionById(transactionId)
@@ -57,6 +61,10 @@ class TransactionRepositoryImpl(private val dao: TransactionDao) : TransactionRe
 
     override suspend fun getAllTransactions(): List<Transaction> {
         return dao.getAllTransactions().map(DetailedTransaction::asExternalModel)
+    }
+
+    override suspend fun getTransactionById(id: Long): Transaction {
+        return dao.getTransactionById(id).asExternalModel()
     }
 
 }

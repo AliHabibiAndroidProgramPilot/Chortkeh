@@ -8,6 +8,8 @@ interface TransactionRepository {
 
     suspend fun saveTransaction(transaction: Transaction): Long
 
+    suspend fun updateTransaction(transaction: Transaction)
+
     suspend fun deleteTransaction(transactionId: Long)
 
     fun getMonthTotalIncome(year: Int, month: Int): Flow<Long>
@@ -21,5 +23,7 @@ interface TransactionRepository {
     fun getLastTransactions(count: Int, type: String): Flow<List<Transaction>>
 
     suspend fun getAllTransactions(): List<Transaction>
+
+    suspend fun getTransactionById(id: Long): Transaction
 
 }

@@ -89,7 +89,8 @@
     <string name="transaction_registered">تراکنش با موفقیت ثبت شد</string>
     <string name="register_transaction">ثبت تراکنش</string>
     <string name="register_category">ثبت دسته‌بندی</string>
-    <string name="update_category">ویرایش دسته‌بندی</string>
+    <string name="edit_category">ویرایش دسته‌بندی</string>
+    <string name="edit_transaction">ویرایش تراکنش</string>
     <string name="register_income_transaction">ثبت درآمد</string>
     <string name="register_outcome_transaction">ثبت هزینه</string>
     <string name="price">مبلغ</string>

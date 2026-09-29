@@ -1,4 +1,4 @@
-package info.alihabibi.domain.local.usecases.database.channel.usecase
+package info.alihabibi.domain.local.usecases.database.channel
 
 import info.alihabibi.domain.local.repositories.ChannelRepository
 

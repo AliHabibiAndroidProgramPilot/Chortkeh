@@ -89,6 +89,8 @@ class NewTransactionViewModel(
 
             is NewTransactionUiIntent.EditCategory -> editCategory(event.id)
 
+            is NewTransactionUiIntent.EditTransaction -> editTransaction(event.id)
+
             is NewTransactionUiIntent.PriceChanged -> changePrice(event.price)
 
             is NewTransactionUiIntent.DateChanged -> changeDate(event.year, event.month, event.day)
@@ -108,6 +110,8 @@ class NewTransactionViewModel(
             is NewTransactionUiIntent.CategoriesDeleted -> deleteCategories(event.categoriesToDelete)
 
             is NewTransactionUiIntent.FetchEditingCategory -> fetchEditingCategory(event.categoryId)
+
+            is NewTransactionUiIntent.FetchEditingTransaction -> fetchEditingTransaction(event.transactionId)
 
             is NewTransactionUiIntent.ResetCategoryDrafts -> resetCategoryDrafts()
 
@@ -134,18 +138,15 @@ class NewTransactionViewModel(
                 time = "${state.transactionHour}:${state.transactionMinute}"
             ).toDomain()
             val id = transactionUseCases.saveTransactionUseCase.invoke(transaction)
-
             updateChannelBalanceAfterTransaction(
+                null,
+                false,
                 state.transactionChannel.id,
                 state.transactionPrice.toLong(),
                 state.transactionType == TransactionTypeOptionUiModel.INCOME
             )
             _newTransactionUiState.update { it.copy(savedTransactionId = id) }
         }
-    }
-
-    private suspend fun updateChannelBalanceAfterTransaction(channelId: Long, balance: Long, isIncome: Boolean) {
-        channelsUseCase.updateChannelBalanceUseCase.invoke(channelId, balance, isIncome)
     }
 
     private fun saveCategory() {
@@ -196,6 +197,35 @@ class NewTransactionViewModel(
                 )
             }
             _newTransactionUiState.update { it.copy(transactionCategory = null) }
+        }
+    }
+
+    private fun editTransaction(transactionId: Long) {
+        viewModelScope.launch {
+            val state = _newTransactionUiState.value
+            if (state.transactionChannel == null || state.transactionCategory == null)
+                return@launch
+
+            val transaction = TransactionUiModel(
+                id = transactionId,
+                type = state.transactionType,
+                amount = state.transactionPrice,
+                channel = state.transactionChannel,
+                category = state.transactionCategory,
+                year = state.transactionYear,
+                month = state.transactionMonth,
+                day = state.transactionDay.first,
+                dayOfWeekName = state.transactionDay.second,
+                time = "${state.transactionHour}:${state.transactionMinute}"
+            ).toDomain()
+            updateChannelBalanceAfterTransaction(
+                transactionId,
+                true,
+                state.transactionChannel.id,
+                state.transactionPrice.toLong(),
+                state.transactionType == TransactionTypeOptionUiModel.INCOME
+            )
+            transactionUseCases.updateTransactionUseCase.invoke(transaction)
         }
     }
 
@@ -259,15 +289,36 @@ class NewTransactionViewModel(
     }
 
     private fun fetchEditingCategory(categoryId: Int) {
-        val category =
-            _newTransactionUiState.value.categories.firstOrNull { it.id.toInt() == categoryId }
-                ?: return
+        val category = _newTransactionUiState.value.categories.firstOrNull { it.id.toInt() == categoryId } ?: return
         _categoryUiState.update { _ ->
             CategoryUiState(
                 categoryName = category.title,
                 categoryType = category.type,
                 categoryIcon = category.icon
             )
+        }
+    }
+
+    private fun fetchEditingTransaction(transactionId: Long) {
+        viewModelScope.launch {
+            val transaction =
+                transactionUseCases.getTransactionByIdUseCase.invoke(transactionId).toUiModel(false)
+            val hour = transaction.time.substringBefore(':').toIntOrNull() ?: 0
+            val minute = transaction.time.substringAfter(':').toIntOrNull() ?: 0
+            _newTransactionUiState.update {
+                it.copy(
+                    transactionType = transaction.type,
+                    transactionPrice = transaction.amount,
+                    transactionHour = hour,
+                    transactionMinute = minute,
+                    formattedTransactionTime = "$hour : $minute",
+                    transactionYear = transaction.year,
+                    transactionMonth = transaction.month,
+                    transactionDay = transaction.day to transaction.dayOfWeekName,
+                    transactionChannel = transaction.channel,
+                    transactionCategory = transaction.category
+                )
+            }
         }
     }
 
@@ -287,6 +338,35 @@ class NewTransactionViewModel(
         }
     }
 
+    private suspend fun updateChannelBalanceAfterTransaction(
+        transactionId: Long?,
+        isEditedTransaction: Boolean,
+        channelId: Long,
+        balance: Long,
+        isIncome: Boolean
+    ) {
+        if (isEditedTransaction && transactionId != null) {
+            val transactionSnapshot =
+                transactionUseCases.getTransactionByIdUseCase.invoke(transactionId).toUiModel(false)
+            transactionSnapshot.channel?.let { oldChannel ->
+                val oldAmount = transactionSnapshot.amount.toLongOrNull() ?: 0L
+                val oldIsIncome = transactionSnapshot.type == TransactionTypeOptionUiModel.INCOME
+                // Revert the old transaction effect on the old channel
+                channelsUseCase.updateChannelBalanceUseCase.invoke(
+                    id = oldChannel.id,
+                    amount = oldAmount,
+                    isIncome = !oldIsIncome
+                )
+            }
+        }
+        // Apply the new transaction effect on the target channel
+        channelsUseCase.updateChannelBalanceUseCase.invoke(
+            id = channelId,
+            amount = balance,
+            isIncome = isIncome
+        )
+    }
+
 }
 
 sealed interface NewTransactionUiIntent {
@@ -296,6 +376,8 @@ sealed interface NewTransactionUiIntent {
     data object SaveCategory : NewTransactionUiIntent
 
     data class EditCategory(val id: Int) : NewTransactionUiIntent
+
+    data class EditTransaction(val id: Long) : NewTransactionUiIntent
 
     data class PriceChanged(val price: String) : NewTransactionUiIntent
 
@@ -316,6 +398,8 @@ sealed interface NewTransactionUiIntent {
     data class CategoriesDeleted(val categoriesToDelete: List<Long>) : NewTransactionUiIntent
 
     data class FetchEditingCategory(val categoryId: Int) : NewTransactionUiIntent
+
+    data class FetchEditingTransaction(val transactionId: Long) : NewTransactionUiIntent
 
     data object ResetCategoryDrafts : NewTransactionUiIntent
 

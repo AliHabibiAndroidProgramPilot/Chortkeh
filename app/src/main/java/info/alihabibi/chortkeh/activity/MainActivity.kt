@@ -2,7 +2,6 @@ package info.alihabibi.chortkeh.activity
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.padding
@@ -27,7 +26,7 @@ import info.alihabibi.chortkeh.navigation.topLevelDestinations
 import info.alihabibi.common_android.ObserveAsEvents
 import info.alihabibi.common_android.snackbar.SnackBarController
 import info.alihabibi.designsystem.theme.ChortkehTheme
-import info.alihabibi.new_transaction.NewTransaction
+import info.alihabibi.new_transaction.NewTransactionGraphRoute
 import info.alihabibi.ui.navigation.AppBottomNavigation
 import info.alihabibi.ui.scaffolds.BaseScaffold
 import info.alihabibi.ui.snackbars.AppSnackBar
@@ -95,7 +94,7 @@ class MainActivity : ComponentActivity() {
                                         currentDestination = currentDestination?.destination,
                                         items = BottomNavItems.entries.map { it.toUiData() },
                                         onFabClick = {
-                                            navController.navigate(NewTransaction)
+                                            navController.navigate(NewTransactionGraphRoute(null))
                                         },
                                         onNavItemClicked = { navItem ->
                                             navController.navigate(navItem.route) {

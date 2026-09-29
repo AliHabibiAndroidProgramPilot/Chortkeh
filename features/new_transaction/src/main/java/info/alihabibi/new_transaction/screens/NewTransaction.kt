@@ -25,6 +25,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -76,11 +77,17 @@ import java.time.LocalTime
 @Composable
 fun NewTransactionDestination(
     viewModel: NewTransactionViewModel = koinViewModel(),
+    editingTransactionId: Long?,
     onAddNewCategory: () -> Unit = {},
     onAddNewChannel: () -> Unit = {},
     onEditCategory: (categoryId: Int) -> Unit = {},
     onBackPressed: () -> Unit
 ) {
+
+    SideEffect(editingTransactionId) {
+        if (editingTransactionId != null)
+            viewModel.onEvent(NewTransactionUiIntent.FetchEditingTransaction(editingTransactionId))
+    }
 
     val context = LocalContext.current
 
@@ -112,6 +119,7 @@ fun NewTransactionDestination(
 
     NewTransactionScreen(
         uiState = uiState,
+        isEditingTransaction = editingTransactionId != null,
         formattedTransactionDate = formattedTransactionDate,
         onAddNewCategory = onAddNewCategory,
         onAddNewChannel = onAddNewChannel,
@@ -134,8 +142,13 @@ fun NewTransactionDestination(
         onCategoriesDelete = { categoriesToDelete ->
             viewModel.onEvent(NewTransactionUiIntent.CategoriesDeleted(categoriesToDelete))
         },
-        onSaveTransaction = {
-            viewModel.onEvent(NewTransactionUiIntent.SaveTransaction)
+        onSaveOrEditTransaction = {
+            if (editingTransactionId != null) {
+                viewModel.onEvent(NewTransactionUiIntent.EditTransaction(editingTransactionId))
+                onBackPressed()
+            }
+            else
+                viewModel.onEvent(NewTransactionUiIntent.SaveTransaction)
         },
         onTransactionTypeChanged = { type ->
             viewModel.onEvent(NewTransactionUiIntent.TransactionTypeChanged(type))
@@ -149,6 +162,7 @@ fun NewTransactionDestination(
 @Composable
 private fun NewTransactionScreen(
     uiState: NewTransactionUiState,
+    isEditingTransaction: Boolean,
     formattedTransactionDate: String = "",
     onPriceChanged: (price: String) -> Unit = {},
     onDateChanged: (year: Int, month: Int, day: Pair<Int, String>) -> Unit = { _, _, _ -> },
@@ -157,7 +171,7 @@ private fun NewTransactionScreen(
     onChannelChanged: (channel: ChannelUiModel) -> Unit = {},
     onCategoriesDelete: (categoriesIdsToDelete: List<Long>) -> Unit = {},
     onEditCategory: (categoryId: Int) -> Unit = {},
-    onSaveTransaction: () -> Unit = {},
+    onSaveOrEditTransaction: () -> Unit = {},
     onAddNewCategory: () -> Unit = {},
     onAddNewChannel: () -> Unit = {},
     onTransactionTypeChanged: (type: TransactionTypeOptionUiModel) -> Unit = {},
@@ -178,6 +192,8 @@ private fun NewTransactionScreen(
                 .wrapContentHeight(),
             controller = datePickerController,
             sheetState = dateBottomSheetState,
+            useInitialDate = isEditingTransaction, // Use Initial Date Only For Transactions That Has A Date, So Dialog Can Open That Date
+            initialDate = Triple(uiState.transactionYear, uiState.transactionMonth, uiState.transactionDay.first),
             minYear = MinYear.On(1404),
             maxYear = MaxYear.On(1406),
             titleBottomSheet = stringResource(id = R.string.date),
@@ -300,7 +316,10 @@ private fun NewTransactionScreen(
         ) {
 
             AppHeader(
-                title = stringResource(id = R.string.register_transaction),
+                title = if (isEditingTransaction)
+                    stringResource(id = R.string.edit_transaction)
+                else
+                    stringResource(id = R.string.register_transaction),
                 windowInsets = TopAppBarDefaults.windowInsets.only(sides = WindowInsetsSides.Top),
                 isActionAvailable = false,
                 onNavigationClicked = onBackPressed
@@ -475,10 +494,12 @@ private fun NewTransactionScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(end = 24.dp, start = 24.dp),
-            onClick = onSaveTransaction,
-            text = when (uiState.transactionType) {
-                TransactionTypeOptionUiModel.OUTCOME -> stringResource(id = R.string.register_outcome_transaction)
-                TransactionTypeOptionUiModel.INCOME -> stringResource(id = R.string.register_income_transaction)
+            onClick = onSaveOrEditTransaction,
+            text = if (isEditingTransaction) stringResource(id = R.string.edit_transaction) else {
+                when (uiState.transactionType) {
+                    TransactionTypeOptionUiModel.OUTCOME -> stringResource(id = R.string.register_outcome_transaction)
+                    TransactionTypeOptionUiModel.INCOME -> stringResource(id = R.string.register_income_transaction)
+                }
             },
             enabled = uiState.isRegisterTransactionButtonEnabled
         )
@@ -493,6 +514,7 @@ private fun NewTransactionPreview() {
 
     NewTransactionScreen(
         uiState = NewTransactionUiState(),
+        isEditingTransaction = false,
         onBackPressed = {}
     )
 
