@@ -41,6 +41,10 @@ class TransactionRepositoryImpl(private val dao: TransactionDao) : TransactionRe
         return dao.getMonthTotalExpenses(year, month).flowOn(Dispatchers.IO)
     }
 
+    override fun hasTransaction(): Flow<Boolean> {
+        return dao.hasTransaction().flowOn(Dispatchers.IO)
+    }
+
     override fun hasOutcomeTransaction(): Flow<Boolean> {
         return dao.hasOutcomeTransaction().flowOn(Dispatchers.IO)
     }

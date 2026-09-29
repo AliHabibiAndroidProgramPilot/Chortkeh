@@ -64,9 +64,10 @@ class HomeViewModel(
         combine(
             transactionUseCases.getMonthTotalIncomeUseCase.invoke(year, month.second),
             transactionUseCases.getMonthTotalExpensesUseCase.invoke(year, month.second),
+            transactionUseCases.hasTransactionUseCases.invoke(),
             transactionUseCases.hasOutcomeTransactionUseCase.invoke(),
             transactionUseCases.getMonthExpensesByAllCategoriesUseCase.invoke(year, month.second)
-        ) { totalIncome, totalExpenses, hasOutcomeTransaction, categoryTransactionExpenses ->
+        ) { totalIncome, totalExpenses, hasTransaction, hasOutcomeTransaction, categoryTransactionExpenses ->
             val formattedIncome = Utils.decimalFormatterPattern.format(totalIncome)
             val formattedExpenses = Utils.decimalFormatterPattern.format(totalExpenses)
             val formattedRemainedBalance = Utils.decimalFormatterPattern.format(totalIncome - totalExpenses)
@@ -80,6 +81,7 @@ class HomeViewModel(
                 it.copy(
                     gaugeChartProgress = gaugeChartProgress,
                     gaugeChartState = gaugeChartState,
+                    hasTransaction = hasTransaction,
                     hasOutcomeTransaction = hasOutcomeTransaction,
                     monthTotalIncome = formattedIncome,
                     monthTotalExpenses = formattedExpenses,
@@ -136,6 +138,7 @@ data class HomeUiState(
     val monthTotalExpenses: String = "",
     val remainedBalance: String = "",
     val persianMonthName: String = "",
+    val hasTransaction: Boolean = false,
     val hasOutcomeTransaction: Boolean = false,
     val formattedTotalBalance: String = "",
     val isSmsModalShown: Boolean? = null,

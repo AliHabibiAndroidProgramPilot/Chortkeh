@@ -126,6 +126,7 @@ val domainModule = module {
             deleteTransactionUseCase = get(),
             getMonthTotalIncomeUseCase = get(),
             getMonthTotalExpensesUseCase = get(),
+            hasTransactionUseCases = get(),
             hasOutcomeTransactionUseCase = get(),
             getMonthExpensesByAllCategoriesUseCase = get(),
             getLastTransactions = get(),

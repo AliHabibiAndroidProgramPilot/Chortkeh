@@ -462,24 +462,25 @@ private fun HomeScreen(
                 )
             }
 
-            TextButton(
-                modifier = Modifier
-                    .fillMaxWidth(fraction = 0.7f)
-                    .padding(vertical = 8.dp),
-                onClick = onTransactionsList,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Transparent,
-                    contentColor = MaterialTheme.colorScheme.secondary
-                )
-            ) {
+            if (uiState.hasTransaction)
+                TextButton(
+                    modifier = Modifier
+                        .fillMaxWidth(fraction = 0.7f)
+                        .padding(vertical = 8.dp),
+                    onClick = onTransactionsList,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Transparent,
+                        contentColor = MaterialTheme.colorScheme.secondary
+                    )
+                ) {
 
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = stringResource(id = R.string.all_transactions),
-                    style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center)
-                )
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = stringResource(id = R.string.all_transactions),
+                        style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center)
+                    )
 
-            }
+                }
 
         }
 

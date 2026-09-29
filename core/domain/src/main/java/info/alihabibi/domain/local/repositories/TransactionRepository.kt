@@ -16,6 +16,8 @@ interface TransactionRepository {
 
     fun getMonthTotalExpenses(year: Int, month: Int): Flow<Long>
 
+    fun hasTransaction(): Flow<Boolean>
+
     fun hasOutcomeTransaction(): Flow<Boolean>
 
     fun getMonthExpensesByAllCategories(year: Int, month: Int): Flow<List<CategoryTransactionExpenses>>

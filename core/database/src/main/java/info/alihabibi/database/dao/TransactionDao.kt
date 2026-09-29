@@ -45,6 +45,9 @@ interface TransactionDao {
     @Query("SELECT EXISTS( SELECT 1 FROM ${Keys.TRANSACTION_TABLE_NAME} WHERE transactionType = 'OUTCOME')")
     fun hasOutcomeTransaction(): Flow<Boolean>
 
+    @Query("SELECT EXISTS( SELECT 1 FROM ${Keys.TRANSACTION_TABLE_NAME})")
+    fun hasTransaction(): Flow<Boolean>
+
     @Query("""
     SELECT
         c.id AS categoryId,
