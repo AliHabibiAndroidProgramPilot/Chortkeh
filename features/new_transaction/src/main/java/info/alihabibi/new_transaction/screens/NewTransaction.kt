@@ -60,6 +60,7 @@ import info.alihabibi.new_transaction.NewTransactionUiState
 import info.alihabibi.new_transaction.NewTransactionViewModel
 import info.alihabibi.ui.buttons.AppButton
 import info.alihabibi.ui.buttons.AppToggle
+import info.alihabibi.ui.dialogs.AppDialog
 import info.alihabibi.ui.dialogs.ChannelListedBottomSheet
 import info.alihabibi.ui.dialogs.ListedBottomSheet
 import info.alihabibi.ui.dialogs.TimePickerBottomSheetContent
@@ -146,9 +147,14 @@ fun NewTransactionDestination(
             if (editingTransactionId != null) {
                 viewModel.onEvent(NewTransactionUiIntent.EditTransaction(editingTransactionId))
                 onBackPressed()
-            }
-            else
+            } else
                 viewModel.onEvent(NewTransactionUiIntent.SaveTransaction)
+        },
+        onDeleteTransaction = {
+            if (editingTransactionId != null) {
+                viewModel.onEvent(NewTransactionUiIntent.DeleteTransaction(editingTransactionId))
+                onBackPressed()
+            }
         },
         onTransactionTypeChanged = { type ->
             viewModel.onEvent(NewTransactionUiIntent.TransactionTypeChanged(type))
@@ -172,6 +178,7 @@ private fun NewTransactionScreen(
     onCategoriesDelete: (categoriesIdsToDelete: List<Long>) -> Unit = {},
     onEditCategory: (categoryId: Int) -> Unit = {},
     onSaveOrEditTransaction: () -> Unit = {},
+    onDeleteTransaction: () -> Unit = {},
     onAddNewCategory: () -> Unit = {},
     onAddNewChannel: () -> Unit = {},
     onTransactionTypeChanged: (type: TransactionTypeOptionUiModel) -> Unit = {},
@@ -193,7 +200,11 @@ private fun NewTransactionScreen(
             controller = datePickerController,
             sheetState = dateBottomSheetState,
             useInitialDate = isEditingTransaction, // Use Initial Date Only For Transactions That Has A Date, So Dialog Can Open That Date
-            initialDate = Triple(uiState.transactionYear, uiState.transactionMonth, uiState.transactionDay.first),
+            initialDate = Triple(
+                uiState.transactionYear,
+                uiState.transactionMonth,
+                uiState.transactionDay.first
+            ),
             minYear = MinYear.On(1404),
             maxYear = MaxYear.On(1406),
             titleBottomSheet = stringResource(id = R.string.date),
@@ -301,6 +312,18 @@ private fun NewTransactionScreen(
             onDismissRequest = { showChannelsBottomSheet = false },
         )
 
+    var showTransactionDeleteDialog by remember { mutableStateOf(false) }
+    if (showTransactionDeleteDialog)
+        AppDialog(
+            title = stringResource(id = R.string.delete_transaction),
+            message = stringResource(id = R.string.delete_transaction_description),
+            confirmButtonText = stringResource(id = R.string.delete),
+            cancelButtonText = stringResource(id = R.string.cancel),
+            onConfirmClicked = onDeleteTransaction,
+            onCancelClicked = { showTransactionDeleteDialog = false },
+            onDismissRequest = { showTransactionDeleteDialog = false }
+        )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -321,8 +344,9 @@ private fun NewTransactionScreen(
                 else
                     stringResource(id = R.string.register_transaction),
                 windowInsets = TopAppBarDefaults.windowInsets.only(sides = WindowInsetsSides.Top),
-                isActionAvailable = false,
-                onNavigationClicked = onBackPressed
+                actionIcon = painterResource(id = R.drawable.trash),
+                onNavigationClicked = onBackPressed,
+                onActionClicked = { showTransactionDeleteDialog = true }
             )
 
             Spacer(Modifier.height(height = 8.dp))
@@ -358,7 +382,11 @@ private fun NewTransactionScreen(
                     .fillMaxWidth()
                     .height(height = 50.dp)
                     .padding(horizontal = 16.dp)
-                    .border(width = 1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(12.dp))
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.outline,
+                        shape = RoundedCornerShape(12.dp)
+                    )
                     .clip(shape = RoundedCornerShape(12.dp))
                     .clickable { showChannelsBottomSheet = true },
                 verticalAlignment = Alignment.CenterVertically
@@ -378,7 +406,7 @@ private fun NewTransactionScreen(
                     text = if (uiState.transactionChannel != null)
                         uiState.transactionChannel.channelName
                     else {
-                        when(uiState.transactionType) {
+                        when (uiState.transactionType) {
                             TransactionTypeOptionUiModel.OUTCOME -> stringResource(id = R.string.withdraw_from)
                             TransactionTypeOptionUiModel.INCOME -> stringResource(id = R.string.deposit_to)
                         }
@@ -395,7 +423,11 @@ private fun NewTransactionScreen(
                     .fillMaxWidth()
                     .height(height = 50.dp)
                     .padding(horizontal = 16.dp)
-                    .border(width = 1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(12.dp))
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.outline,
+                        shape = RoundedCornerShape(12.dp)
+                    )
                     .clip(shape = RoundedCornerShape(size = 12.dp))
                     .clickable { showCategoryBottomSheet = true },
                 verticalAlignment = Alignment.CenterVertically
@@ -428,7 +460,11 @@ private fun NewTransactionScreen(
                     .fillMaxWidth()
                     .height(height = 50.dp)
                     .padding(horizontal = 16.dp)
-                    .border(width = 1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(size = 12.dp))
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.outline,
+                        shape = RoundedCornerShape(size = 12.dp)
+                    )
                     .clip(shape = RoundedCornerShape(size = 12.dp))
                     .clickable {
                         scope.launch { dateBottomSheetState.show() }
@@ -460,7 +496,11 @@ private fun NewTransactionScreen(
                     .fillMaxWidth()
                     .height(height = 50.dp)
                     .padding(horizontal = 16.dp)
-                    .border(width = 1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(size = 12.dp))
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.outline,
+                        shape = RoundedCornerShape(size = 12.dp)
+                    )
                     .clip(shape = RoundedCornerShape(size = 12.dp))
                     .clickable {
                         scope.launch { timeBottomSheetState.show() }

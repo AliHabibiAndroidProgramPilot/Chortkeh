@@ -91,6 +91,8 @@ class NewTransactionViewModel(
 
             is NewTransactionUiIntent.EditTransaction -> editTransaction(event.id)
 
+            is NewTransactionUiIntent.DeleteTransaction -> deleteTransaction(event.id)
+
             is NewTransactionUiIntent.PriceChanged -> changePrice(event.price)
 
             is NewTransactionUiIntent.DateChanged -> changeDate(event.year, event.month, event.day)
@@ -226,6 +228,19 @@ class NewTransactionViewModel(
                 state.transactionType == TransactionTypeOptionUiModel.INCOME
             )
             transactionUseCases.updateTransactionUseCase.invoke(transaction)
+        }
+    }
+
+    private fun deleteTransaction(transactionId: Long) {
+        viewModelScope.launch {
+            val transactionSnapshot =
+                transactionUseCases.getTransactionByIdUseCase.invoke(transactionId).toUiModel(false)
+            transactionSnapshot.channel?.let { channel ->
+                val oldAmount = transactionSnapshot.amount.toLongOrNull() ?: 0L
+                val oldIsIncome = transactionSnapshot.type == TransactionTypeOptionUiModel.INCOME
+                channelsUseCase.updateChannelBalanceUseCase.invoke(channel.id, oldAmount,!oldIsIncome)
+            }
+            transactionUseCases.deleteTransactionUseCase.invoke(transactionId)
         }
     }
 
@@ -370,6 +385,8 @@ sealed interface NewTransactionUiIntent {
     data class EditCategory(val id: Int) : NewTransactionUiIntent
 
     data class EditTransaction(val id: Long) : NewTransactionUiIntent
+
+    data class DeleteTransaction(val id: Long) : NewTransactionUiIntent
 
     data class PriceChanged(val price: String) : NewTransactionUiIntent
 
