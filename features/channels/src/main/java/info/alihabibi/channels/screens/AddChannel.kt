@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -98,7 +99,9 @@ private fun AddNewChannelScreen(
     ) {
 
         Column(
-            modifier = Modifier.weight(weight = 1f),
+            modifier = Modifier
+                .widthIn(max = 600.dp)
+                .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
@@ -217,6 +220,7 @@ private fun AddNewChannelScreen(
 
             AppButton(
                 modifier = Modifier
+                    .widthIn(max = 400.dp)
                     .fillMaxWidth(fraction = 0.9f)
                     .padding(bottom = 12.dp),
                 onClick = onSaveChannel,

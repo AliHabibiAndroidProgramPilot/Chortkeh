@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Icon
@@ -71,34 +72,44 @@ private fun ChannelsListScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        AppHeader(
-            title = stringResource(id = R.string.input_channels),
-            isActionAvailable = false,
-            onNavigationClicked = onBackPressed
-        )
-
-        if (channels.isEmpty())
-            EmptyChannelState(
-                modifier = Modifier
-                    .weight(weight = 1f)
-                    .fillMaxWidth()
-            )
-        else
-            ChannelsListContent(
-                modifier = Modifier
-                    .weight(weight = 1f)
-                    .fillMaxWidth(),
-                channels = channels,
-                onChannelItemClicked = onEditChannel
-            )
-
-        AppButton(
+        Column(
             modifier = Modifier
-                .fillMaxWidth(fraction = 0.9f)
-                .padding(bottom = 16.dp),
-            onClick = onAddNewChannel,
-            text = stringResource(id = R.string.add_new_channel)
-        )
+                .widthIn(max = 700.dp)
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            AppHeader(
+                title = stringResource(id = R.string.input_channels),
+                isActionAvailable = false,
+                onNavigationClicked = onBackPressed
+            )
+
+            if (channels.isEmpty())
+                EmptyChannelState(
+                    modifier = Modifier
+                        .weight(weight = 1f)
+                        .fillMaxWidth()
+                )
+            else
+                ChannelsListContent(
+                    modifier = Modifier
+                        .weight(weight = 1f)
+                        .fillMaxWidth(),
+                    channels = channels,
+                    onChannelItemClicked = onEditChannel
+                )
+
+            AppButton(
+                modifier = Modifier
+                    .widthIn(max = 400.dp)
+                    .fillMaxWidth(fraction = 0.9f)
+                    .padding(bottom = 16.dp),
+                onClick = onAddNewChannel,
+                text = stringResource(id = R.string.add_new_channel)
+            )
+
+        }
 
     }
 

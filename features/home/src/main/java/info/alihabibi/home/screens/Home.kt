@@ -28,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.VerticalDivider
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastMapIndexed
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.window.core.layout.WindowWidthSizeClass
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
@@ -144,345 +146,405 @@ private fun HomeScreen(
             }
         )
 
+    val windowAdaptiveInfo = currentWindowAdaptiveInfoV2()
+    val isCompact = !windowAdaptiveInfo.windowSizeClass.isWidthAtLeastBreakpoint(widthDpBreakpoint = 600)
+
     val scrollState = rememberScrollState()
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(state = scrollState),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
 
-        HomePageHeader(
-            isBadgeAvailable = false,
-            onNavigationClick = onAnnouncements
-        )
-
-        Row(
+    if (isCompact) {
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+                .fillMaxSize()
+                .verticalScroll(state = scrollState),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            AppOutlinedButton(
-                modifier = Modifier.width(width = 135.dp),
-                onClick = { showChannelsBottomSheet = true },
-                text = stringResource(id = R.string.all_accounts),
-                startIcon = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.short_arrow_down),
-                        contentDescription = null,
-                        tint = Primary
-                    )
-                }
+            HomePageHeader(
+                isBadgeAvailable = false,
+                onNavigationClick = onAnnouncements
             )
 
-            Text(
-                text = "${stringResource(id = R.string.bookkeeping)} ${uiState.persianMonthName}",
-                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp),
-                overflow = TextOverflow.Ellipsis
+            AccountSelectorRow(
+                uiState = uiState,
+                onShowChannels = { showChannelsBottomSheet = true }
             )
 
-        }
+            Spacer(modifier = Modifier.height(height = 16.dp))
 
-        Spacer(modifier = Modifier.height(height = 16.dp))
+            GaugeChartCard(uiState = uiState)
 
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            shape = RoundedCornerShape(topStartPercent = 6, topEndPercent = 6),
-            border = BorderStroke(width = 1.4.dp, color = NeutralGray),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)
-        ) {
+            GaugeSummaryCard(uiState = uiState)
 
-            GaugeChart(
-                modifier = Modifier
-                    .size(size = 230.dp)
-                    .align(alignment = Alignment.CenterHorizontally)
-                    .padding(top = 12.dp),
-                progress = uiState.gaugeChartProgress,
-                textStyle = MaterialTheme.typography.bodyLarge.copy(
-                    color = MaterialTheme.colorScheme.onSurface,
-                    textAlign = TextAlign.Center,
-                    textDirection = TextDirection.Ltr
-                ),
-                data = GaugeChartData(
-                    totalIncome = uiState.monthTotalIncome.ifEmpty { "0" },
-                    remainedBalance = uiState.remainedBalance.ifEmpty { "0" },
-                    bottomMessage = when(uiState.gaugeChartState) {
-                        GaugeChartState.EMPTY -> stringResource(id = R.string.empty_balance_state)
-                        GaugeChartState.GREEN -> stringResource(id = R.string.good_balance_state)
-                        GaugeChartState.RED -> stringResource(id = R.string.bad_balance_state)
-                    },
-                    iconResId = when(uiState.gaugeChartState) {
-                        GaugeChartState.EMPTY, GaugeChartState.RED -> R.drawable.warnign_red_2
-                        GaugeChartState.GREEN -> R.drawable.green_tick
-                    }
-                )
+            Spacer(modifier = Modifier.height(height = 16.dp))
+
+            AppFeaturesRow()
+
+            Spacer(modifier = Modifier.height(height = 16.dp))
+
+            PieChartSection(uiState = uiState)
+
+            Spacer(modifier = Modifier.height(height = 16.dp))
+
+            LastTransactionsSection(
+                uiState = uiState,
+                onTransactionsList = onTransactionsList
             )
 
         }
-
-        Card(
+    } else {
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            shape = RoundedCornerShape(bottomStartPercent = 8, bottomEndPercent = 8),
-            border = BorderStroke(width = 1.4.dp, color = NeutralGray),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)
+                .fillMaxSize()
+                .verticalScroll(state = scrollState),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
+            HomePageHeader(
+                isBadgeAvailable = false,
+                onNavigationClick = onAnnouncements
+            )
 
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 12.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
 
+                // Left Column: Account selector & gauge chart dashboard
                 Column(
-                    modifier = Modifier.weight(weight = 1f),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Top
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    AccountSelectorRow(
+                        uiState = uiState,
+                        onShowChannels = { showChannelsBottomSheet = true }
+                    )
 
-                        Text(
-                            text = stringResource(id = R.string.outcome2),
-                            style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp)
-                        )
+                    Spacer(modifier = Modifier.height(height = 16.dp))
 
-                        Spacer(modifier = Modifier.padding(horizontal = 3.dp))
+                    GaugeChartCard(uiState = uiState)
 
-                        Icon(
-                            modifier = Modifier.size(size = 24.dp),
-                            painter = painterResource(id = R.drawable.card_send),
-                            contentDescription = null,
-                            tint = Color.Unspecified
-                        )
-
-                    }
-
-                    Spacer(modifier = Modifier.padding(vertical = 4.dp))
-
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-
-                        Text(
-                            text = stringResource(id = R.string.toman),
-                            style = MaterialTheme.typography.bodyLarge.copy(
-                                color = Gray8,
-                                fontSize = 16.sp
-                            )
-                        )
-
-                        Spacer(modifier = Modifier.padding(horizontal = 3.dp))
-
-                        Text(
-                            text = uiState.monthTotalExpenses.ifEmpty { "0" },
-                            style = MaterialTheme.typography.labelLarge.copy(fontSize = 14.sp)
-                        )
-
-                    }
+                    GaugeSummaryCard(uiState = uiState)
 
                 }
 
-                VerticalDivider(
-                    modifier = Modifier.height(32.dp),
-                    thickness = 1.dp,
-                    color = NeutralGray
-                )
-
+                // Right Column: App features, pie chart, and last transactions
                 Column(
-                    modifier = Modifier.weight(weight = 1f),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Top
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    AppFeaturesRow()
 
-                        Text(
-                            text = stringResource(id = R.string.income2),
-                            style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp)
-                        )
+                    Spacer(modifier = Modifier.height(height = 16.dp))
 
-                        Spacer(modifier = Modifier.padding(horizontal = 3.dp))
+                    PieChartSection(uiState = uiState)
 
-                        Icon(
-                            modifier = Modifier.size(size = 24.dp),
-                            painter = painterResource(id = R.drawable.card_receive),
-                            contentDescription = null,
-                            tint = Color.Unspecified
-                        )
+                    Spacer(modifier = Modifier.height(height = 16.dp))
 
-                    }
-
-                    Spacer(modifier = Modifier.padding(vertical = 4.dp))
-
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-
-                        Text(
-                            text = stringResource(id = R.string.toman),
-                            style = MaterialTheme.typography.bodyLarge.copy(
-                                color = Gray8,
-                                fontSize = 16.sp
-                            )
-                        )
-
-                        Spacer(modifier = Modifier.padding(horizontal = 3.dp))
-
-                        Text(
-                            text = uiState.monthTotalIncome.ifEmpty { "0" },
-                            style = MaterialTheme.typography.labelLarge.copy(fontSize = 14.sp)
-                        )
-
-                    }
+                    LastTransactionsSection(
+                        uiState = uiState,
+                        onTransactionsList = onTransactionsList
+                    )
 
                 }
 
             }
 
         }
+    }
 
-        Spacer(modifier = Modifier.height(height = 16.dp))
+}
+
+@Composable
+private fun AccountSelectorRow(
+    uiState: HomeUiState,
+    onShowChannels: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+
+        AppOutlinedButton(
+            modifier = Modifier.width(width = 135.dp),
+            onClick = onShowChannels,
+            text = stringResource(id = R.string.all_accounts),
+            startIcon = {
+                Icon(
+                    painter = painterResource(id = R.drawable.short_arrow_down),
+                    contentDescription = null,
+                    tint = Primary
+                )
+            }
+        )
+
+        Text(
+            text = "${stringResource(id = R.string.bookkeeping)} ${uiState.persianMonthName}",
+            style = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp),
+            overflow = TextOverflow.Ellipsis
+        )
+
+    }
+}
+
+@Composable
+private fun GaugeChartCard(uiState: HomeUiState) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        shape = RoundedCornerShape(topStartPercent = 6, topEndPercent = 6),
+        border = BorderStroke(width = 1.4.dp, color = NeutralGray),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)
+    ) {
+
+        GaugeChart(
+            modifier = Modifier
+                .size(size = 230.dp)
+                .align(alignment = Alignment.CenterHorizontally)
+                .padding(top = 12.dp),
+            progress = uiState.gaugeChartProgress,
+            textStyle = MaterialTheme.typography.bodyLarge.copy(
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Center,
+                textDirection = TextDirection.Ltr
+            ),
+            data = GaugeChartData(
+                totalIncome = uiState.monthTotalIncome.ifEmpty { "0" },
+                remainedBalance = uiState.remainedBalance.ifEmpty { "0" },
+                bottomMessage = when(uiState.gaugeChartState) {
+                    GaugeChartState.EMPTY -> stringResource(id = R.string.empty_balance_state)
+                    GaugeChartState.GREEN -> stringResource(id = R.string.good_balance_state)
+                    GaugeChartState.RED -> stringResource(id = R.string.bad_balance_state)
+                },
+                iconResId = when(uiState.gaugeChartState) {
+                    GaugeChartState.EMPTY, GaugeChartState.RED -> R.drawable.warnign_red_2
+                    GaugeChartState.GREEN -> R.drawable.green_tick
+                }
+            )
+        )
+
+    }
+}
+
+@Composable
+private fun GaugeSummaryCard(uiState: HomeUiState) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        shape = RoundedCornerShape(bottomStartPercent = 8, bottomEndPercent = 8),
+        border = BorderStroke(width = 1.4.dp, color = NeutralGray),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)
+    ) {
 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .padding(vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            AppFeatures.appFeatures.forEachIndexed { index, item ->
-                AppFeatureBotton(
-                    modifier = Modifier
-                        .weight(weight = 1f)
-                        .align(Alignment.CenterVertically)
-                        .padding(
-                            start = when (index) {
-                                1, 2 -> 4.dp
-                                else -> 0.dp
-                            }
-                        )
-                        .width(width = 175.dp)
-                        .height(height = 140.dp),
-                    iconResId = item.iconResId,
-                    title = stringResource(id = item.title),
-                    subtitle = stringResource(id = item.subTitle),
-                    isEnabled = item.isEnabled
-                )
-            }
-
-        }
-
-        Spacer(modifier = Modifier.height(height = 16.dp))
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-        ) {
-
             Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
+                modifier = Modifier.weight(weight = 1f),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top
             ) {
 
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = "${stringResource(id = R.string.last_actions)} ${uiState.persianMonthName}",
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        fontSize = 18.sp,
-                        textAlign = TextAlign.Right
-                    ),
-                    overflow = TextOverflow.Ellipsis
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
 
-                Spacer(modifier = Modifier.height(height = 8.dp))
-
-                if (!uiState.hasOutcomeTransaction)
-                    Image(
-                        modifier = Modifier
-                            .size(width = 154.dp, height = 184.dp)
-                            .padding(top = 24.dp, bottom = 40.dp),
-                        painter = painterResource(id = R.drawable.empty_transaction),
-                        contentDescription = null,
-                        contentScale = ContentScale.FillBounds
+                    Text(
+                        text = stringResource(id = R.string.outcome2),
+                        style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp)
                     )
-                else
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(percent = 8),
-                        border = BorderStroke(width = 1.5.dp, color = NeutralGray),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-                    ) {
 
-                        val data = remember(key1 = uiState.expensesByCategories) {
-                            val colorsList = AndroidUtils.generateDistinctColors(uiState.expensesByCategories.size)
-                            uiState.expensesByCategories.fastMapIndexed { index, category ->
-                                PieChartData(
-                                    category.categoryTitle,
-                                    category.totalAmount,
-                                    colorsList[index]
-                                )
-                            }
-                        }
+                    Spacer(modifier = Modifier.padding(horizontal = 3.dp))
 
-                        AppPieChart(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(all = 8.dp),
-                            segments = data
+                    Icon(
+                        modifier = Modifier.size(size = 24.dp),
+                        painter = painterResource(id = R.drawable.card_send),
+                        contentDescription = null,
+                        tint = Color.Unspecified
+                    )
+
+                }
+
+                Spacer(modifier = Modifier.padding(vertical = 4.dp))
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+
+                    Text(
+                        text = stringResource(id = R.string.toman),
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            color = Gray8,
+                            fontSize = 16.sp
                         )
+                    )
 
-                    }
+                    Spacer(modifier = Modifier.padding(horizontal = 3.dp))
+
+                    Text(
+                        text = uiState.monthTotalExpenses.ifEmpty { "0" },
+                        style = MaterialTheme.typography.labelLarge.copy(fontSize = 14.sp)
+                    )
+
+                }
+
+            }
+
+            VerticalDivider(
+                modifier = Modifier.height(32.dp),
+                thickness = 1.dp,
+                color = NeutralGray
+            )
+
+            Column(
+                modifier = Modifier.weight(weight = 1f),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top
+            ) {
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+
+                    Text(
+                        text = stringResource(id = R.string.income2),
+                        style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp)
+                    )
+
+                    Spacer(modifier = Modifier.padding(horizontal = 3.dp))
+
+                    Icon(
+                        modifier = Modifier.size(size = 24.dp),
+                        painter = painterResource(id = R.drawable.card_receive),
+                        contentDescription = null,
+                        tint = Color.Unspecified
+                    )
+
+                }
+
+                Spacer(modifier = Modifier.padding(vertical = 4.dp))
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+
+                    Text(
+                        text = stringResource(id = R.string.toman),
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            color = Gray8,
+                            fontSize = 16.sp
+                        )
+                    )
+
+                    Spacer(modifier = Modifier.padding(horizontal = 3.dp))
+
+                    Text(
+                        text = uiState.monthTotalIncome.ifEmpty { "0" },
+                        style = MaterialTheme.typography.labelLarge.copy(fontSize = 14.sp)
+                    )
+
+                }
 
             }
 
         }
 
-        Spacer(modifier = Modifier.height(height = 16.dp))
+    }
+}
+
+@Composable
+private fun AppFeaturesRow(modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        AppFeatures.appFeatures.forEachIndexed { index, item ->
+            AppFeatureBotton(
+                modifier = Modifier
+                    .weight(weight = 1f)
+                    .align(Alignment.CenterVertically)
+                    .padding(
+                        start = when (index) {
+                            1, 2 -> 4.dp
+                            else -> 0.dp
+                        }
+                    )
+                    .height(height = 140.dp),
+                iconResId = item.iconResId,
+                title = stringResource(id = item.title),
+                subtitle = stringResource(id = item.subTitle),
+                isEnabled = item.isEnabled
+            )
+        }
+
+    }
+}
+
+@Composable
+private fun PieChartSection(uiState: HomeUiState) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+    ) {
 
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 32.dp),
+            modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            val lastTransactions = uiState.lastTransactions
-            repeat(lastTransactions.size) { index ->
-                TransactionItem(
-                    title = lastTransactions[index].category?.title.orEmpty(),
-                    transactionAmount = lastTransactions[index].amount,
-                    subTitle = PersianDateFormatter.format(
-                        lastTransactions[index].year,
-                        lastTransactions[index].month,
-                        lastTransactions[index].dayOfWeekName,
-                        lastTransactions[index].day,
-                        lastTransactions[index].time
-                    ),
-                    iconResId = lastTransactions[index].category?.icon?.iconResId ?: R.drawable.category_ic_others
-                )
-            }
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = "${stringResource(id = R.string.last_actions)} ${uiState.persianMonthName}",
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontSize = 18.sp,
+                    textAlign = TextAlign.Right
+                ),
+                overflow = TextOverflow.Ellipsis
+            )
 
-            if (uiState.hasTransaction)
-                TextButton(
+            Spacer(modifier = Modifier.height(height = 8.dp))
+
+            if (!uiState.hasOutcomeTransaction)
+                Image(
                     modifier = Modifier
-                        .fillMaxWidth(fraction = 0.7f)
-                        .padding(vertical = 8.dp),
-                    onClick = onTransactionsList,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Transparent,
-                        contentColor = MaterialTheme.colorScheme.secondary
-                    )
+                        .size(width = 154.dp, height = 184.dp)
+                        .padding(top = 24.dp, bottom = 40.dp),
+                    painter = painterResource(id = R.drawable.empty_transaction),
+                    contentDescription = null,
+                    contentScale = ContentScale.FillBounds
+                )
+            else
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(percent = 8),
+                    border = BorderStroke(width = 1.5.dp, color = NeutralGray),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                 ) {
 
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = stringResource(id = R.string.all_transactions),
-                        style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center)
+                    val data = remember(key1 = uiState.expensesByCategories) {
+                        val colorsList = AndroidUtils.generateDistinctColors(uiState.expensesByCategories.size)
+                        uiState.expensesByCategories.fastMapIndexed { index, category ->
+                            PieChartData(
+                                category.categoryTitle,
+                                category.totalAmount,
+                                colorsList[index]
+                            )
+                        }
+                    }
+
+                    AppPieChart(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(all = 8.dp),
+                        segments = data
                     )
 
                 }
@@ -490,7 +552,57 @@ private fun HomeScreen(
         }
 
     }
+}
 
+@Composable
+private fun LastTransactionsSection(
+    uiState: HomeUiState,
+    onTransactionsList: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        val lastTransactions = uiState.lastTransactions
+        repeat(lastTransactions.size) { index ->
+            TransactionItem(
+                title = lastTransactions[index].category?.title.orEmpty(),
+                transactionAmount = lastTransactions[index].amount,
+                subTitle = PersianDateFormatter.format(
+                    lastTransactions[index].year,
+                    lastTransactions[index].month,
+                    lastTransactions[index].dayOfWeekName,
+                    lastTransactions[index].day,
+                    lastTransactions[index].time
+                ),
+                iconResId = lastTransactions[index].category?.icon?.iconResId ?: R.drawable.category_ic_others
+            )
+        }
+
+        if (uiState.hasTransaction)
+            TextButton(
+                modifier = Modifier
+                    .fillMaxWidth(fraction = 0.7f)
+                    .padding(vertical = 8.dp),
+                onClick = onTransactionsList,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Transparent,
+                    contentColor = MaterialTheme.colorScheme.secondary
+                )
+            ) {
+
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = stringResource(id = R.string.all_transactions),
+                    style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center)
+                )
+
+            }
+
+    }
 }
 
 @Preview(showBackground = true, showSystemUi = true)

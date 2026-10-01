@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -108,107 +109,116 @@ private fun PrivacyAndPolicyScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        AppHeader(
-            title = stringResource(id = R.string.privacy_policy),
-            isActionAvailable = false,
-            onNavigationClicked = onBackPressed
-        )
-
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
+                .widthIn(max = 600.dp)
+                .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            Row(
+            AppHeader(
+                title = stringResource(id = R.string.privacy_policy),
+                isActionAvailable = false,
+                onNavigationClicked = onBackPressed
+            )
+
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 4.dp)
-                    .clip(shape = RoundedCornerShape(20))
-                    .clickable {
-                        showSmsPermissionDialog = true
-                    },
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                    .weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                Switch(
-                    checked = smsPermissionsState.allPermissionsGranted,
-                    onCheckedChange = {
-                        showSmsPermissionDialog = true
-                    },
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = White,
-                        uncheckedThumbColor = White,
-                        checkedTrackColor = Primary,
-                        uncheckedTrackColor = Gray5,
-                        uncheckedBorderColor = Gray5
-                    )
-                )
-
-                Text(
+                Row(
                     modifier = Modifier
-                        .weight(1f)
-                        .padding(start = 4.dp, end = 8.dp),
-                    text = stringResource(id = R.string.sms_access),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        textAlign = TextAlign.Start,
-                        fontSize = 16.sp
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 4.dp)
+                        .clip(shape = RoundedCornerShape(20))
+                        .clickable {
+                            showSmsPermissionDialog = true
+                        },
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+
+                    Switch(
+                        checked = smsPermissionsState.allPermissionsGranted,
+                        onCheckedChange = {
+                            showSmsPermissionDialog = true
+                        },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = White,
+                            uncheckedThumbColor = White,
+                            checkedTrackColor = Primary,
+                            uncheckedTrackColor = Gray5,
+                            uncheckedBorderColor = Gray5
+                        )
                     )
-                )
 
-                Icon(
-                    painter = painterResource(id = R.drawable.sms),
-                    contentDescription = null,
-                    tint = Gray9
-                )
-
-            }
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 4.dp)
-                    .clip(shape = RoundedCornerShape(20))
-                    .clickable(enabled = false) {}
-                    .alpha(alpha = 0.45f),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-
-                Switch(
-                    checked = false,
-                    onCheckedChange = {},
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = White,
-                        uncheckedThumbColor = White,
-                        checkedTrackColor = Primary,
-                        uncheckedTrackColor = Gray5,
-                        uncheckedBorderColor = Gray5
+                    Text(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(start = 4.dp, end = 8.dp),
+                        text = stringResource(id = R.string.sms_access),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            textAlign = TextAlign.Start,
+                            fontSize = 16.sp
+                        )
                     )
-                )
 
-                Text(
+                    Icon(
+                        painter = painterResource(id = R.drawable.sms),
+                        contentDescription = null,
+                        tint = Gray9
+                    )
+
+                }
+
+                Row(
                     modifier = Modifier
-                        .weight(1f)
-                        .padding(start = 4.dp, end = 8.dp),
-                    text = stringResource(id = R.string.enter_with_biometrics),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        textAlign = TextAlign.Start,
-                        fontSize = 16.sp
-                    )
-                )
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 4.dp)
+                        .clip(shape = RoundedCornerShape(20))
+                        .clickable(enabled = false) {}
+                        .alpha(alpha = 0.45f),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
 
-                Icon(
-                    painter = painterResource(id = R.drawable.finger_print),
-                    contentDescription = null,
-                    tint = Gray9
-                )
+                    Switch(
+                        checked = false,
+                        onCheckedChange = {},
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = White,
+                            uncheckedThumbColor = White,
+                            checkedTrackColor = Primary,
+                            uncheckedTrackColor = Gray5,
+                            uncheckedBorderColor = Gray5
+                        )
+                    )
+
+                    Text(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(start = 4.dp, end = 8.dp),
+                        text = stringResource(id = R.string.enter_with_biometrics),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            textAlign = TextAlign.Start,
+                            fontSize = 16.sp
+                        )
+                    )
+
+                    Icon(
+                        painter = painterResource(id = R.drawable.finger_print),
+                        contentDescription = null,
+                        tint = Gray9
+                    )
+
+                }
 
             }
 

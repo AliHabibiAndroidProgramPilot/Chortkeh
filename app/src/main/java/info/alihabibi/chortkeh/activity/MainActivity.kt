@@ -4,11 +4,14 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -28,6 +31,7 @@ import info.alihabibi.common_android.snackbar.SnackBarController
 import info.alihabibi.designsystem.theme.ChortkehTheme
 import info.alihabibi.new_transaction.NewTransactionGraphRoute
 import info.alihabibi.ui.navigation.AppBottomNavigation
+import info.alihabibi.ui.navigation.AppNavigationRail
 import info.alihabibi.ui.scaffolds.BaseScaffold
 import info.alihabibi.ui.snackbars.AppSnackBar
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -75,42 +79,65 @@ class MainActivity : ComponentActivity() {
                             false -> Home
                         }
 
-                        BaseScaffold(
-                            snackBarHost = {
-                                SnackbarHost(
-                                    modifier = Modifier.padding(bottom = 22.dp),
-                                    hostState = snackBarHostState
-                                ) { data ->
-                                    AppSnackBar(
-                                        description = data.visuals.message,
-                                        isUndoAvailable = data.visuals.actionLabel != null,
-                                        onUndo = { data.performAction() }
-                                    )
-                                }
-                            },
-                            bottomBar = {
-                                if (shouldShowBottomBar)
-                                    AppBottomNavigation(
-                                        currentDestination = currentDestination?.destination,
-                                        items = BottomNavItems.entries.map { it.toUiData() },
-                                        onFabClick = {
-                                            navController.navigate(NewTransactionGraphRoute(null))
-                                        },
-                                        onNavItemClicked = { navItem ->
-                                            navController.navigate(navItem.route) {
-                                                popUpTo(Home) { saveState = true }
-                                                launchSingleTop = true
-                                                restoreState = true
-                                            }
+                        val windowAdaptiveInfo = currentWindowAdaptiveInfoV2()
+                        val isCompact = !windowAdaptiveInfo.windowSizeClass.isWidthAtLeastBreakpoint(widthDpBreakpoint = 600)
+
+                        Row(modifier = Modifier.fillMaxSize()) {
+                            if (shouldShowBottomBar && !isCompact) {
+                                AppNavigationRail(
+                                    currentDestination = currentDestination?.destination,
+                                    items = BottomNavItems.entries.map { it.toUiData() },
+                                    onFabClick = {
+                                        navController.navigate(NewTransactionGraphRoute(null))
+                                    },
+                                    onNavItemClicked = { navItem ->
+                                        navController.navigate(navItem.route) {
+                                            popUpTo(Home) { saveState = true }
+                                            launchSingleTop = true
+                                            restoreState = true
                                         }
-                                    )
+                                    }
+                                )
                             }
-                        ) { innerPadding ->
-                            DemoNavHost(
-                                navController = navController,
-                                modifier = Modifier.padding(paddingValues = innerPadding),
-                                startDestination = startDestination
-                            )
+
+                            BaseScaffold(
+                                modifier = Modifier.weight(1f),
+                                snackBarHost = {
+                                    SnackbarHost(
+                                        modifier = Modifier.padding(bottom = 22.dp),
+                                        hostState = snackBarHostState
+                                    ) { data ->
+                                        AppSnackBar(
+                                            description = data.visuals.message,
+                                            isUndoAvailable = data.visuals.actionLabel != null,
+                                            onUndo = { data.performAction() }
+                                        )
+                                    }
+                                },
+                                bottomBar = {
+                                    if (shouldShowBottomBar && isCompact)
+                                        AppBottomNavigation(
+                                            currentDestination = currentDestination?.destination,
+                                            items = BottomNavItems.entries.map { it.toUiData() },
+                                            onFabClick = {
+                                                navController.navigate(NewTransactionGraphRoute(null))
+                                            },
+                                            onNavItemClicked = { navItem ->
+                                                navController.navigate(navItem.route) {
+                                                    popUpTo(Home) { saveState = true }
+                                                    launchSingleTop = true
+                                                    restoreState = true
+                                                }
+                                            }
+                                        )
+                                }
+                            ) { innerPadding ->
+                                DemoNavHost(
+                                    navController = navController,
+                                    modifier = Modifier.padding(paddingValues = innerPadding),
+                                    startDestination = startDestination
+                                )
+                            }
                         }
                     }
                 }

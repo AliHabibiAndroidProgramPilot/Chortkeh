@@ -18,6 +18,8 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -51,6 +53,59 @@ fun AppBottomNavigation(
         onNavItemClicked = { onNavItemClicked(it) }
     )
 
+}
+
+@Composable
+fun AppNavigationRail(
+    currentDestination: NavDestination?,
+    onFabClick: () -> Unit,
+    items: List<BottomNavItemData>,
+    onNavItemClicked: (BottomNavItemData) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    NavigationRail(
+        modifier = modifier,
+        header = {
+            FloatingActionButton(
+                onClick = onFabClick,
+                containerColor = Primary,
+                contentColor = Color.White,
+                shape = CircleShape
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.plus),
+                    contentDescription = null
+                )
+            }
+        },
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface
+    ) {
+        Spacer(Modifier.height(12.dp))
+        items.forEach { item ->
+            val selected = currentDestination
+                ?.hierarchy
+                ?.any { it.hasRoute(item.route::class) } == true
+            NavigationRailItem(
+                selected = selected,
+                onClick = { onNavItemClicked(item) },
+                icon = {
+                    Icon(
+                        painter = painterResource(id = if (selected) item.enabledIconResId else item.iconResId),
+                        contentDescription = stringResource(id = item.labelResId),
+                        tint = if (selected) Primary else Gray10
+                    )
+                },
+                label = {
+                    Text(
+                        text = stringResource(id = item.labelResId),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = if (selected) Primary else Gray10
+                    )
+                }
+            )
+        }
+    }
 }
 
 @Composable
