@@ -10,7 +10,9 @@ import info.alihabibi.announcements.AnnouncementsDestination
 import info.alihabibi.channels.AddChannel
 import info.alihabibi.channels.ChannelGraphRoute
 import info.alihabibi.channels.channelsGraph
-import info.alihabibi.home.HomeDestination
+import info.alihabibi.home.screens.AllTransactionsDestination
+import info.alihabibi.home.screens.HomeDestination
+import info.alihabibi.new_transaction.NewTransactionGraphRoute
 import info.alihabibi.new_transaction.newTransactionGraph
 import info.alihabibi.onboarding.OnBoardingDestination
 import info.alihabibi.profile.Profile
@@ -25,6 +27,9 @@ object Home
 
 @Serializable
 object Announcements
+
+@Serializable
+object AllTransactions
 
 /** non usable here, should be in its own module with a sub graph here! currently using it as help for Bottom nav bar implementation */
 @Serializable
@@ -74,12 +79,26 @@ fun DemoNavHost(
                 onNewChannel = {
                     navController.navigate(ChannelGraphRoute)
                     navController.navigate(AddChannel)
+                },
+                onTransactionsList = {
+                    navController.navigate(AllTransactions)
                 }
             )
         }
 
         composable<Announcements> {
             AnnouncementsDestination(
+                onBackPressed = {
+                    navController.navigateUp()
+                }
+            )
+        }
+
+        composable<AllTransactions> {
+            AllTransactionsDestination(
+                onEditTransaction = { transactionId ->
+                    navController.navigate(NewTransactionGraphRoute(transactionId))
+                },
                 onBackPressed = {
                     navController.navigateUp()
                 }

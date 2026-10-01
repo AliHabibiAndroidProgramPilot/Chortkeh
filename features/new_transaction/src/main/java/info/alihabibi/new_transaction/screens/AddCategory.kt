@@ -21,7 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,7 +36,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import info.alihabibi.designsystem.R
-import info.alihabibi.designsystem.theme.Gray11
 import info.alihabibi.designsystem.theme.Gray8
 import info.alihabibi.model.ui_model.category.CategoryIconOptionUiModel
 import info.alihabibi.model.ui_model.category.CategoryTypeOptionUiModel
@@ -59,7 +58,7 @@ fun AddCategoryDestination(
 
     val uiState by viewModel.categoryUiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(editingCategoryId) {
+    SideEffect(editingCategoryId) {
         if (editingCategoryId != null)
             viewModel.onEvent(NewTransactionUiIntent.FetchEditingCategory(editingCategoryId))
         else
@@ -144,7 +143,7 @@ private fun AddCategoryScreen(
 
             AppHeader(
                 title = when(isEditingCategory) {
-                    true -> stringResource(id = R.string.update_category)
+                    true -> stringResource(id = R.string.edit_category)
                     false -> stringResource(id = R.string.new_category)
                 },
                 windowInsets = TopAppBarDefaults.windowInsets.only(sides = WindowInsetsSides.Top),
@@ -244,7 +243,7 @@ private fun AddCategoryScreen(
             enabled = uiState.isCategoryRegisterButtonEnabled,
             onClick = onRegisterCategory,
             text = when(isEditingCategory) {
-                true -> stringResource(id = R.string.update_category)
+                true -> stringResource(id = R.string.edit_category)
                 false -> stringResource(id = R.string.register_category)
             }
         )

@@ -1,32 +1,43 @@
 package info.alihabibi.model.mapper
 
+import info.alihabibi.common.Utils
+import info.alihabibi.domain.models.transaction.CategoryTransactionExpenses
 import info.alihabibi.domain.models.transaction.Transaction
 import info.alihabibi.domain.models.transaction.TransactionType
+import info.alihabibi.model.ui_model.transaction.CategoryTransactionExpensesUiModel
 import info.alihabibi.model.ui_model.transaction.TransactionTypeOptionUiModel
 import info.alihabibi.model.ui_model.transaction.TransactionUiModel
 
-fun Transaction.toUiModel(): TransactionUiModel = TransactionUiModel(
+fun Transaction.toUiModel(needsAmountFormat: Boolean = true): TransactionUiModel = TransactionUiModel(
     id = id,
-    transactionTypeOptionUiModel = transactionType.toUiOption(),
-    amount = amount,
-    channel = channel.toUiModel(needsBalanceFormat = false),
-    category = category.toUiModel(),
+    type = transactionType.toUiOption(),
+    amount = if (needsAmountFormat) Utils.decimalFormatterPattern.format(amount) else amount.toString(),
+    channel = channel?.toUiModel(false),
+    category = category?.toUiModel(),
     year = year,
     month = month,
     day = day,
+    dayOfWeekName = dayOfWeekName,
     time = time
 )
 
 fun TransactionUiModel.toDomain(): Transaction = Transaction(
     id = id,
-    transactionType = transactionTypeOptionUiModel.toDomain(),
-    amount = amount,
-    channel = channel.toDomain(),
-    category = category.toDomain(),
+    transactionType = type.toDomain(),
+    amount = amount.toLongOrNull() ?: 0L,
+    channel = channel?.toDomain(),
+    category = category?.toDomain(),
     year = year,
     month = month,
     day = day,
+    dayOfWeekName = dayOfWeekName,
     time = time
+)
+
+fun CategoryTransactionExpenses.toUiOption(): CategoryTransactionExpensesUiModel = CategoryTransactionExpensesUiModel(
+    categoryId = categoryId,
+    categoryTitle = categoryTitle,
+    totalAmount = totalAmount.toFloat()
 )
 
 fun TransactionType.toUiOption(): TransactionTypeOptionUiModel = when(this) {

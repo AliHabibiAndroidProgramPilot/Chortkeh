@@ -25,6 +25,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,10 +44,7 @@ import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.repeatOnLifecycle
 import info.alihabibi.common.Utils
 import info.alihabibi.common_android.snackbar.SnackBarController
 import info.alihabibi.common_android.snackbar.SnackBarEvent
@@ -62,6 +60,7 @@ import info.alihabibi.new_transaction.NewTransactionUiState
 import info.alihabibi.new_transaction.NewTransactionViewModel
 import info.alihabibi.ui.buttons.AppButton
 import info.alihabibi.ui.buttons.AppToggle
+import info.alihabibi.ui.dialogs.AppDialog
 import info.alihabibi.ui.dialogs.ChannelListedBottomSheet
 import info.alihabibi.ui.dialogs.ListedBottomSheet
 import info.alihabibi.ui.dialogs.TimePickerBottomSheetContent
@@ -79,20 +78,22 @@ import java.time.LocalTime
 @Composable
 fun NewTransactionDestination(
     viewModel: NewTransactionViewModel = koinViewModel(),
+    editingTransactionId: Long?,
     onAddNewCategory: () -> Unit = {},
     onAddNewChannel: () -> Unit = {},
     onEditCategory: (categoryId: Int) -> Unit = {},
     onBackPressed: () -> Unit
 ) {
 
+    SideEffect(editingTransactionId) {
+        if (editingTransactionId != null)
+            viewModel.onEvent(NewTransactionUiIntent.FetchEditingTransaction(editingTransactionId))
+    }
+
     val context = LocalContext.current
 
     val uiState by viewModel.newTransactionUiState.collectAsStateWithLifecycle()
     val formattedTransactionDate by viewModel.formattedTransactionDate.collectAsStateWithLifecycle()
-
-    LaunchedEffect(Unit) {
-        viewModel.onEvent(NewTransactionUiIntent.Init)
-    }
 
     val currentOnBackPressed by rememberUpdatedState(onBackPressed)
     val transactionUndoManager: TransactionUndoManager = koinInject()
@@ -119,6 +120,7 @@ fun NewTransactionDestination(
 
     NewTransactionScreen(
         uiState = uiState,
+        isEditingTransaction = editingTransactionId != null,
         formattedTransactionDate = formattedTransactionDate,
         onAddNewCategory = onAddNewCategory,
         onAddNewChannel = onAddNewChannel,
@@ -141,8 +143,18 @@ fun NewTransactionDestination(
         onCategoriesDelete = { categoriesToDelete ->
             viewModel.onEvent(NewTransactionUiIntent.CategoriesDeleted(categoriesToDelete))
         },
-        onSaveTransaction = {
-            viewModel.onEvent(NewTransactionUiIntent.SaveTransaction)
+        onSaveOrEditTransaction = {
+            if (editingTransactionId != null) {
+                viewModel.onEvent(NewTransactionUiIntent.EditTransaction(editingTransactionId))
+                onBackPressed()
+            } else
+                viewModel.onEvent(NewTransactionUiIntent.SaveTransaction)
+        },
+        onDeleteTransaction = {
+            if (editingTransactionId != null) {
+                viewModel.onEvent(NewTransactionUiIntent.DeleteTransaction(editingTransactionId))
+                onBackPressed()
+            }
         },
         onTransactionTypeChanged = { type ->
             viewModel.onEvent(NewTransactionUiIntent.TransactionTypeChanged(type))
@@ -156,15 +168,17 @@ fun NewTransactionDestination(
 @Composable
 private fun NewTransactionScreen(
     uiState: NewTransactionUiState,
+    isEditingTransaction: Boolean,
     formattedTransactionDate: String = "",
     onPriceChanged: (price: String) -> Unit = {},
-    onDateChanged: (year: Int, month: Int, day: Int) -> Unit = { _, _, _ -> },
+    onDateChanged: (year: Int, month: Int, day: Pair<Int, String>) -> Unit = { _, _, _ -> },
     onTimeChange: (hour: Int?, minute: Int?) -> Unit = { _, _ -> },
     onCategoryChanged: (category: CategoryUiModel) -> Unit = {},
     onChannelChanged: (channel: ChannelUiModel) -> Unit = {},
     onCategoriesDelete: (categoriesIdsToDelete: List<Long>) -> Unit = {},
     onEditCategory: (categoryId: Int) -> Unit = {},
-    onSaveTransaction: () -> Unit = {},
+    onSaveOrEditTransaction: () -> Unit = {},
+    onDeleteTransaction: () -> Unit = {},
     onAddNewCategory: () -> Unit = {},
     onAddNewChannel: () -> Unit = {},
     onTransactionTypeChanged: (type: TransactionTypeOptionUiModel) -> Unit = {},
@@ -185,6 +199,12 @@ private fun NewTransactionScreen(
                 .wrapContentHeight(),
             controller = datePickerController,
             sheetState = dateBottomSheetState,
+            useInitialDate = isEditingTransaction, // Use Initial Date Only For Transactions That Has A Date, So Dialog Can Open That Date
+            initialDate = Triple(
+                uiState.transactionYear,
+                uiState.transactionMonth,
+                uiState.transactionDay.first
+            ),
             minYear = MinYear.On(1404),
             maxYear = MaxYear.On(1406),
             titleBottomSheet = stringResource(id = R.string.date),
@@ -214,14 +234,12 @@ private fun NewTransactionScreen(
             onDismissRequest = {
                 scope.launch { dateBottomSheetState.hide() }
             },
-            onDateChanged = { year, month, day ->
-                onDateChanged(year, month, day)
-            },
             onSubmitClick = {
                 val year = datePickerController.getPersianYear()
                 val month = datePickerController.getPersianMonth()
                 val day = datePickerController.getPersianDay()
-                onDateChanged(year, month, day)
+                val dayName = datePickerController.getPersianDayOfWeekName()
+                onDateChanged(year, month, Pair(day, dayName))
             }
         )
 
@@ -294,6 +312,18 @@ private fun NewTransactionScreen(
             onDismissRequest = { showChannelsBottomSheet = false },
         )
 
+    var showTransactionDeleteDialog by remember { mutableStateOf(false) }
+    if (showTransactionDeleteDialog)
+        AppDialog(
+            title = stringResource(id = R.string.delete_transaction),
+            message = stringResource(id = R.string.delete_transaction_description),
+            confirmButtonText = stringResource(id = R.string.delete),
+            cancelButtonText = stringResource(id = R.string.cancel),
+            onConfirmClicked = onDeleteTransaction,
+            onCancelClicked = { showTransactionDeleteDialog = false },
+            onDismissRequest = { showTransactionDeleteDialog = false }
+        )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -309,10 +339,14 @@ private fun NewTransactionScreen(
         ) {
 
             AppHeader(
-                title = stringResource(id = R.string.register_transaction),
+                title = if (isEditingTransaction)
+                    stringResource(id = R.string.edit_transaction)
+                else
+                    stringResource(id = R.string.register_transaction),
                 windowInsets = TopAppBarDefaults.windowInsets.only(sides = WindowInsetsSides.Top),
-                isActionAvailable = false,
-                onNavigationClicked = onBackPressed
+                actionIcon = painterResource(id = R.drawable.trash),
+                onNavigationClicked = onBackPressed,
+                onActionClicked = { showTransactionDeleteDialog = true }
             )
 
             Spacer(Modifier.height(height = 8.dp))
@@ -348,7 +382,11 @@ private fun NewTransactionScreen(
                     .fillMaxWidth()
                     .height(height = 50.dp)
                     .padding(horizontal = 16.dp)
-                    .border(width = 1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(12.dp))
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.outline,
+                        shape = RoundedCornerShape(12.dp)
+                    )
                     .clip(shape = RoundedCornerShape(12.dp))
                     .clickable { showChannelsBottomSheet = true },
                 verticalAlignment = Alignment.CenterVertically
@@ -368,7 +406,7 @@ private fun NewTransactionScreen(
                     text = if (uiState.transactionChannel != null)
                         uiState.transactionChannel.channelName
                     else {
-                        when(uiState.transactionType) {
+                        when (uiState.transactionType) {
                             TransactionTypeOptionUiModel.OUTCOME -> stringResource(id = R.string.withdraw_from)
                             TransactionTypeOptionUiModel.INCOME -> stringResource(id = R.string.deposit_to)
                         }
@@ -385,7 +423,11 @@ private fun NewTransactionScreen(
                     .fillMaxWidth()
                     .height(height = 50.dp)
                     .padding(horizontal = 16.dp)
-                    .border(width = 1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(12.dp))
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.outline,
+                        shape = RoundedCornerShape(12.dp)
+                    )
                     .clip(shape = RoundedCornerShape(size = 12.dp))
                     .clickable { showCategoryBottomSheet = true },
                 verticalAlignment = Alignment.CenterVertically
@@ -418,7 +460,11 @@ private fun NewTransactionScreen(
                     .fillMaxWidth()
                     .height(height = 50.dp)
                     .padding(horizontal = 16.dp)
-                    .border(width = 1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(size = 12.dp))
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.outline,
+                        shape = RoundedCornerShape(size = 12.dp)
+                    )
                     .clip(shape = RoundedCornerShape(size = 12.dp))
                     .clickable {
                         scope.launch { dateBottomSheetState.show() }
@@ -450,7 +496,11 @@ private fun NewTransactionScreen(
                     .fillMaxWidth()
                     .height(height = 50.dp)
                     .padding(horizontal = 16.dp)
-                    .border(width = 1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(size = 12.dp))
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.outline,
+                        shape = RoundedCornerShape(size = 12.dp)
+                    )
                     .clip(shape = RoundedCornerShape(size = 12.dp))
                     .clickable {
                         scope.launch { timeBottomSheetState.show() }
@@ -484,10 +534,12 @@ private fun NewTransactionScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(end = 24.dp, start = 24.dp),
-            onClick = onSaveTransaction,
-            text = when (uiState.transactionType) {
-                TransactionTypeOptionUiModel.OUTCOME -> stringResource(id = R.string.register_outcome_transaction)
-                TransactionTypeOptionUiModel.INCOME -> stringResource(id = R.string.register_income_transaction)
+            onClick = onSaveOrEditTransaction,
+            text = if (isEditingTransaction) stringResource(id = R.string.edit_transaction) else {
+                when (uiState.transactionType) {
+                    TransactionTypeOptionUiModel.OUTCOME -> stringResource(id = R.string.register_outcome_transaction)
+                    TransactionTypeOptionUiModel.INCOME -> stringResource(id = R.string.register_income_transaction)
+                }
             },
             enabled = uiState.isRegisterTransactionButtonEnabled
         )
@@ -502,6 +554,7 @@ private fun NewTransactionPreview() {
 
     NewTransactionScreen(
         uiState = NewTransactionUiState(),
+        isEditingTransaction = false,
         onBackPressed = {}
     )
 

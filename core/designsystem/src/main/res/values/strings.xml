@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     // Components
     <string name="undo">برگردون</string>
@@ -22,6 +22,7 @@
     <string name="reminder">یادآور</string>
     <string name="reports">گزارشات</string>
     <string name="home">خانه</string>
+    <string name="month">ماه</string>
     <string name="user_account_info">اطلاعات حساب کاربری</string>
     <string name="privacy_policy">امنیت و حریم خصوصی</string>
     <string name="currency">واحد پول</string>
@@ -35,11 +36,13 @@
 
     // Home
     <string name="bookkeeping">حساب کتاب</string>
+    <string name="last_actions">فعالیت‌های اخیر</string>
     <string name="all_accounts">همه حساب‌ها</string>
     <string name="input_channels">کانال‌های ورودی</string>
     <string name="budgeting_subtitle">مدیریت مالی</string>
     <string name="piggy_bank_subtitle">ذخیره پس‌انداز</string>
     <string name="stairs_subtitle">هدف‌گذاری مالی</string>
+    <string name="all_transactions">همه تراکنش ها</string>
 
     // On Boarding
     <string name="piggy_bank">قلک</string>
@@ -47,7 +50,7 @@
     <string name="enter_app">ورود به اپلیکیشن</string>
     <string name="budgeting">بودجه بندی</string>
     <string name="budgeting_description">با کیف پول های جدا دیگه نگران دخل و خرجت نباش</string>
-    <string name="stairs">پله پله</string>
+    <string name="stairs" tools:ignore="Typos">پله پله</string>
     <string name="stairs_description">پله هات رو برای رسیدن به آرزو هات بچین</string>
 
     // Otp
@@ -86,7 +89,8 @@
     <string name="transaction_registered">تراکنش با موفقیت ثبت شد</string>
     <string name="register_transaction">ثبت تراکنش</string>
     <string name="register_category">ثبت دسته‌بندی</string>
-    <string name="update_category">ویرایش دسته‌بندی</string>
+    <string name="edit_category">ویرایش دسته‌بندی</string>
+    <string name="edit_transaction">ویرایش تراکنش</string>
     <string name="register_income_transaction">ثبت درآمد</string>
     <string name="register_outcome_transaction">ثبت هزینه</string>
     <string name="price">مبلغ</string>
@@ -110,6 +114,8 @@
     <string name="category_icon">آیکون دسته</string>
     <string name="category_icon2">آیکون دسته‌بندی</string>
     <string name="category_name_error">نام دسته‌بندی نمیتواند بیشتر از 30 کاراکتر باشد</string>
+    <string name="delete_transaction">حذف تراکنش؟</string>
+    <string name="delete_transaction_description">مطمعنی میخوای این تراکنش رو حذف کنی؟</string>
 
     // Channels
     <string name="channels">کانال‌ها</string>

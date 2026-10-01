@@ -12,7 +12,7 @@ import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
 
 @Serializable
-object NewTransactionGraphRoute
+data class NewTransactionGraphRoute(val editingTransactionId: Long? = null)
 
 @Serializable
 object NewTransaction
@@ -32,9 +32,13 @@ fun NavGraphBuilder.newTransactionGraph(
                 navController.getBackStackEntry<NewTransactionGraphRoute>()
             }
             val viewModel: NewTransactionViewModel = koinViewModel(viewModelStoreOwner = parentEntry)
+            val editingTransactionId = remember(parentEntry) {
+                parentEntry.toRoute<NewTransactionGraphRoute>().editingTransactionId
+            }
 
             NewTransactionDestination(
                 viewModel = viewModel,
+                editingTransactionId = editingTransactionId,
                 onAddNewCategory = {
                     navController.navigate(AddCategory(editingCategoryId = null))
                 },
