@@ -48,7 +48,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastMapIndexed
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.window.core.layout.WindowWidthSizeClass
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
@@ -287,7 +286,7 @@ private fun AccountSelectorRow(
         )
 
         Text(
-            text = "${stringResource(id = R.string.bookkeeping)} ${uiState.persianMonthName}",
+            text = "${stringResource(id = R.string.bookkeeping)} ${uiState.persianMonthName}${stringResource(id = R.string.month)}",
             style = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp),
             overflow = TextOverflow.Ellipsis
         )
@@ -509,7 +508,7 @@ private fun PieChartSection(uiState: HomeUiState) {
 
             Text(
                 modifier = Modifier.fillMaxWidth(),
-                text = "${stringResource(id = R.string.last_actions)} ${uiState.persianMonthName}",
+                text = "${stringResource(id = R.string.last_actions)} ${uiState.persianMonthName}${stringResource(id = R.string.month)}",
                 style = MaterialTheme.typography.bodyLarge.copy(
                     fontSize = 18.sp,
                     textAlign = TextAlign.Right
