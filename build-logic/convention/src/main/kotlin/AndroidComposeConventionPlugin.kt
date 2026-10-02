@@ -53,6 +53,10 @@ class AndroidComposeConventionPlugin : Plugin<Project> {
 
             add("implementation", libs.findLibrary("androidx-navigation-compose").get())
 
+            add("implementation", libs.findLibrary("compose-adaptive").get())
+            add("implementation", libs.findLibrary("compose-adaptive-layout").get())
+            add("implementation", libs.findLibrary("compose-adaptive-navigation").get())
+
             add("implementation", libs.findLibrary("androidx-activity-compose").get())
 
             add("implementation", libs.findLibrary("kotlinx-serialization-json").get())

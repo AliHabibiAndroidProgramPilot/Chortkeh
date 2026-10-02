@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
@@ -42,8 +43,8 @@ import kotlin.math.sin
 fun AppPieChart(
     modifier: Modifier = Modifier,
     segments: List<PieChartData>,
-    strokeWidth: Dp = 22.dp,
-    gapWidth: Dp = 5.dp
+    strokeWidth: Dp = 18.dp,
+    gapWidth: Dp = 4.dp
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -175,7 +176,9 @@ private fun LabelItem(segment: PieChartData) {
     ) {
 
         Text(
-            modifier = Modifier.widthIn(min = 12.dp, max = 46.dp),
+            modifier = Modifier
+                .weight(weight = 1f, fill = false)
+                .widthIn(max = 46.dp),
             text = segment.label,
             style = MaterialTheme.typography.labelLarge.copy(
                 color = MaterialTheme.colorScheme.onSurface,
@@ -189,9 +192,8 @@ private fun LabelItem(segment: PieChartData) {
 
         Box(
             modifier = Modifier
-                .size(14.dp)
-                .clip(shape = RoundedCornerShape(size = 2.dp))
-                .background(segment.color)
+                .requiredSize(size = 10.dp)
+                .background(color = segment.color, shape = RoundedCornerShape(size = 2.dp))
         )
 
     }

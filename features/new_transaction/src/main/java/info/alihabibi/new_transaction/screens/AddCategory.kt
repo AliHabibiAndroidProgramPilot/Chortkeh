@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -136,117 +137,127 @@ private fun AddCategoryScreen(
 
         Column(
             modifier = Modifier
-                .weight(weight = 1f)
-                .verticalScroll(state = rememberScrollState()),
+                .widthIn(max = 600.dp)
+                .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            AppHeader(
-                title = when(isEditingCategory) {
-                    true -> stringResource(id = R.string.edit_category)
-                    false -> stringResource(id = R.string.new_category)
-                },
-                windowInsets = TopAppBarDefaults.windowInsets.only(sides = WindowInsetsSides.Top),
-                isActionAvailable = false,
-                onNavigationClicked = onBackPressed
-            )
-
-            Spacer(Modifier.height(height = 8.dp))
-
-            AppTitledTextField(
-                modifier = Modifier.padding(horizontal = 4.dp),
-                title = stringResource(id = R.string.name),
-                text = uiState.categoryName,
-                placeHolderText = stringResource(id = R.string.category_name),
-                error = uiState.categoryName.length >= 30,
-                errorMessage = stringResource(id = R.string.category_name_error),
-                onValueChange = onCategoryNameChanged
-            )
-
-            Spacer(modifier = Modifier.height(height = 16.dp))
-
-            Row(
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(height = 50.dp)
-                    .padding(horizontal = 16.dp)
-                    .border(width = 1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(12.dp))
-                    .clip(shape = RoundedCornerShape(12.dp))
-                    .clickable { showCategoryTypeSelectionModel = true },
-                verticalAlignment = Alignment.CenterVertically
+                    .weight(weight = 1f)
+                    .verticalScroll(state = rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                Icon(
-                    modifier = Modifier.padding(start = 18.dp),
-                    painter = painterResource(id = R.drawable.short_arrow_down),
-                    contentDescription = null,
-                    tint = Gray8
-                )
-
-                Spacer(modifier = Modifier.weight(weight = 1f))
-
-                Text(
-                    modifier = Modifier.padding(horizontal = 12.dp),
-                    text = when {
-                        uiState.categoryType != null -> stringResource(id = uiState.categoryType.labelRes)
-                        else -> stringResource(id = R.string.category_type)
+                AppHeader(
+                    title = when(isEditingCategory) {
+                        true -> stringResource(id = R.string.edit_category)
+                        false -> stringResource(id = R.string.new_category)
                     },
-                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp)
+                    windowInsets = TopAppBarDefaults.windowInsets.only(sides = WindowInsetsSides.Top),
+                    isActionAvailable = false,
+                    onNavigationClicked = onBackPressed
                 )
 
-            }
+                Spacer(Modifier.height(height = 8.dp))
 
-            Spacer(modifier = Modifier.height(height = 16.dp))
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(height = 50.dp)
-                    .padding(horizontal = 16.dp)
-                    .border(width = 1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(12.dp))
-                    .clip(shape = RoundedCornerShape(12.dp))
-                    .clickable { showCategoryIconSelectionModel = true },
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-
-                Icon(
-                    modifier = Modifier.padding(start = 18.dp),
-                    painter = painterResource(id = R.drawable.short_arrow_down),
-                    contentDescription = null,
-                    tint = Gray8
+                AppTitledTextField(
+                    modifier = Modifier.padding(horizontal = 4.dp),
+                    title = stringResource(id = R.string.name),
+                    text = uiState.categoryName,
+                    placeHolderText = stringResource(id = R.string.category_name),
+                    error = uiState.categoryName.length >= 30,
+                    errorMessage = stringResource(id = R.string.category_name_error),
+                    onValueChange = onCategoryNameChanged
                 )
 
-                Spacer(modifier = Modifier.weight(weight = 1f))
+                Spacer(modifier = Modifier.height(height = 16.dp))
 
-                if (uiState.categoryIcon != null)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(height = 50.dp)
+                        .padding(horizontal = 16.dp)
+                        .border(width = 1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(12.dp))
+                        .clip(shape = RoundedCornerShape(12.dp))
+                        .clickable { showCategoryTypeSelectionModel = true },
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
                     Icon(
-                        modifier = Modifier.padding(horizontal = 12.dp),
-                        painter = painterResource(id = uiState.categoryIcon.iconResId),
+                        modifier = Modifier.padding(start = 18.dp),
+                        painter = painterResource(id = R.drawable.short_arrow_down),
                         contentDescription = null,
-                        tint = Color.Unspecified
+                        tint = Gray8
                     )
-                else
+
+                    Spacer(modifier = Modifier.weight(weight = 1f))
+
                     Text(
                         modifier = Modifier.padding(horizontal = 12.dp),
-                        text = stringResource(id = R.string.category_icon),
+                        text = when {
+                            uiState.categoryType != null -> stringResource(id = uiState.categoryType.labelRes)
+                            else -> stringResource(id = R.string.category_type)
+                        },
                         style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp)
                     )
 
+                }
+
+                Spacer(modifier = Modifier.height(height = 16.dp))
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(height = 50.dp)
+                        .padding(horizontal = 16.dp)
+                        .border(width = 1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(12.dp))
+                        .clip(shape = RoundedCornerShape(12.dp))
+                        .clickable { showCategoryIconSelectionModel = true },
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    Icon(
+                        modifier = Modifier.padding(start = 18.dp),
+                        painter = painterResource(id = R.drawable.short_arrow_down),
+                        contentDescription = null,
+                        tint = Gray8
+                    )
+
+                    Spacer(modifier = Modifier.weight(weight = 1f))
+
+                    if (uiState.categoryIcon != null)
+                        Icon(
+                            modifier = Modifier.padding(horizontal = 12.dp),
+                            painter = painterResource(id = uiState.categoryIcon.iconResId),
+                            contentDescription = null,
+                            tint = Color.Unspecified
+                        )
+                    else
+                        Text(
+                            modifier = Modifier.padding(horizontal = 12.dp),
+                            text = stringResource(id = R.string.category_icon),
+                            style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp)
+                        )
+
+                }
+
             }
+
+            AppButton(
+                modifier = Modifier
+                    .widthIn(max = 400.dp)
+                    .fillMaxWidth()
+                    .padding(end = 24.dp, start = 24.dp, bottom = 16.dp),
+                enabled = uiState.isCategoryRegisterButtonEnabled,
+                onClick = onRegisterCategory,
+                text = when(isEditingCategory) {
+                    true -> stringResource(id = R.string.edit_category)
+                    false -> stringResource(id = R.string.register_category)
+                }
+            )
 
         }
-
-        AppButton(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(end = 24.dp, start = 24.dp),
-            enabled = uiState.isCategoryRegisterButtonEnabled,
-            onClick = onRegisterCategory,
-            text = when(isEditingCategory) {
-                true -> stringResource(id = R.string.edit_category)
-                false -> stringResource(id = R.string.register_category)
-            }
-        )
 
     }
 
