@@ -22,7 +22,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,7 +33,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.window.core.layout.WindowWidthSizeClass
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray5
 import info.alihabibi.designsystem.theme.Gray8
@@ -47,8 +46,8 @@ fun OnBoardingDestination(
     viewModel: OnBoardingViewModel = koinViewModel()
 ) {
 
-    val windowAdaptiveInfo = currentWindowAdaptiveInfo()
-    val isWide = windowAdaptiveInfo.windowSizeClass.windowWidthSizeClass != WindowWidthSizeClass.COMPACT
+    val windowAdaptiveInfo = currentWindowAdaptiveInfoV2()
+    val isWide = windowAdaptiveInfo.windowSizeClass.isWidthAtLeastBreakpoint(widthDpBreakpoint = 600)
 
     val pagerContent = providePagerContent(isWide = isWide)
 
