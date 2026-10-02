@@ -105,124 +105,126 @@ private fun AddNewChannelScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            AppHeader(
-                title = stringResource(id = R.string.add_new_channel),
-                isActionAvailable = false,
-                onNavigationClicked = onBackPressed
-            )
+            Column(
+                modifier = Modifier
+                    .weight(weight = 1f)
+                    .verticalScroll(state = rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
 
-            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .height(height = 65.dp)
-                        .border(
-                            width = 1.dp,
-                            color = Gray3,
-                            shape = RoundedCornerShape(size = 12.dp)
-                        ),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                AppHeader(
+                    title = stringResource(id = R.string.add_new_channel),
+                    isActionAvailable = false,
+                    onNavigationClicked = onBackPressed
+                )
 
-                    Text(
-                        modifier = Modifier.padding(start = 12.dp),
-                        text = stringResource(id = R.string.input_channel_type),
-                        style = MaterialTheme.typography.bodyLarge.copy(
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold
+                Spacer(modifier = Modifier.height(height = 8.dp))
+
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .height(height = 65.dp)
+                            .border(
+                                width = 1.dp,
+                                color = Gray3,
+                                shape = RoundedCornerShape(size = 12.dp)
+                            ),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        Text(
+                            modifier = Modifier.padding(start = 12.dp),
+                            text = stringResource(id = R.string.input_channel_type),
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold
+                            )
                         )
-                    )
 
-                    Spacer(modifier = Modifier.width(width = 8.dp))
+                        Spacer(modifier = Modifier.width(width = 8.dp))
 
-                    RadioButton(
-                        modifier = Modifier.scale(scale = 0.8f),
-                        selected = uiState.isBankAccountChannel,
-                        onClick = {
-                            if (!uiState.isBankAccountChannel)
-                                onChannelTypeChange(true)
-                        },
-                        colors = RadioButtonDefaults.colors(
-                            selectedColor = Primary,
-                            unselectedColor = Gray6
+                        RadioButton(
+                            modifier = Modifier.scale(scale = 0.8f),
+                            selected = uiState.isBankAccountChannel,
+                            onClick = {
+                                if (!uiState.isBankAccountChannel)
+                                    onChannelTypeChange(true)
+                            },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = Primary,
+                                unselectedColor = Gray6
+                            )
                         )
-                    )
 
-                    Text(
-                        modifier = Modifier.offset(x = (-12).dp),
-                        text = stringResource(id = R.string.bank_card),
-                        style = MaterialTheme.typography.labelLarge
-                    )
-
-                    RadioButton(
-                        modifier = Modifier.scale(scale = 0.8f),
-                        selected = !uiState.isBankAccountChannel,
-                        onClick = {
-                            if (uiState.isBankAccountChannel)
-                                onChannelTypeChange(false)
-                        },
-                        colors = RadioButtonDefaults.colors(
-                            selectedColor = Primary,
-                            unselectedColor = Gray6
+                        Text(
+                            modifier = Modifier.offset(x = (-12).dp),
+                            text = stringResource(id = R.string.bank_card),
+                            style = MaterialTheme.typography.labelLarge
                         )
-                    )
 
-                    Text(
-                        modifier = Modifier.offset(x = (-12).dp),
-                        text = stringResource(id = R.string.other_source),
-                        style = MaterialTheme.typography.labelLarge
-                    )
+                        RadioButton(
+                            modifier = Modifier.scale(scale = 0.8f),
+                            selected = !uiState.isBankAccountChannel,
+                            onClick = {
+                                if (uiState.isBankAccountChannel)
+                                    onChannelTypeChange(false)
+                            },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = Primary,
+                                unselectedColor = Gray6
+                            )
+                        )
 
+                        Text(
+                            modifier = Modifier.offset(x = (-12).dp),
+                            text = stringResource(id = R.string.other_source),
+                            style = MaterialTheme.typography.labelLarge
+                        )
+
+                    }
 
                 }
 
-            }
+                Spacer(modifier = Modifier.height(height = 12.dp))
 
-            Crossfade(
-                modifier = Modifier
-                    .weight(weight = 1f)
-                    .fillMaxWidth(),
-                targetState = uiState.isBankAccountChannel
-            ) { isBankAccount ->
-                if (isBankAccount)
-                    BankAccountChannelContent(
-                        modifier = Modifier
-                            .weight(weight = 1f)
-                            .fillMaxWidth()
-                            .padding(vertical = 12.dp)
-                            .imePadding()
-                            .verticalScroll(state = rememberScrollState()),
-                        channelName = uiState.channelName,
-                        cardNumber = uiState.cardNumber,
-                        balance = uiState.channelBalance,
-                        iconResId = uiState.channelIcon?.iconResId ?: R.drawable.channel_ic_default,
-                        onChannelNameChange = onChannelNameChanged,
-                        onCardNumberChange = onCardNumberChange,
-                        onInitialBalanceChange = onInitialBalanceChanged
-                    )
-                else
-                    OtherChannelContent(
-                        modifier = Modifier
-                            .weight(weight = 1f)
-                            .fillMaxWidth()
-                            .padding(vertical = 12.dp)
-                            .imePadding()
-                            .verticalScroll(state = rememberScrollState()),
-                        channelName = uiState.channelName,
-                        initialBalance = uiState.channelBalance,
-                        channelSelectedIcon = uiState.channelIcon,
-                        onChannelNameChange = onChannelNameChanged,
-                        onInitialBalanceChange = onInitialBalanceChanged,
-                        onChannelIconChanged = onChannelIconChanged
-                    )
+                Crossfade(
+                    modifier = Modifier.fillMaxWidth(),
+                    targetState = uiState.isBankAccountChannel
+                ) { isBankAccount ->
+                    if (isBankAccount)
+                        BankAccountChannelContent(
+                            modifier = Modifier.fillMaxWidth(),
+                            channelName = uiState.channelName,
+                            cardNumber = uiState.cardNumber,
+                            balance = uiState.channelBalance,
+                            iconResId = uiState.channelIcon?.iconResId ?: R.drawable.channel_ic_default,
+                            onChannelNameChange = onChannelNameChanged,
+                            onCardNumberChange = onCardNumberChange,
+                            onInitialBalanceChange = onInitialBalanceChanged
+                        )
+                    else
+                        OtherChannelContent(
+                            modifier = Modifier.fillMaxWidth(),
+                            channelName = uiState.channelName,
+                            initialBalance = uiState.channelBalance,
+                            channelSelectedIcon = uiState.channelIcon,
+                            onChannelNameChange = onChannelNameChanged,
+                            onInitialBalanceChange = onInitialBalanceChanged,
+                            onChannelIconChanged = onChannelIconChanged
+                        )
+                }
+
+                Spacer(modifier = Modifier.height(height = 16.dp))
+
             }
 
             AppButton(
                 modifier = Modifier
                     .widthIn(max = 400.dp)
                     .fillMaxWidth(fraction = 0.9f)
-                    .padding(bottom = 12.dp),
+                    .padding(bottom = 16.dp, top = 8.dp),
                 onClick = onSaveChannel,
                 text = stringResource(id = R.string.register_channel),
                 enabled = uiState.isChannelRegisterButtonEnabled
