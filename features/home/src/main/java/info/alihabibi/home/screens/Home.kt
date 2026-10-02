@@ -228,6 +228,12 @@ private fun HomeScreen(
 
                     GaugeSummaryCard(uiState = uiState)
 
+                    Spacer(modifier = Modifier.height(height = 16.dp))
+
+                    AppFeaturesRow()
+
+                    Spacer(modifier = Modifier.height(height = 16.dp))
+
                 }
 
                 // Right Column: App features, pie chart, and last transactions
@@ -235,10 +241,6 @@ private fun HomeScreen(
                     modifier = Modifier.weight(1f),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-
-                    AppFeaturesRow()
-
-                    Spacer(modifier = Modifier.height(height = 16.dp))
 
                     PieChartSection(uiState = uiState)
 
@@ -295,6 +297,7 @@ private fun AccountSelectorRow(
 
 @Composable
 private fun GaugeChartCard(uiState: HomeUiState) {
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -331,10 +334,12 @@ private fun GaugeChartCard(uiState: HomeUiState) {
         )
 
     }
+
 }
 
 @Composable
 private fun GaugeSummaryCard(uiState: HomeUiState) {
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -454,6 +459,7 @@ private fun GaugeSummaryCard(uiState: HomeUiState) {
         }
 
     }
+
 }
 
 @Composable
@@ -489,6 +495,7 @@ private fun AppFeaturesRow(modifier: Modifier = Modifier) {
 
 @Composable
 private fun PieChartSection(uiState: HomeUiState) {
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -552,6 +559,7 @@ private fun PieChartSection(uiState: HomeUiState) {
         }
 
     }
+
 }
 
 @Composable

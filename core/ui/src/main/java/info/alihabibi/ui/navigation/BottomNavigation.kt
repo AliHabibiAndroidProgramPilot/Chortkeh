@@ -20,6 +20,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -89,6 +90,7 @@ fun AppNavigationRail(
             NavigationRailItem(
                 selected = selected,
                 onClick = { onNavItemClicked(item) },
+                colors = NavigationRailItemDefaults.colors(indicatorColor = Color.Transparent),
                 icon = {
                     Icon(
                         painter = painterResource(id = if (selected) item.enabledIconResId else item.iconResId),
