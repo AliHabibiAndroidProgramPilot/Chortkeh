@@ -43,6 +43,7 @@
     <string name="piggy_bank_subtitle">ذخیره پس‌انداز</string>
     <string name="stairs_subtitle">هدف‌گذاری مالی</string>
     <string name="all_transactions">همه تراکنش ها</string>
+    <string name="not_available">این بخش هنوز در دسترس نیست</string>
 
     // On Boarding
     <string name="piggy_bank">قلک</string>

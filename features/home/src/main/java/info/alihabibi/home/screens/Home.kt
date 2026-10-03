@@ -33,11 +33,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -53,9 +55,12 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.permissions.rememberPermissionState
 import info.alihabibi.common.PersianDateFormatter
+import info.alihabibi.common.Utils
 import info.alihabibi.common_android.AndroidUtils
 import info.alihabibi.common_android.RequestNotificationPermission
 import info.alihabibi.common_android.RequestSMSPermission
+import info.alihabibi.common_android.snackbar.SnackBarController
+import info.alihabibi.common_android.snackbar.SnackBarEvent
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray8
 import info.alihabibi.designsystem.theme.NeutralGray
@@ -74,6 +79,7 @@ import info.alihabibi.ui.charts.PieChartData
 import info.alihabibi.ui.dialogs.ChannelListedBottomSheet
 import info.alihabibi.ui.headrs.HomePageHeader
 import info.alihabibi.ui.items.TransactionItem
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -85,12 +91,22 @@ fun HomeDestination(
     onTransactionsList: () -> Unit = {}
 ) {
 
+    val content = LocalContext.current
+    val scope = rememberCoroutineScope()
+
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     HomeScreen(
         uiState = uiState,
         onSmsModalShowed = {
             viewModel.onEvent(HomeUiIntent.SaveSmsPermissionModalShownState(value = true))
+        },
+        onAppFeature = {
+            scope.launch {
+                SnackBarController.sendEvent(
+                    SnackBarEvent(Utils.getStringResources(content, R.string.not_available))
+                )
+            }
         },
         onAnnouncements = onAnnouncements,
         onNewChannel = onNewChannel,
@@ -109,7 +125,8 @@ private fun HomeScreen(
     onAnnouncements: () -> Unit = {},
     onNewChannel: () -> Unit = {},
     onChannels: () -> Unit = {},
-    onTransactionsList: () -> Unit = {}
+    onTransactionsList: () -> Unit = {},
+    onAppFeature: () -> Unit = {}
 ) {
 
     val notificationPermission =
@@ -176,7 +193,7 @@ private fun HomeScreen(
 
             Spacer(modifier = Modifier.height(height = 16.dp))
 
-            AppFeaturesRow()
+            AppFeaturesRow(onFeatureClick = onAppFeature)
 
             Spacer(modifier = Modifier.height(height = 16.dp))
 
@@ -229,7 +246,7 @@ private fun HomeScreen(
 
                     Spacer(modifier = Modifier.height(height = 16.dp))
 
-                    AppFeaturesRow()
+                    AppFeaturesRow(onFeatureClick = onAppFeature)
 
                     Spacer(modifier = Modifier.height(height = 16.dp))
 
@@ -462,7 +479,10 @@ private fun GaugeSummaryCard(uiState: HomeUiState) {
 }
 
 @Composable
-private fun AppFeaturesRow(modifier: Modifier = Modifier) {
+private fun AppFeaturesRow(
+    modifier: Modifier = Modifier,
+    onFeatureClick: () -> Unit = {}
+) {
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -485,7 +505,7 @@ private fun AppFeaturesRow(modifier: Modifier = Modifier) {
                 iconResId = item.iconResId,
                 title = stringResource(id = item.title),
                 subtitle = stringResource(id = item.subTitle),
-                isEnabled = item.isEnabled
+                onClick = onFeatureClick
             )
         }
 
