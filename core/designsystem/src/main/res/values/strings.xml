@@ -143,4 +143,8 @@
     </string>
     <string name="delete">حذف کردن</string>
 
+    // Reminders
+    <string name="add_new_reminder">ثبت یادآور جدید</string>
+    <string name="empty_reminder_list_message">هنوز یادآوری ثبت نکردی</string>
+
 </resources>

@@ -17,6 +17,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -35,7 +37,10 @@ import androidx.compose.ui.unit.dp
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.ErrorRed
 import info.alihabibi.designsystem.theme.Gray3
+import info.alihabibi.designsystem.theme.Gray5
 import info.alihabibi.designsystem.theme.Gray8
+import info.alihabibi.designsystem.theme.Primary
+import info.alihabibi.designsystem.theme.White
 
 @Composable
 fun AppSimpleListItem(
@@ -203,6 +208,68 @@ fun ListedChannelItem(
                 contentDescription = null,
                 tint = Color.Unspecified
             )
+
+        }
+
+    }
+
+}
+
+@Composable
+fun ListedReminderItem(
+    title: String,
+    subTitle: String = "",
+    isEnabled: Boolean = true,
+    onCheckedChange: (isChecked: Boolean) -> Unit,
+    onClick: () -> Unit,
+) {
+
+    val shape = RoundedCornerShape(size = 10.dp)
+
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+
+        Row(
+            modifier = Modifier
+                .height(height = 65.dp)
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 4.dp)
+                .border(width = 1.dp, color = MaterialTheme.colorScheme.outlineVariant, shape = shape)
+                .clip(shape = shape)
+                .clickable(onClick = onClick),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.End
+        ) {
+
+            Switch(
+                checked = isEnabled,
+                onCheckedChange = onCheckedChange,
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = White,
+                    uncheckedThumbColor = White,
+                    checkedTrackColor = Primary,
+                    uncheckedTrackColor = Gray5,
+                    uncheckedBorderColor = Gray5
+                )
+            )
+
+            Column(horizontalAlignment = Alignment.End) {
+
+                Text(
+                    modifier = Modifier.padding(end = 10.dp, bottom = 8.dp),
+                    text = title,
+                    style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.End)
+                )
+
+                Text(
+                    modifier = Modifier.padding(end = 10.dp),
+                    text = subTitle,
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        textAlign = TextAlign.End,
+                        color = Gray8
+                    )
+                )
+
+            }
 
         }
 

@@ -1,70 +1,56 @@
-package info.alihabibi.channels.screens
+package info.alihabibi.reminder.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import info.alihabibi.channels.ChannelsUiIntent
-import info.alihabibi.channels.ChannelsViewModel
+import info.alihabibi.common.PersianDateFormatter
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray7
-import info.alihabibi.model.ui_model.channel.ChannelUiModel
+import info.alihabibi.model.ui_model.reminder.ReminderUiModel
+import info.alihabibi.reminder.ReminderViewModel
 import info.alihabibi.ui.buttons.AppButton
 import info.alihabibi.ui.headrs.AppHeader
-import info.alihabibi.ui.items.ListedChannelItem
+import info.alihabibi.ui.items.ListedReminderItem
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun ChannelsListDestination(
-    viewModel: ChannelsViewModel = koinViewModel(),
-    onEditChannel: (channelId: Int) -> Unit = {},
-    onAddNewChannel: () -> Unit = {},
-    onBackPressed: () -> Unit
+fun RemindersListDestination(
+    viewModel: ReminderViewModel = koinViewModel(),
+    onNewReminder: () -> Unit = {}
 ) {
 
-    val channels by viewModel.channels.collectAsStateWithLifecycle()
+    val reminders by viewModel.reminders.collectAsStateWithLifecycle()
 
-    ChannelsListScreen(
-        channels = channels,
-        onEditChannel = { channel ->
-            onEditChannel(channel.id.toInt())
-        },
-        onAddNewChannel = {
-            viewModel.onEvent(ChannelsUiIntent.ResetChannelsDraft)
-            onAddNewChannel()
-        },
-        onBackPressed = onBackPressed
+    RemindersListScreen(
+        reminders = reminders,
+        onNewReminder = onNewReminder
     )
 
 }
 
 @Composable
-private fun ChannelsListScreen(
-    channels: List<ChannelUiModel>,
-    onEditChannel: (channel: ChannelUiModel) -> Unit = {},
-    onAddNewChannel: () -> Unit = {},
-    onBackPressed: () -> Unit
+private fun RemindersListScreen(
+    reminders: List<ReminderUiModel>,
+    onNewReminder: () -> Unit = {}
 ) {
 
     Column(
@@ -80,33 +66,32 @@ private fun ChannelsListScreen(
         ) {
 
             AppHeader(
-                title = stringResource(id = R.string.input_channels),
+                title = stringResource(id = R.string.reminder),
                 isActionAvailable = false,
-                onNavigationClicked = onBackPressed
+                isNavigationAvailable = false
             )
 
-            if (channels.isEmpty())
-                EmptyChannelState(
+            if (reminders.isEmpty())
+                EmptyReminderState(
                     modifier = Modifier
-                        .weight(weight = 1f)
+                        .weight(1f)
                         .fillMaxWidth()
                 )
             else
-                ChannelsListContent(
+                RemindersListContent(
                     modifier = Modifier
                         .weight(weight = 1f)
                         .fillMaxWidth(),
-                    channels = channels,
-                    onChannelItemClicked = onEditChannel
+                    reminders = reminders
                 )
 
             AppButton(
                 modifier = Modifier
                     .widthIn(max = 400.dp)
                     .fillMaxWidth(fraction = 0.9f)
-                    .padding(bottom = 16.dp),
-                onClick = onAddNewChannel,
-                text = stringResource(id = R.string.add_new_channel)
+                    .padding(bottom = 32.dp, top = 8.dp),
+                onClick = onNewReminder,
+                text = stringResource(id = R.string.add_new_reminder)
             )
 
         }
@@ -116,10 +101,10 @@ private fun ChannelsListScreen(
 }
 
 @Composable
-private fun ChannelsListContent(
+private fun RemindersListContent(
     modifier: Modifier = Modifier,
-    channels: List<ChannelUiModel>,
-    onChannelItemClicked: (channel: ChannelUiModel) -> Unit = {}
+    reminders: List<ReminderUiModel>,
+    onReminderClicked: (reminder: ReminderUiModel) -> Unit = {}
 ) {
 
     LazyColumn(
@@ -128,27 +113,22 @@ private fun ChannelsListContent(
     ) {
 
         items(
-            items = channels,
+            items = reminders,
             key = { it.id }
-        ) { channel ->
+        ) { reminder ->
 
-            ListedChannelItem(
-                title = channel.channelName,
-                subTitle = channel.channelBalance,
-                iconResId = channel.icon.iconResId,
-                trailingIcon = {
-
-                    Icon(
-                        modifier = Modifier.padding(start = 16.dp),
-                        painter = painterResource(id = R.drawable.short_arrow_left),
-                        contentDescription = null,
-                        tint = Color.Unspecified
-                    )
-
-                    Spacer(modifier = Modifier.weight(weight = 1f))
-
-                },
-                onClick = { onChannelItemClicked(channel) }
+            ListedReminderItem(
+                title = reminder.title,
+                subTitle = PersianDateFormatter.format(
+                    reminder.year,
+                    reminder.month,
+                    reminder.dayOfWeekName,
+                    reminder.day,
+                    reminder.time
+                ),
+                isEnabled = reminder.isEnabled,
+                onCheckedChange = {},
+                onClick = { onReminderClicked(reminder) }
             )
 
         }
@@ -158,7 +138,7 @@ private fun ChannelsListContent(
 }
 
 @Composable
-private fun EmptyChannelState(modifier: Modifier = Modifier) {
+private fun EmptyReminderState(modifier: Modifier = Modifier) {
 
     Box(
         modifier = modifier,
@@ -172,13 +152,13 @@ private fun EmptyChannelState(modifier: Modifier = Modifier) {
         ) {
 
             Image(
-                painter = painterResource(id = R.drawable.empty_wallet),
+                painter = painterResource(id = R.drawable.empty_reminder),
                 contentDescription = null,
                 contentScale = ContentScale.Fit
             )
 
             Text(
-                text = stringResource(id = R.string.empty_channels_list_message),
+                text = stringResource(id = R.string.empty_reminder_list_message),
                 style = MaterialTheme.typography.labelLarge.copy(color = Gray7)
             )
 

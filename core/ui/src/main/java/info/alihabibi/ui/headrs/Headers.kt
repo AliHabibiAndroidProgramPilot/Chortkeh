@@ -92,6 +92,7 @@ fun AppHeader(
     windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
     actionIcon: Painter = painterResource(id = R.drawable.kebab_menu),
     isActionAvailable: Boolean = true,
+    isNavigationAvailable: Boolean = true,
     onActionClicked: () -> Unit = {},
     onNavigationClicked: () -> Unit = {}
 ) {
@@ -117,14 +118,15 @@ fun AppHeader(
                 }
         },
         actions = {
-            IconButton(
-                onClick = onNavigationClicked
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.arrow_right),
-                    contentDescription = null
-                )
-            }
+            if (isNavigationAvailable)
+                IconButton(
+                    onClick = onNavigationClicked
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.arrow_right),
+                        contentDescription = null
+                    )
+                }
         }
     )
 
