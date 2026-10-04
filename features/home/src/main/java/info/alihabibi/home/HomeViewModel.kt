@@ -108,7 +108,7 @@ class HomeViewModel(
         }
     }
 
-    private fun calculateGaugeChartProgress(totalExpense: Float, totalIncome: Float, ): Float {
+    private fun calculateGaugeChartProgress(totalExpense: Float, totalIncome: Float): Float {
         if (totalIncome == 0.0f && totalExpense == 0.0f) return 0f
         val spendRatio = if (totalIncome > 0f) (totalExpense / totalIncome).coerceIn(0.0f, 2.0f) else 2.0f
         val progress = (spendRatio * 90.0f).coerceIn(0.0f, 180.0f)

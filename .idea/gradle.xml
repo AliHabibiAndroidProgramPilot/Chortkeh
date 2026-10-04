@@ -40,6 +40,7 @@
             <option value="$PROJECT_DIR$/features/new_transaction" />
             <option value="$PROJECT_DIR$/features/onboarding" />
             <option value="$PROJECT_DIR$/features/profile" />
+            <option value="$PROJECT_DIR$/features/reminder" />
           </set>
         </option>
       </GradleProjectSettings>
