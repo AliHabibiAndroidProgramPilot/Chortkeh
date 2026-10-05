@@ -9,13 +9,15 @@ import info.alihabibi.database.converters.ChannelIconConverter
 import info.alihabibi.database.converters.TransactionTypeConverter
 import info.alihabibi.database.dao.CategoryDao
 import info.alihabibi.database.dao.ChannelDao
+import info.alihabibi.database.dao.ReminderDao
 import info.alihabibi.database.dao.TransactionDao
 import info.alihabibi.database.entities.CategoryEntity
 import info.alihabibi.database.entities.ChannelEntity
+import info.alihabibi.database.entities.ReminderEntity
 import info.alihabibi.database.entities.TransactionEntity
 
 @Database(
-    entities = [CategoryEntity::class, ChannelEntity::class, TransactionEntity::class],
+    entities = [CategoryEntity::class, ChannelEntity::class, TransactionEntity::class, ReminderEntity::class],
     version = 1,
     exportSchema = false
 )
@@ -25,10 +27,11 @@ import info.alihabibi.database.entities.TransactionEntity
     ChannelIconConverter::class,
     TransactionTypeConverter::class
 )
-abstract class AppDatabase: RoomDatabase() {
+abstract class AppDatabase : RoomDatabase() {
 
     abstract fun categoryDao(): CategoryDao
     abstract fun channelDao(): ChannelDao
     abstract fun transactionDao(): TransactionDao
+    abstract fun reminderDao(): ReminderDao
 
 }

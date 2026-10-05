@@ -43,10 +43,10 @@ class NewTransactionViewModel(
     val formattedTransactionDate: StateFlow<String> = combine(
         newTransactionUiState.map { it.transactionYear },
         newTransactionUiState.map { it.transactionMonth },
-        newTransactionUiState.map { it.transactionDay }
+        newTransactionUiState.map { it.transactionDay.first }
     ) { year, month, day ->
-        if (year > 0 && month > 0 && day.first > 0)
-            PersianDateFormatter.format(year, month, day.first)
+        if (year > 0 && month > 0 && day > 0)
+            PersianDateFormatter.format(year, month, day)
         else ""
     }.stateIn(
         scope = viewModelScope,
@@ -434,8 +434,8 @@ data class NewTransactionUiState(
 ) {
     val isRegisterTransactionButtonEnabled: Boolean
         get() {
-            return transactionPrice.isNotEmpty() &&
-                    formattedTransactionTime.isNotEmpty() &&
+            return transactionPrice.isNotBlank() &&
+                    formattedTransactionTime.isNotBlank() &&
                     transactionCategory != null &&
                     transactionChannel != null &&
                     transactionYear > 0 &&

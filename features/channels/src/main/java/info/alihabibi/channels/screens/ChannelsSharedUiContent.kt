@@ -175,6 +175,8 @@ internal fun OtherChannelContent(
         AppTitledTextField(
             modifier = Modifier.padding(horizontal = 4.dp),
             text = channelName,
+            error = channelName.length >= 30,
+            errorMessage = stringResource(id = R.string.channel_name_error),
             onValueChange = onChannelNameChange,
             title = stringResource(id = R.string.source_name)
         )

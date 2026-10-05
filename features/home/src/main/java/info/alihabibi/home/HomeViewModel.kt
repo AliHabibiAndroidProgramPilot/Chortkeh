@@ -59,14 +59,14 @@ class HomeViewModel(
             }
         }.launchIn(viewModelScope)
 
-        val year = Utils.getCurrentPersianYear()
-        val month = Utils.getCurrentPersianMonth()
+        val currentDate = Utils.getCurrentPersianDate()
+        val currentMonth = Utils.getCurrentPersianMonth()
         combine(
-            transactionUseCases.getMonthTotalIncomeUseCase.invoke(year, month.second),
-            transactionUseCases.getMonthTotalExpensesUseCase.invoke(year, month.second),
+            transactionUseCases.getMonthTotalIncomeUseCase.invoke(currentDate.first, currentDate.second),
+            transactionUseCases.getMonthTotalExpensesUseCase.invoke(currentDate.first, currentDate.second),
             transactionUseCases.hasTransactionUseCases.invoke(),
             transactionUseCases.hasOutcomeTransactionUseCase.invoke(),
-            transactionUseCases.getMonthExpensesByAllCategoriesUseCase.invoke(year, month.second)
+            transactionUseCases.getMonthExpensesByAllCategoriesUseCase.invoke(currentDate.first, currentDate.second)
         ) { totalIncome, totalExpenses, hasTransaction, hasOutcomeTransaction, categoryTransactionExpenses ->
             val formattedIncome = Utils.decimalFormatterPattern.format(totalIncome)
             val formattedExpenses = Utils.decimalFormatterPattern.format(totalExpenses)
@@ -87,7 +87,7 @@ class HomeViewModel(
                     monthTotalExpenses = formattedExpenses,
                     remainedBalance = formattedRemainedBalance,
                     expensesByCategories = categoryTransactionExpensesUiModel,
-                    persianMonthName = month.first
+                    persianMonthName = currentMonth.first
                 )
             }
         }.launchIn(viewModelScope)

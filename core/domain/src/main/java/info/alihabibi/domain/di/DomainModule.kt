@@ -14,6 +14,8 @@ import info.alihabibi.domain.local.usecases.database.channel.SaveChannelUseCase
 import info.alihabibi.domain.local.usecases.database.channel.UpdateChannelBalanceUseCase
 import info.alihabibi.domain.local.usecases.database.channel.UpdateChannelUseCase
 import info.alihabibi.domain.local.usecases.database.channel.usecase.ChannelUseCases
+import info.alihabibi.domain.local.usecases.database.reminder.SaveReminderUseCase
+import info.alihabibi.domain.local.usecases.database.reminder.usecase.ReminderUseCases
 import info.alihabibi.domain.local.usecases.database.transaction.DeleteTransactionUseCase
 import info.alihabibi.domain.local.usecases.database.transaction.GetAllTransactionsUseCase
 import info.alihabibi.domain.local.usecases.database.transaction.GetLastTransactions
@@ -134,6 +136,18 @@ val domainModule = module {
             getLastTransactions = get(),
             getAllTransactions = get(),
             getTransactionByIdUseCase = get()
+        )
+    }
+
+    // endregion
+
+    // region Reminder
+
+    factory { SaveReminderUseCase(get()) }
+
+    factory {
+        ReminderUseCases(
+            saveReminderUseCases = get()
         )
     }
 

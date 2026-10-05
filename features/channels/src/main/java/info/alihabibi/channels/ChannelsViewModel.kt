@@ -93,7 +93,7 @@ class ChannelsViewModel(
     }
 
     private fun changeChannelName(name: String) {
-        if (name.length < 30)
+        if (name.length <= 30)
             _channelUiState.update { it.copy(channelName = name) }
     }
 

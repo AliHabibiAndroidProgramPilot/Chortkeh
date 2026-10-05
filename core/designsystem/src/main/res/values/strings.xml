@@ -133,6 +133,7 @@
     <string name="channel_icon">آیکون کانال</string>
     <string name="read_sms">خواندن پیامک ها</string>
     <string name="read_sms_description">دریافتی‌ها و پرداختی‌ها مسقیم از پیامک خونده میشه</string>
+    <string name="channel_name_error">نام کانال نمیتواند بیشتر از 30 کاراکتر باشد</string>
     <string name="edit_channel">ویرایش کانال</string>
     <string name="save_changes">ذخیره تغییرات</string>
     <string name="delete_channel">حذف کانال</string>
@@ -145,6 +146,11 @@
 
     // Reminders
     <string name="add_new_reminder">ثبت یادآور جدید</string>
+    <string name="register_reminder">ثبت یادآور</string>
+    <string name="edit_reminder">ویرایش یادآور</string>
+    <string name="reminder_title">عنوان یادآور</string>
+    <string name="register">ثبت</string>
+    <string name="reminder_name_error">نام یادآور نمیتواند بیشتر از 30 کاراکتر باشد</string>
     <string name="empty_reminder_list_message">هنوز یادآوری ثبت نکردی</string>
 
 </resources>

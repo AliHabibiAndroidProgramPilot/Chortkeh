@@ -1,11 +1,10 @@
-package info.alihabibi.model.ui_model.reminder
+package info.alihabibi.domain.models.reminder
 
-data class ReminderUiModel(
+data class Reminder(
     val id: Long = 0L,
     val title: String,
-    val triggerTimeStamp: Long,
     val isEnabled: Boolean,
-    val isPassed: Boolean?,
+    val triggerAtMillis: Long,
     val year: Int,
     val month: Int,
     val day: Int,

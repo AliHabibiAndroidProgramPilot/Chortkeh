@@ -6,6 +6,6 @@ import org.koin.dsl.module
 
 val reminderModule = module {
 
-    viewModel { ReminderViewModel() }
+    viewModel { ReminderViewModel(get()) }
 
 }

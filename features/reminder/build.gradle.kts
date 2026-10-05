@@ -27,4 +27,7 @@ dependencies {
     // ui
     implementation(projects.core.ui)
 
+    // Persian Date Picker
+    implementation(libs.composedatepicker)
+
 }

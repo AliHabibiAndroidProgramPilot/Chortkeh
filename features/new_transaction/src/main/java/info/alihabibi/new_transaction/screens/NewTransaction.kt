@@ -351,7 +351,6 @@ private fun NewTransactionScreen(
                         stringResource(id = R.string.edit_transaction)
                     else
                         stringResource(id = R.string.register_transaction),
-                    windowInsets = TopAppBarDefaults.windowInsets.only(sides = WindowInsetsSides.Top),
                     actionIcon = painterResource(id = R.drawable.trash),
                     isActionAvailable = isEditingTransaction,
                     onNavigationClicked = onBackPressed,
