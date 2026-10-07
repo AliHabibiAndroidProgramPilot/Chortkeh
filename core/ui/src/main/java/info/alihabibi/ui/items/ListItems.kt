@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -267,6 +268,7 @@ fun ListedReminderItem(
                     modifier = Modifier.padding(end = 10.dp),
                     text = subTitle,
                     style = MaterialTheme.typography.bodySmall.copy(
+                        textDirection = TextDirection.Rtl,
                         textAlign = TextAlign.End,
                         color = Gray8
                     )

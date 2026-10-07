@@ -8,7 +8,6 @@ import info.alihabibi.common.Utils
 import info.alihabibi.domain.local.usecases.database.reminder.usecase.ReminderUseCases
 import info.alihabibi.model.mapper.toDomain
 import info.alihabibi.model.ui_model.reminder.ReminderUiModel
-import java.util.Locale
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -17,6 +16,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 class AddOrEditReminderViewModel(
     private val reminderUseCases: ReminderUseCases
@@ -81,7 +81,7 @@ class AddOrEditReminderViewModel(
 
     private fun changeReminderTime(hour: Int?, minute: Int?) {
         val formattedTime =
-            if (hour != null && minute != null) String.format(Locale.US, "%02d : %02d", hour, minute) else ""
+            if (hour != null && minute != null) String.format(Locale.US,"%02d:%02d", hour, minute) else ""
         uiState.update {
             it.copy(
                 reminderHour = hour,
@@ -94,19 +94,18 @@ class AddOrEditReminderViewModel(
     private fun saveReminder() {
         viewModelScope.launch {
             val state = uiState.value
-            if (state.reminderTitle.isBlank() || state.reminderMinute == null || state.reminderHour == null || state.triggerTimeStamp == null)
+            if (state.reminderTitle.isBlank() || state.formattedReminderTime.isBlank() || state.triggerTimeStamp == null)
                 return@launch
-            val time = String.format(Locale.US, "%02d : %02d", state.reminderHour, state.reminderMinute)
             val reminder = ReminderUiModel(
                 title = state.reminderTitle,
                 isEnabled = true,
-                triggerTimeStamp = Utils.mergeTimeIntoEpochMillis(state.triggerTimeStamp, time),
+                triggerTimeStamp = Utils.mergeTimeIntoEpochMillis(state.triggerTimeStamp, state.formattedReminderTime),
                 isPassed = null,
                 year = state.reminderYear,
                 month = state.reminderMonth,
                 day = state.reminderDay.first,
                 dayOfWeekName = state.reminderDay.second,
-                time = time
+                time = state.formattedReminderTime
             ).toDomain()
             val id = reminderUseCases.saveReminderUseCases.invoke(reminder)
             uiState.update { it.copy(savedReminderId = id) }

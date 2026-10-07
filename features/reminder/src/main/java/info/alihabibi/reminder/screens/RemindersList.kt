@@ -23,6 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import info.alihabibi.common.PersianDateFormatter
+import info.alihabibi.common.Utils.loog
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray7
 import info.alihabibi.model.ui_model.reminder.ReminderUiModel
