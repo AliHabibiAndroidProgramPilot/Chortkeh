@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
@@ -221,6 +222,7 @@ fun ListedReminderItem(
     title: String,
     subTitle: String = "",
     isEnabled: Boolean = true,
+    isPassed: Boolean? = null,
     onCheckedChange: (isChecked: Boolean) -> Unit,
     onClick: () -> Unit,
 ) {
@@ -243,7 +245,10 @@ fun ListedReminderItem(
 
             Switch(
                 modifier = Modifier.padding(horizontal = 16.dp),
-                checked = isEnabled,
+                checked = when(isPassed) {
+                    true -> false
+                    else -> isEnabled
+                },
                 onCheckedChange = onCheckedChange,
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = White,
@@ -261,7 +266,10 @@ fun ListedReminderItem(
                 Text(
                     modifier = Modifier.padding(end = 10.dp, bottom = 8.dp),
                     text = title,
-                    style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.End)
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        textAlign = TextAlign.End,
+                        textDecoration = if (isPassed == true) TextDecoration.LineThrough else TextDecoration.None
+                    )
                 )
 
                 Text(

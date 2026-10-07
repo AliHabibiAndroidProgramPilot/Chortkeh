@@ -128,6 +128,7 @@ private fun RemindersListContent(
                     reminder.time
                 ),
                 isEnabled = reminder.isEnabled,
+                isPassed = reminder.isPassed,
                 onCheckedChange = {},
                 onClick = { onReminderClicked(reminder) }
             )
