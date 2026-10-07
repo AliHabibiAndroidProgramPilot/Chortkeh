@@ -22,12 +22,15 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -37,12 +40,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import info.alihabibi.common.Utils
+import info.alihabibi.common_android.snackbar.SnackBarController
+import info.alihabibi.common_android.snackbar.SnackBarEvent
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray8
 import info.alihabibi.designsystem.theme.White
-import info.alihabibi.reminder.ReminderUiState
-import info.alihabibi.reminder.ReminderViewModel
-import info.alihabibi.reminder.RemindersUiIntent
+import info.alihabibi.domain.local.coordinators.ReminderUndoManager
+import info.alihabibi.reminder.viewmodels.ReminderUiState
+import info.alihabibi.reminder.viewmodels.AddOrEditReminderViewModel
+import info.alihabibi.reminder.viewmodels.RemindersUiIntent
 import info.alihabibi.ui.buttons.AppButton
 import info.alihabibi.ui.dialogs.TimePickerBottomSheetContent
 import info.alihabibi.ui.headrs.AppHeader
@@ -51,16 +57,36 @@ import ir.mehrafzoon.composedatepicker.core.component.rememberDialogDatePicker
 import ir.mehrafzoon.composedatepicker.sheet.DatePickerModalBottomSheet
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 import java.time.LocalTime
 
 @Composable
 fun AddOrEditReminderDestination(
-    viewModel: ReminderViewModel = koinViewModel(),
+    viewModel: AddOrEditReminderViewModel = koinViewModel(),
     onBackPressed: () -> Unit
 ) {
 
+    val context = LocalContext.current
+
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val formattedReminderDate by viewModel.formattedReminderDate.collectAsStateWithLifecycle()
+
+    val currentOnBackPressed by rememberUpdatedState(onBackPressed)
+    val reminderUndoManager: ReminderUndoManager = koinInject()
+    uiState.savedReminderId?.let { id ->
+        LaunchedEffect(id) {
+            SnackBarController.sendEvent(
+                SnackBarEvent(
+                    message = Utils.getStringResources(context, R.string.reminder_saved_successfully),
+                    actionTitle = Utils.getStringResources(context, R.string.undo),
+                    action = {
+                        reminderUndoManager.executeUndo(id)
+                    }
+                )
+            )
+            currentOnBackPressed()
+        }
+    }
 
     AddOrEditReminderScreen(
         uiState = uiState,

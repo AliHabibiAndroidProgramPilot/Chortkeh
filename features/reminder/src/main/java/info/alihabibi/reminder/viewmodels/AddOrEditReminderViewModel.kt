@@ -1,4 +1,4 @@
-package info.alihabibi.reminder
+package info.alihabibi.reminder.viewmodels
 
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
@@ -18,15 +18,12 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class ReminderViewModel(
+class AddOrEditReminderViewModel(
     private val reminderUseCases: ReminderUseCases
 ) : ViewModel() {
 
     val uiState: StateFlow<ReminderUiState>
         field = MutableStateFlow(ReminderUiState())
-
-    val reminders: StateFlow<List<ReminderUiModel>>
-        field = MutableStateFlow(emptyList<ReminderUiModel>())
 
     val formattedReminderDate: StateFlow<String> = combine(
         uiState.map { it.reminderYear },

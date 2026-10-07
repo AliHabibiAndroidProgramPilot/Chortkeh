@@ -16,5 +16,6 @@ object Keys {
     const val CATEGORY_TABLE_NAME = "categories"
     const val CHANNELS_TABLE_NAME = "channels"
     const val TRANSACTION_TABLE_NAME = "transactions"
+    const val REMINDER_TABLE_NAME = "reminders"
 
 }

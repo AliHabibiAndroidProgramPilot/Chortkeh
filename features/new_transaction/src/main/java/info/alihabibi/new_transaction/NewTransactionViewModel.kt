@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import info.alihabibi.common.PersianDateFormatter
+import java.util.Locale
 import info.alihabibi.domain.local.usecases.database.category.usecase.CategoryUseCases
 import info.alihabibi.domain.local.usecases.database.channel.usecase.ChannelUseCases
 import info.alihabibi.domain.local.usecases.database.transaction.usecase.TransactionUseCases
@@ -137,7 +138,7 @@ class NewTransactionViewModel(
                 month = state.transactionMonth,
                 day = state.transactionDay.first,
                 dayOfWeekName = state.transactionDay.second,
-                time = "${state.transactionHour}:${state.transactionMinute}"
+                time = String.format(Locale.US, "%02d:%02d", state.transactionHour, state.transactionMinute)
             ).toDomain()
             val id = transactionUseCases.saveTransactionUseCase.invoke(transaction)
             updateChannelBalanceAfterTransaction(
@@ -218,7 +219,7 @@ class NewTransactionViewModel(
                 month = state.transactionMonth,
                 day = state.transactionDay.first,
                 dayOfWeekName = state.transactionDay.second,
-                time = "${state.transactionHour}:${state.transactionMinute}"
+                time = String.format(Locale.US, "%02d:%02d", state.transactionHour, state.transactionMinute)
             ).toDomain()
             updateChannelBalanceAfterTransaction(
                 transactionId,
@@ -256,7 +257,7 @@ class NewTransactionViewModel(
 
     private fun changeTime(hour: Int?, minute: Int?) {
         val formattedTime =
-            if (hour != null && minute != null) "$hour : $minute" else ""
+            if (hour != null && minute != null) String.format(Locale.US, "%02d : %02d", hour, minute) else ""
         _newTransactionUiState.update {
             it.copy(
                 formattedTransactionTime = formattedTime,

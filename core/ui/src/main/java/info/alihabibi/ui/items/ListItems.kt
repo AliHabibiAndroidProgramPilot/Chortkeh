@@ -241,6 +241,7 @@ fun ListedReminderItem(
         ) {
 
             Switch(
+                modifier = Modifier.padding(horizontal = 16.dp),
                 checked = isEnabled,
                 onCheckedChange = onCheckedChange,
                 colors = SwitchDefaults.colors(
@@ -251,6 +252,8 @@ fun ListedReminderItem(
                     uncheckedBorderColor = Gray5
                 )
             )
+
+            Spacer(modifier = Modifier.weight(weight = 1f))
 
             Column(horizontalAlignment = Alignment.End) {
 

@@ -26,7 +26,7 @@ import info.alihabibi.common.PersianDateFormatter
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray7
 import info.alihabibi.model.ui_model.reminder.ReminderUiModel
-import info.alihabibi.reminder.ReminderViewModel
+import info.alihabibi.reminder.viewmodels.ReminderListViewModel
 import info.alihabibi.ui.buttons.AppButton
 import info.alihabibi.ui.headrs.AppHeader
 import info.alihabibi.ui.items.ListedReminderItem
@@ -34,7 +34,7 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun RemindersListDestination(
-    viewModel: ReminderViewModel = koinViewModel(),
+    viewModel: ReminderListViewModel = koinViewModel(),
     onNewReminder: () -> Unit = {}
 ) {
 

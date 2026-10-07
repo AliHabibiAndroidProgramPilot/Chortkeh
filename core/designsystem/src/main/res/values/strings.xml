@@ -149,6 +149,7 @@
     <string name="register_reminder">ثبت یادآور</string>
     <string name="edit_reminder">ویرایش یادآور</string>
     <string name="reminder_title">عنوان یادآور</string>
+    <string name="reminder_saved_successfully">یادآور با موفیت ذخیره شد</string>
     <string name="register">ثبت</string>
     <string name="reminder_name_error">نام یادآور نمیتواند بیشتر از 30 کاراکتر باشد</string>
     <string name="empty_reminder_list_message">هنوز یادآوری ثبت نکردی</string>

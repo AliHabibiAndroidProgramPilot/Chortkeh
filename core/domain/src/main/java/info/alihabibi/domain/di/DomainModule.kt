@@ -1,5 +1,6 @@
 package info.alihabibi.domain.di
 
+import info.alihabibi.domain.local.coordinators.ReminderUndoManager
 import info.alihabibi.domain.local.coordinators.TransactionUndoManager
 import info.alihabibi.domain.local.usecases.database.category.DeleteCategoriesUseCase
 import info.alihabibi.domain.local.usecases.database.category.GetCategoriesUseCase
@@ -14,6 +15,8 @@ import info.alihabibi.domain.local.usecases.database.channel.SaveChannelUseCase
 import info.alihabibi.domain.local.usecases.database.channel.UpdateChannelBalanceUseCase
 import info.alihabibi.domain.local.usecases.database.channel.UpdateChannelUseCase
 import info.alihabibi.domain.local.usecases.database.channel.usecase.ChannelUseCases
+import info.alihabibi.domain.local.usecases.database.reminder.DeleteReminderUseCase
+import info.alihabibi.domain.local.usecases.database.reminder.GetAllRemindersUseCase
 import info.alihabibi.domain.local.usecases.database.reminder.SaveReminderUseCase
 import info.alihabibi.domain.local.usecases.database.reminder.usecase.ReminderUseCases
 import info.alihabibi.domain.local.usecases.database.transaction.DeleteTransactionUseCase
@@ -144,10 +147,14 @@ val domainModule = module {
     // region Reminder
 
     factory { SaveReminderUseCase(get()) }
+    factory { DeleteReminderUseCase(get()) }
+    factory { GetAllRemindersUseCase(get()) }
 
     factory {
         ReminderUseCases(
-            saveReminderUseCases = get()
+            saveReminderUseCases = get(),
+            deleteReminderUseCase = get(),
+            getAllRemindersUseCase = get()
         )
     }
 
@@ -157,6 +164,10 @@ val domainModule = module {
 
     single {
         TransactionUndoManager(get(), get(), get())
+    }
+
+    single {
+        ReminderUndoManager(get(), get())
     }
 
     // endregion
