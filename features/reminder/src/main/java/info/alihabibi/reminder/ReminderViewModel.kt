@@ -5,10 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import info.alihabibi.common.PersianDateFormatter
 import info.alihabibi.common.Utils
-import info.alihabibi.common.Utils.loog
 import info.alihabibi.domain.local.usecases.database.reminder.usecase.ReminderUseCases
 import info.alihabibi.model.mapper.toDomain
 import info.alihabibi.model.ui_model.reminder.ReminderUiModel
+import java.util.Locale
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -84,7 +84,7 @@ class ReminderViewModel(
 
     private fun changeReminderTime(hour: Int?, minute: Int?) {
         val formattedTime =
-            if (hour != null && minute != null) "$hour : $minute" else ""
+            if (hour != null && minute != null) String.format(Locale.US, "%02d : %02d", hour, minute) else ""
         uiState.update {
             it.copy(
                 reminderHour = hour,
@@ -99,7 +99,7 @@ class ReminderViewModel(
             val state = uiState.value
             if (state.reminderTitle.isBlank() || state.reminderMinute == null || state.reminderHour == null || state.triggerTimeStamp == null)
                 return@launch
-            val time = "${state.reminderHour} : ${state.reminderMinute}"
+            val time = String.format(Locale.US, "%02d : %02d", state.reminderHour, state.reminderMinute)
             val reminder = ReminderUiModel(
                 title = state.reminderTitle,
                 isEnabled = true,
@@ -111,7 +111,8 @@ class ReminderViewModel(
                 dayOfWeekName = state.reminderDay.second,
                 time = time
             ).toDomain()
-            reminderUseCases.saveReminderUseCases.invoke(reminder)
+            val id = reminderUseCases.saveReminderUseCases.invoke(reminder)
+            uiState.update { it.copy(savedReminderId = id) }
         }
     }
 
@@ -143,7 +144,8 @@ data class ReminderUiState(
     val reminderYear: Int = 0,
     val reminderMonth: Int = 0,
     val reminderDay: Pair<Int, String> = Pair(0, ""),
-    val triggerTimeStamp: Long? = null
+    val triggerTimeStamp: Long? = null,
+    val savedReminderId: Long? = null
 ) {
     val isRegisterReminderButtonEnabled: Boolean
         get() {
