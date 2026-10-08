@@ -36,7 +36,8 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun RemindersListDestination(
     viewModel: ReminderListViewModel = koinViewModel(),
-    onNewReminder: () -> Unit = {}
+    onNewReminder: () -> Unit = {},
+    onEditReminder: (reminderId: Long) -> Unit = {}
 ) {
 
     val reminders by viewModel.reminders.collectAsStateWithLifecycle()
@@ -44,6 +45,9 @@ fun RemindersListDestination(
     RemindersListScreen(
         reminders = reminders,
         onNewReminder = onNewReminder,
+        onEditReminder = { reminderId ->
+            onEditReminder(reminderId)
+        },
         onReminderEnabledChanged = { reminderId, value ->
             viewModel.onEvent(ReminderListUiIntent.ReminderEnabledChanged(reminderId, value))
         }
@@ -55,7 +59,8 @@ fun RemindersListDestination(
 private fun RemindersListScreen(
     reminders: List<ReminderUiModel>,
     onNewReminder: () -> Unit = {},
-    onReminderEnabledChanged: (reminderId: Long ,value: Boolean) -> Unit = { _, _ -> }
+    onEditReminder: (reminderId: Long) -> Unit = {},
+    onReminderEnabledChanged: (reminderId: Long, value: Boolean) -> Unit = { _, _ -> }
 ) {
 
     Column(
@@ -88,7 +93,8 @@ private fun RemindersListScreen(
                         .weight(weight = 1f)
                         .fillMaxWidth(),
                     reminders = reminders,
-                    onReminderEnabledChanged = onReminderEnabledChanged
+                    onReminderEnabledChanged = onReminderEnabledChanged,
+                    onReminderClicked = onEditReminder
                 )
 
             AppButton(
@@ -110,8 +116,8 @@ private fun RemindersListScreen(
 private fun RemindersListContent(
     modifier: Modifier = Modifier,
     reminders: List<ReminderUiModel>,
-    onReminderClicked: (reminder: ReminderUiModel) -> Unit = {},
-    onReminderEnabledChanged: (reminderId: Long ,value: Boolean) -> Unit = { _, _ -> }
+    onReminderClicked: (reminder: Long) -> Unit = {},
+    onReminderEnabledChanged: (reminderId: Long, value: Boolean) -> Unit = { _, _ -> }
 ) {
 
     LazyColumn(
@@ -139,7 +145,7 @@ private fun RemindersListContent(
                     if (reminder.isPassed == false)
                         onReminderEnabledChanged(reminder.id, value)
                 },
-                onClick = { onReminderClicked(reminder) }
+                onClick = { onReminderClicked(reminder.id) }
             )
 
         }

@@ -23,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,9 +50,9 @@ import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray8
 import info.alihabibi.designsystem.theme.White
 import info.alihabibi.domain.local.coordinators.ReminderUndoManager
-import info.alihabibi.reminder.viewmodels.ReminderUiState
+import info.alihabibi.reminder.viewmodels.AddOrEditReminderUiIntent
 import info.alihabibi.reminder.viewmodels.AddOrEditReminderViewModel
-import info.alihabibi.reminder.viewmodels.RemindersUiIntent
+import info.alihabibi.reminder.viewmodels.ReminderUiState
 import info.alihabibi.ui.buttons.AppButton
 import info.alihabibi.ui.dialogs.AppDialog
 import info.alihabibi.ui.dialogs.TimePickerBottomSheetContent
@@ -67,8 +68,14 @@ import java.time.LocalTime
 @Composable
 fun AddOrEditReminderDestination(
     viewModel: AddOrEditReminderViewModel = koinViewModel(),
+    editingReminderId: Long?,
     onBackPressed: () -> Unit
 ) {
+
+    SideEffect(editingReminderId) {
+        if (editingReminderId != null)
+            viewModel.onEvent(AddOrEditReminderUiIntent.FetchEditingReminder(editingReminderId))
+    }
 
     val context = LocalContext.current
 
@@ -94,18 +101,24 @@ fun AddOrEditReminderDestination(
 
     AddOrEditReminderScreen(
         uiState = uiState,
+        isEditingReminder = editingReminderId != null,
         formattedReminderDate = formattedReminderDate,
         onReminderNameChanged = { value ->
-            viewModel.onEvent(RemindersUiIntent.ChangeReminderName(value))
+            viewModel.onEvent(AddOrEditReminderUiIntent.ChangeReminderName(value))
         },
         onDateChanged = { year, month, day, triggerTimeStamp ->
-            viewModel.onEvent(RemindersUiIntent.ChangeReminderDate(year, month, day, triggerTimeStamp))
+            viewModel.onEvent(AddOrEditReminderUiIntent.ChangeReminderDate(year, month, day, triggerTimeStamp))
         },
         onTimeChange = { hour, minute ->
-            viewModel.onEvent(RemindersUiIntent.ChangeReminderTime(hour, minute))
+            viewModel.onEvent(AddOrEditReminderUiIntent.ChangeReminderTime(hour, minute))
         },
         onSaveOrEditReminder = {
-            viewModel.onEvent(RemindersUiIntent.SaveReminder)
+            if (editingReminderId != null) {
+               viewModel.onEvent(AddOrEditReminderUiIntent.EditReminder(editingReminderId))
+               onBackPressed()
+           }
+            else
+                viewModel.onEvent(AddOrEditReminderUiIntent.SaveReminder)
         },
         onBackPressed = onBackPressed
     )
@@ -116,6 +129,7 @@ fun AddOrEditReminderDestination(
 @Composable
 fun AddOrEditReminderScreen(
     uiState: ReminderUiState,
+    isEditingReminder: Boolean,
     formattedReminderDate: String = "",
     onReminderNameChanged: (value: String) -> Unit = {},
     onDateChanged: (year: Int, month: Int, day: Pair<Int, String>, timeStamp: Long) -> Unit = { _, _, _, _ -> },
@@ -126,8 +140,6 @@ fun AddOrEditReminderScreen(
 
     val scope = rememberCoroutineScope()
 
-    val currentDate = remember { Utils.getCurrentPersianDate() }
-
     val datePickerController = rememberDialogDatePicker()
     val dateBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     if (dateBottomSheetState.isVisible)
@@ -137,8 +149,12 @@ fun AddOrEditReminderScreen(
                 .wrapContentHeight(),
             controller = datePickerController,
             sheetState = dateBottomSheetState,
-            useInitialDate = true,
-            initialDate = currentDate,
+            useInitialDate = isEditingReminder, // Use Initial Date Only For Reminders That Has A Date, So Dialog Can Open That Date
+            initialDate = Triple(
+                uiState.reminderYear,
+                uiState.reminderMonth,
+                uiState.reminderDay.first
+            ),
             titleBottomSheet = stringResource(id = R.string.date),
             titleStyle = MaterialTheme.typography.labelLarge.copy(
                 textAlign = TextAlign.Center,
@@ -248,9 +264,15 @@ fun AddOrEditReminderScreen(
             ) {
 
                 AppHeader(
-                    title = stringResource(id = R.string.register_reminder),
+                    title = if (isEditingReminder)
+                        stringResource(id = R.string.edit_reminder)
+                    else
+                        stringResource(id = R.string.register_reminder),
                     onNavigationClicked = onBackPressed,
-                    isActionAvailable = false
+                    isActionAvailable = isEditingReminder,
+                    onActionClicked = {
+
+                    }
                 )
 
                 Spacer(Modifier.height(height = 8.dp))
@@ -356,7 +378,10 @@ fun AddOrEditReminderScreen(
                     else
                         showAlarmPermissionRequestDialog = true
                 },
-                text = stringResource(id = R.string.register),
+                text = if (isEditingReminder)
+                    stringResource(id = R.string.edit_reminder)
+                else
+                    stringResource(id = R.string.register),
                 enabled = uiState.isRegisterReminderButtonEnabled
             )
 

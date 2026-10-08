@@ -7,6 +7,7 @@ import info.alihabibi.common.PersianDateFormatter
 import info.alihabibi.common.Utils
 import info.alihabibi.domain.local.usecases.database.reminder.usecase.ReminderUseCases
 import info.alihabibi.model.mapper.toDomain
+import info.alihabibi.model.mapper.toUiModel
 import info.alihabibi.model.ui_model.reminder.ReminderUiModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -39,21 +40,25 @@ class AddOrEditReminderViewModel(
         started = SharingStarted.WhileSubscribed(5_000, 10_000)
     )
 
-    fun onEvent(event: RemindersUiIntent) {
+    fun onEvent(event: AddOrEditReminderUiIntent) {
         when (event) {
 
-            is RemindersUiIntent.ChangeReminderName -> changeReminderName(event.name)
+            is AddOrEditReminderUiIntent.ChangeReminderName -> changeReminderName(event.name)
 
-            is RemindersUiIntent.ChangeReminderDate -> changeReminderDate(
+            is AddOrEditReminderUiIntent.ChangeReminderDate -> changeReminderDate(
                 event.year,
                 event.month,
                 event.day,
                 event.triggerTimeStamp
             )
 
-            is RemindersUiIntent.ChangeReminderTime -> changeReminderTime(event.hour, event.minute)
+            is AddOrEditReminderUiIntent.ChangeReminderTime -> changeReminderTime(event.hour, event.minute)
 
-            is RemindersUiIntent.SaveReminder -> saveReminder()
+            is AddOrEditReminderUiIntent.FetchEditingReminder -> fetchEditingReminder(event.id)
+
+            is AddOrEditReminderUiIntent.EditReminder -> editReminder(event.id)
+
+            is AddOrEditReminderUiIntent.SaveReminder -> saveReminder()
 
         }
     }
@@ -91,6 +96,48 @@ class AddOrEditReminderViewModel(
         }
     }
 
+    private fun fetchEditingReminder(id: Long) {
+        viewModelScope.launch {
+            val reminder = reminderUseCases.getReminderByIdUseCase.invoke(id).toUiModel()
+            val hour = reminder.time.substringBefore(':').toIntOrNull() ?: 0
+            val minute = reminder.time.substringAfter(':').toIntOrNull() ?: 0
+            val formattedReminderTime = String.format(Locale.US,"%02d:%02d", hour, minute)
+            uiState.update {
+                it.copy(
+                    reminderTitle = reminder.title,
+                    reminderHour = hour,
+                    reminderMinute = minute,
+                    formattedReminderTime = formattedReminderTime,
+                    triggerTimeStamp = reminder.triggerTimeStamp,
+                    reminderYear = reminder.year,
+                    reminderMonth = reminder.month,
+                    reminderDay = Pair(reminder.day, reminder.dayOfWeekName)
+                )
+            }
+        }
+    }
+
+    private fun editReminder(id: Long) {
+        viewModelScope.launch {
+            val state = uiState.value
+            if (state.reminderTitle.isBlank() || state.formattedReminderTime.isBlank() || state.triggerTimeStamp == null)
+                return@launch
+            val reminder = ReminderUiModel(
+                id = id,
+                title = state.reminderTitle,
+                isEnabled = true,
+                triggerTimeStamp = Utils.mergeTimeIntoEpochMillis(state.triggerTimeStamp, state.formattedReminderTime),
+                isPassed = null,
+                year = state.reminderYear,
+                month = state.reminderMonth,
+                day = state.reminderDay.first,
+                dayOfWeekName = state.reminderDay.second,
+                time = state.formattedReminderTime
+            ).toDomain()
+            reminderUseCases.updateReminderUseCase.invoke(reminder)
+        }
+    }
+
     private fun saveReminder() {
         viewModelScope.launch {
             val state = uiState.value
@@ -114,20 +161,24 @@ class AddOrEditReminderViewModel(
 
 }
 
-sealed interface RemindersUiIntent {
+sealed interface AddOrEditReminderUiIntent {
 
-    data class ChangeReminderName(val name: String) : RemindersUiIntent
+    data class ChangeReminderName(val name: String) : AddOrEditReminderUiIntent
 
     data class ChangeReminderDate(
         val year: Int,
         val month: Int,
         val day: Pair<Int, String>,
         val triggerTimeStamp: Long
-    ) : RemindersUiIntent
+    ) : AddOrEditReminderUiIntent
 
-    data class ChangeReminderTime(val hour: Int?, val minute: Int?) : RemindersUiIntent
+    data class ChangeReminderTime(val hour: Int?, val minute: Int?) : AddOrEditReminderUiIntent
 
-    data object SaveReminder : RemindersUiIntent
+    data class FetchEditingReminder(val id: Long) : AddOrEditReminderUiIntent
+
+    data class EditReminder(val id: Long) : AddOrEditReminderUiIntent
+
+    data object SaveReminder : AddOrEditReminderUiIntent
 
 }
 

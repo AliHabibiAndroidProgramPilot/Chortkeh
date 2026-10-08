@@ -20,6 +20,12 @@ class ReminderRepositoryImpl(private val dao: ReminderDao) : ReminderRepository 
         }
     }
 
+    override suspend fun updateReminder(reminder: Reminder) {
+        withContext(Dispatchers.IO) {
+            dao.updateReminder(reminder.asEntity())
+        }
+    }
+
     override suspend fun deleteReminder(reminderId: Long) {
         withContext(Dispatchers.IO) {
             dao.deleteReminder(reminderId)
@@ -35,6 +41,12 @@ class ReminderRepositoryImpl(private val dao: ReminderDao) : ReminderRepository 
     override suspend fun updateReminderIsEnabled(reminderId: Long, isEnabled: Boolean) {
         withContext(Dispatchers.IO) {
             dao.updateReminderIsEnabled(reminderId, isEnabled)
+        }
+    }
+
+    override suspend fun getReminderById(reminderId: Long): Reminder {
+        return withContext(Dispatchers.IO) {
+            dao.getReminderById(reminderId).asExternalModel()
         }
     }
 
