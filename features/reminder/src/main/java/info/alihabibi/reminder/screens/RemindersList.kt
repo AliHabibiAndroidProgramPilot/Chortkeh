@@ -26,6 +26,7 @@ import info.alihabibi.common.PersianDateFormatter
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray7
 import info.alihabibi.model.ui_model.reminder.ReminderUiModel
+import info.alihabibi.reminder.viewmodels.ReminderListUiIntent
 import info.alihabibi.reminder.viewmodels.ReminderListViewModel
 import info.alihabibi.ui.buttons.AppButton
 import info.alihabibi.ui.headrs.AppHeader
@@ -42,7 +43,10 @@ fun RemindersListDestination(
 
     RemindersListScreen(
         reminders = reminders,
-        onNewReminder = onNewReminder
+        onNewReminder = onNewReminder,
+        onReminderEnabledChanged = { reminderId, value ->
+            viewModel.onEvent(ReminderListUiIntent.ReminderEnabledChanged(reminderId, value))
+        }
     )
 
 }
@@ -50,7 +54,8 @@ fun RemindersListDestination(
 @Composable
 private fun RemindersListScreen(
     reminders: List<ReminderUiModel>,
-    onNewReminder: () -> Unit = {}
+    onNewReminder: () -> Unit = {},
+    onReminderEnabledChanged: (reminderId: Long ,value: Boolean) -> Unit = { _, _ -> }
 ) {
 
     Column(
@@ -82,7 +87,8 @@ private fun RemindersListScreen(
                     modifier = Modifier
                         .weight(weight = 1f)
                         .fillMaxWidth(),
-                    reminders = reminders
+                    reminders = reminders,
+                    onReminderEnabledChanged = onReminderEnabledChanged
                 )
 
             AppButton(
@@ -104,7 +110,8 @@ private fun RemindersListScreen(
 private fun RemindersListContent(
     modifier: Modifier = Modifier,
     reminders: List<ReminderUiModel>,
-    onReminderClicked: (reminder: ReminderUiModel) -> Unit = {}
+    onReminderClicked: (reminder: ReminderUiModel) -> Unit = {},
+    onReminderEnabledChanged: (reminderId: Long ,value: Boolean) -> Unit = { _, _ -> }
 ) {
 
     LazyColumn(
@@ -128,7 +135,10 @@ private fun RemindersListContent(
                 ),
                 isEnabled = reminder.isEnabled,
                 isPassed = reminder.isPassed,
-                onCheckedChange = {},
+                onCheckedChange = { value ->
+                    if (reminder.isPassed == false)
+                        onReminderEnabledChanged(reminder.id, value)
+                },
                 onClick = { onReminderClicked(reminder) }
             )
 

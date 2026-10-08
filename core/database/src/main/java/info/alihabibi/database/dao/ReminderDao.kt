@@ -20,4 +20,7 @@ interface ReminderDao {
     @Query("SELECT * FROM ${Keys.REMINDER_TABLE_NAME} ORDER BY id DESC")
     fun getAllReminders(): Flow<List<ReminderEntity>>
 
+    @Query("UPDATE ${Keys.REMINDER_TABLE_NAME} SET isEnabled = :isEnabled WHERE id = :id")
+    suspend fun updateReminderIsEnabled(id: Long, isEnabled: Boolean)
+
 }

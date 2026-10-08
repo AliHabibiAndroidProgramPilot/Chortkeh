@@ -12,8 +12,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
-class ReminderListViewModel(reminderUseCases: ReminderUseCases) : ViewModel() {
+class ReminderListViewModel(private val reminderUseCases: ReminderUseCases) : ViewModel() {
 
     val reminders: StateFlow<List<ReminderUiModel>>
         field = MutableStateFlow(emptyList<ReminderUiModel>())
@@ -24,5 +25,25 @@ class ReminderListViewModel(reminderUseCases: ReminderUseCases) : ViewModel() {
             this.reminders.update { reminders.fastMap(Reminder::toUiModel) }
         }.launchIn(viewModelScope)
     }
+
+    fun onEvent(event: ReminderListUiIntent) {
+        when(event) {
+
+            is ReminderListUiIntent.ReminderEnabledChanged -> reminderChangeEnable(event.id, event.value)
+
+        }
+    }
+
+    private fun reminderChangeEnable(id: Long, value: Boolean) {
+        viewModelScope.launch {
+            reminderUseCases.updateReminderIsEnabledUseCase.invoke(id, value)
+        }
+    }
+
+}
+
+sealed interface ReminderListUiIntent {
+
+    data class ReminderEnabledChanged(val id: Long, val value: Boolean) : ReminderListUiIntent
 
 }

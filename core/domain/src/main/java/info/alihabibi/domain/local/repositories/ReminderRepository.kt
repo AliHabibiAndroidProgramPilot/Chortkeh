@@ -11,4 +11,6 @@ interface ReminderRepository {
 
     fun getAllReminders(): Flow<List<Reminder>>
 
+    suspend fun updateReminderIsEnabled(reminderId: Long, isEnabled: Boolean)
+
 }

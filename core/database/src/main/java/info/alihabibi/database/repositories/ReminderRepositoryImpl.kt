@@ -32,4 +32,10 @@ class ReminderRepositoryImpl(private val dao: ReminderDao) : ReminderRepository 
             .flowOn(Dispatchers.IO)
     }
 
+    override suspend fun updateReminderIsEnabled(reminderId: Long, isEnabled: Boolean) {
+        withContext(Dispatchers.IO) {
+            dao.updateReminderIsEnabled(reminderId, isEnabled)
+        }
+    }
+
 }

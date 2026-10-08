@@ -26,7 +26,8 @@
         android:enableOnBackInvokedCallback="true"
         android:supportsRtl="true"
         android:name=".ChortkehApp"
-        android:theme="@style/Theme.Chortkeh">
+        android:theme="@style/Theme.Chortkeh"
+        tools:ignore="UnusedAttribute">
         <activity
             android:name=".activity.MainActivity"
             android:exported="true"

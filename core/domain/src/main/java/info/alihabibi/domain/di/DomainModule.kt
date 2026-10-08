@@ -18,6 +18,7 @@ import info.alihabibi.domain.local.usecases.database.channel.usecase.ChannelUseC
 import info.alihabibi.domain.local.usecases.database.reminder.DeleteReminderUseCase
 import info.alihabibi.domain.local.usecases.database.reminder.GetAllRemindersUseCase
 import info.alihabibi.domain.local.usecases.database.reminder.SaveReminderUseCase
+import info.alihabibi.domain.local.usecases.database.reminder.UpdateReminderIsEnabledUseCase
 import info.alihabibi.domain.local.usecases.database.reminder.usecase.ReminderUseCases
 import info.alihabibi.domain.local.usecases.database.transaction.DeleteTransactionUseCase
 import info.alihabibi.domain.local.usecases.database.transaction.GetAllTransactionsUseCase
@@ -149,12 +150,14 @@ val domainModule = module {
     factory { SaveReminderUseCase(get()) }
     factory { DeleteReminderUseCase(get()) }
     factory { GetAllRemindersUseCase(get()) }
+    factory { UpdateReminderIsEnabledUseCase(get()) }
 
     factory {
         ReminderUseCases(
             saveReminderUseCases = get(),
             deleteReminderUseCase = get(),
-            getAllRemindersUseCase = get()
+            getAllRemindersUseCase = get(),
+            updateReminderIsEnabledUseCase = get()
         )
     }
 
