@@ -24,9 +24,11 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import info.alihabibi.common.Utils
+import info.alihabibi.common_android.alarm_permission.rememberExactAlarmPermissionState
 import info.alihabibi.common_android.snackbar.SnackBarController
 import info.alihabibi.common_android.snackbar.SnackBarEvent
 import info.alihabibi.designsystem.R
@@ -50,6 +53,7 @@ import info.alihabibi.reminder.viewmodels.ReminderUiState
 import info.alihabibi.reminder.viewmodels.AddOrEditReminderViewModel
 import info.alihabibi.reminder.viewmodels.RemindersUiIntent
 import info.alihabibi.ui.buttons.AppButton
+import info.alihabibi.ui.dialogs.AppDialog
 import info.alihabibi.ui.dialogs.TimePickerBottomSheetContent
 import info.alihabibi.ui.headrs.AppHeader
 import info.alihabibi.ui.inputs.AppTitledTextField
@@ -202,6 +206,26 @@ fun AddOrEditReminderScreen(
             }
         )
 
+    val exactAlarmPermissionState = rememberExactAlarmPermissionState()
+    var showAlarmPermissionRequestDialog by remember { mutableStateOf(false) }
+    if (showAlarmPermissionRequestDialog)
+            AppDialog(
+                title = stringResource(id = R.string.exact_alarm_permission_title),
+                message = stringResource(id = R.string.exact_alarm_permission_message),
+                confirmButtonText = stringResource(id = R.string.confirm),
+                cancelButtonText = stringResource(id = R.string.dismiss),
+                onConfirmClicked = {
+                    exactAlarmPermissionState.launchSetting()
+                    showAlarmPermissionRequestDialog = false
+                },
+                onCancelClicked = {
+                    showAlarmPermissionRequestDialog = false
+                },
+                onDismissRequest = {
+                    showAlarmPermissionRequestDialog = false
+                }
+            )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -326,7 +350,12 @@ fun AddOrEditReminderScreen(
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp)
                     .padding(bottom = 16.dp),
-                onClick = onSaveOrEditReminder,
+                onClick = {
+                    if (exactAlarmPermissionState.isGranted)
+                        onSaveOrEditReminder()
+                    else
+                        showAlarmPermissionRequestDialog = true
+                },
                 text = stringResource(id = R.string.register),
                 enabled = uiState.isRegisterReminderButtonEnabled
             )

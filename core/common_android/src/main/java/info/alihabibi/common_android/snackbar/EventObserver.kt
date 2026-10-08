@@ -1,4 +1,4 @@
-package info.alihabibi.common_android
+package info.alihabibi.common_android.snackbar
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect

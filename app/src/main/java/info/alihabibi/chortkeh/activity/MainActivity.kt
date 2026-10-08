@@ -26,7 +26,7 @@ import info.alihabibi.chortkeh.navigation.DemoNavHost
 import info.alihabibi.chortkeh.navigation.Home
 import info.alihabibi.chortkeh.navigation.OnBoarding
 import info.alihabibi.chortkeh.navigation.topLevelDestinations
-import info.alihabibi.common_android.ObserveAsEvents
+import info.alihabibi.common_android.snackbar.ObserveAsEvents
 import info.alihabibi.common_android.snackbar.SnackBarController
 import info.alihabibi.designsystem.theme.ChortkehTheme
 import info.alihabibi.new_transaction.NewTransactionGraphRoute

@@ -153,5 +153,7 @@
     <string name="register">ثبت</string>
     <string name="reminder_name_error">نام یادآور نمیتواند بیشتر از 30 کاراکتر باشد</string>
     <string name="empty_reminder_list_message">هنوز یادآوری ثبت نکردی</string>
+    <string name="exact_alarm_permission_title">اجازه تنظیم آلارم</string>
+    <string name="exact_alarm_permission_message">برای اینکه بتونی سر ساعت از یادآور هایی که تنظیم کردی مطلع بشی، لازمه دسترسی آلارم رو فعال کنی</string>
 
 </resources>

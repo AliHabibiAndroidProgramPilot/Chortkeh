@@ -7,8 +7,8 @@ import org.koin.dsl.module
 
 val reminderModule = module {
 
-    viewModel { AddOrEditReminderViewModel(get()) }
-
     viewModel { ReminderListViewModel(get()) }
+
+    viewModel { AddOrEditReminderViewModel(get()) }
 
 }
