@@ -102,20 +102,20 @@ class AddOrEditReminderViewModel(
 
     private fun fetchEditingReminder(id: Long) {
         viewModelScope.launch {
-            val reminder = reminderUseCases.getReminderByIdUseCase.invoke(id).toUiModel()
-            val hour = reminder.time.substringBefore(':').toIntOrNull() ?: 0
-            val minute = reminder.time.substringAfter(':').toIntOrNull() ?: 0
+            val reminder = reminderUseCases.getReminderByIdUseCase.invoke(id)?.toUiModel()
+            val hour = reminder?.time?.substringBefore(':')?.toIntOrNull() ?: 0
+            val minute = reminder?.time?.substringAfter(':')?.toIntOrNull() ?: 0
             val formattedReminderTime = String.format(Locale.US,"%02d:%02d", hour, minute)
             uiState.update {
                 it.copy(
-                    reminderTitle = reminder.title,
+                    reminderTitle = reminder?.title.orEmpty(),
                     reminderHour = hour,
                     reminderMinute = minute,
                     formattedReminderTime = formattedReminderTime,
-                    triggerTimeStamp = reminder.triggerTimeStamp,
-                    reminderYear = reminder.year,
-                    reminderMonth = reminder.month,
-                    reminderDay = Pair(reminder.day, reminder.dayOfWeekName)
+                    triggerTimeStamp = reminder?.triggerTimeStamp ?: 0L,
+                    reminderYear = reminder?.year ?: 0,
+                    reminderMonth = reminder?.month ?: 0,
+                    reminderDay = Pair(reminder?.day ?: 0, reminder?.dayOfWeekName.orEmpty())
                 )
             }
         }
@@ -144,6 +144,7 @@ class AddOrEditReminderViewModel(
 
     private fun deleteReminder(id: Long) {
         viewModelScope.launch {
+            reminderScheduler.cancelReminder(id)
             reminderUseCases.deleteReminderUseCase.invoke(id)
         }
     }

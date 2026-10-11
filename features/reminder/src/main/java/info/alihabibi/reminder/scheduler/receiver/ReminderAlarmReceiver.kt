@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import info.alihabibi.common.ApplicationScope
+import info.alihabibi.common.PersianDateFormatter
 import info.alihabibi.domain.local.usecases.database.reminder.usecase.ReminderUseCases
 import info.alihabibi.reminder.notification.ReminderNotifier
 import kotlinx.coroutines.launch
@@ -22,9 +23,12 @@ class ReminderAlarmReceiver : BroadcastReceiver(), KoinComponent {
         val pendingResult = goAsync()
         applicationScope.launch {
             try {
-                val reminder = reminderUseCases.getReminderByIdUseCase.invoke(reminderId)
+                val reminder = reminderUseCases.getReminderByIdUseCase.invoke(reminderId) ?: return@launch
                 if (!reminder.isEnabled) return@launch
-                notifier.pushNotification(reminderId, reminder.title)
+                notifier.pushNotification(
+                    reminderId,
+                    reminder.title
+                )
                 reminderUseCases.updateReminderIsEnabledUseCase.invoke(reminderId, false)
             } finally {
                 pendingResult.finish()

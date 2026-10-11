@@ -15,6 +15,6 @@ interface ReminderRepository {
 
     suspend fun updateReminderIsEnabled(reminderId: Long, isEnabled: Boolean)
 
-    suspend fun getReminderById(reminderId: Long): Reminder
+    suspend fun getReminderById(reminderId: Long): Reminder?
 
 }

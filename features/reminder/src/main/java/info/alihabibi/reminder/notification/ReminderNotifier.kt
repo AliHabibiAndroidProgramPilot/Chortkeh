@@ -5,7 +5,10 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
+import android.media.AudioAttributes
+import android.media.RingtoneManager
 import info.alihabibi.designsystem.R
+import info.alihabibi.designsystem.theme.Primary
 
 internal class ReminderNotifier(private val context: Context) {
 
@@ -15,14 +18,14 @@ internal class ReminderNotifier(private val context: Context) {
 
     private val notificationManager = context.getSystemService(NotificationManager::class.java)
 
-    fun pushNotification(reminderId: Long, title: String) {
+    fun pushNotification(reminderId: Long, text: String) {
         if (!notificationManager.areNotificationsEnabled()) return
 
         buildNotificationChannel()
         val notification = Notification.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.app_logo)
-            .setContentTitle(title)
-            .setContentText("")
+            .setContentTitle(context.getString(R.string.chortkeh_reminder))
+            .setContentText(text)
             .setCategory(Notification.CATEGORY_REMINDER)
             .setContentIntent(buildContentIntent())
             .setAutoCancel(true)
@@ -37,6 +40,14 @@ internal class ReminderNotifier(private val context: Context) {
             NotificationManager.IMPORTANCE_HIGH
         ).apply {
             description = context.getString(R.string.reminder_notification_channel_description)
+            setSound(
+                RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION),
+                AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build()
+            )
+            enableVibration(true)
         }
         notificationManager.createNotificationChannel(channel)
     }

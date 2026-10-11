@@ -7,6 +7,6 @@ class GetReminderByIdUseCase(
     private val repository: ReminderRepository
 ) {
 
-    suspend operator fun invoke(reminderId: Long): Reminder = repository.getReminderById(reminderId)
+    suspend operator fun invoke(reminderId: Long): Reminder? = repository.getReminderById(reminderId)
 
 }

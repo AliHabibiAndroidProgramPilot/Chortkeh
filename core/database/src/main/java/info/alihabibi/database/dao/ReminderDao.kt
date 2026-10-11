@@ -28,6 +28,6 @@ interface ReminderDao {
     suspend fun updateReminderIsEnabled(id: Long, isEnabled: Boolean)
 
     @Query("SELECT * FROM ${Keys.REMINDER_TABLE_NAME} WHERE id = :id")
-    suspend fun getReminderById(id: Long): ReminderEntity
+    suspend fun getReminderById(id: Long): ReminderEntity?
 
 }
