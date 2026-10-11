@@ -58,6 +58,8 @@ class AddOrEditReminderViewModel(
 
             is AddOrEditReminderUiIntent.EditReminder -> editReminder(event.id)
 
+            is AddOrEditReminderUiIntent.DeleteReminder -> deleteReminder(event.id)
+
             is AddOrEditReminderUiIntent.SaveReminder -> saveReminder()
 
         }
@@ -138,6 +140,12 @@ class AddOrEditReminderViewModel(
         }
     }
 
+    private fun deleteReminder(id: Long) {
+        viewModelScope.launch {
+            reminderUseCases.deleteReminderUseCase.invoke(id)
+        }
+    }
+
     private fun saveReminder() {
         viewModelScope.launch {
             val state = uiState.value
@@ -177,6 +185,8 @@ sealed interface AddOrEditReminderUiIntent {
     data class FetchEditingReminder(val id: Long) : AddOrEditReminderUiIntent
 
     data class EditReminder(val id: Long) : AddOrEditReminderUiIntent
+
+    data class DeleteReminder(val id: Long) : AddOrEditReminderUiIntent
 
     data object SaveReminder : AddOrEditReminderUiIntent
 

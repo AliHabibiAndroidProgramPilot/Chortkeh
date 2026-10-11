@@ -120,6 +120,12 @@ fun AddOrEditReminderDestination(
             else
                 viewModel.onEvent(AddOrEditReminderUiIntent.SaveReminder)
         },
+        onDeleteReminder = {
+            if (editingReminderId != null) {
+                viewModel.onEvent(AddOrEditReminderUiIntent.DeleteReminder(editingReminderId))
+                onBackPressed()
+            }
+        },
         onBackPressed = onBackPressed
     )
 
@@ -135,6 +141,7 @@ fun AddOrEditReminderScreen(
     onDateChanged: (year: Int, month: Int, day: Pair<Int, String>, timeStamp: Long) -> Unit = { _, _, _, _ -> },
     onTimeChange: (hour: Int?, minute: Int?) -> Unit = { _, _ -> },
     onSaveOrEditReminder: () -> Unit = {},
+    onDeleteReminder: () -> Unit = {},
     onBackPressed: () -> Unit
 ) {
 
@@ -242,6 +249,23 @@ fun AddOrEditReminderScreen(
                 }
             )
 
+    var showDeleteWarningDialog by remember { mutableStateOf(false) }
+    if (showDeleteWarningDialog)
+        AppDialog(
+            title = stringResource(id = R.string.delete_reminder),
+            message = stringResource(id = R.string.delete_reminder_description),
+            confirmButtonText = stringResource(id = R.string.cancel),
+            cancelButtonText = stringResource(id = R.string.delete),
+            onConfirmClicked = {
+                showDeleteWarningDialog = false
+            },
+            onCancelClicked = {
+                onDeleteReminder()
+                showDeleteWarningDialog = false
+            },
+            onDismissRequest = { showDeleteWarningDialog = false }
+        )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -268,10 +292,11 @@ fun AddOrEditReminderScreen(
                         stringResource(id = R.string.edit_reminder)
                     else
                         stringResource(id = R.string.register_reminder),
+                    actionIcon = painterResource(id = R.drawable.trash),
                     onNavigationClicked = onBackPressed,
                     isActionAvailable = isEditingReminder,
                     onActionClicked = {
-
+                        showDeleteWarningDialog = true
                     }
                 )
 
