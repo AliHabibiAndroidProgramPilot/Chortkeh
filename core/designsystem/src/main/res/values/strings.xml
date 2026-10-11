@@ -157,5 +157,7 @@
     <string name="empty_reminder_list_message">هنوز یادآوری ثبت نکردی</string>
     <string name="exact_alarm_permission_title">اجازه تنظیم آلارم</string>
     <string name="exact_alarm_permission_message">برای اینکه بتونی سر ساعت از یادآور هایی که تنظیم کردی مطلع بشی، لازمه دسترسی آلارم رو فعال کنی</string>
+    <string name="reminder_notification_channel_name">یادآورها</string>
+    <string name="reminder_notification_channel_description">یادآور هایی که ثبت کردی</string>
 
 </resources>

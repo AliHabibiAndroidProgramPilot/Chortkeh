@@ -9,6 +9,7 @@ import info.alihabibi.domain.local.usecases.database.reminder.usecase.ReminderUs
 import info.alihabibi.model.mapper.toDomain
 import info.alihabibi.model.mapper.toUiModel
 import info.alihabibi.model.ui_model.reminder.ReminderUiModel
+import info.alihabibi.reminder.scheduler.ReminderScheduler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -20,7 +21,8 @@ import kotlinx.coroutines.launch
 import java.util.Locale
 
 class AddOrEditReminderViewModel(
-    private val reminderUseCases: ReminderUseCases
+    private val reminderUseCases: ReminderUseCases,
+    private val reminderScheduler: ReminderScheduler
 ) : ViewModel() {
 
     val uiState: StateFlow<ReminderUiState>
@@ -60,7 +62,7 @@ class AddOrEditReminderViewModel(
 
             is AddOrEditReminderUiIntent.DeleteReminder -> deleteReminder(event.id)
 
-            is AddOrEditReminderUiIntent.SaveReminder -> saveReminder()
+            is AddOrEditReminderUiIntent.SaveReminder -> saveAndScheduleReminder()
 
         }
     }
@@ -146,7 +148,7 @@ class AddOrEditReminderViewModel(
         }
     }
 
-    private fun saveReminder() {
+    private fun saveAndScheduleReminder() {
         viewModelScope.launch {
             val state = uiState.value
             if (state.reminderTitle.isBlank() || state.formattedReminderTime.isBlank() || state.triggerTimeStamp == null)
@@ -164,6 +166,7 @@ class AddOrEditReminderViewModel(
             ).toDomain()
             val id = reminderUseCases.saveReminderUseCases.invoke(reminder)
             uiState.update { it.copy(savedReminderId = id) }
+            reminderScheduler.schedule(id, reminder.triggerAtMillis)
         }
     }
 

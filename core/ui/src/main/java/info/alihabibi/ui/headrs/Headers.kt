@@ -74,7 +74,7 @@ fun HomePageHeader(
         actions = {
             Icon(
                 modifier = Modifier.padding(12.dp),
-                painter = painterResource(id = R.drawable.header_app_logo),
+                painter = painterResource(id = R.drawable.app_logo),
                 tint = Primary,
                 contentDescription = null
             )
