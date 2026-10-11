@@ -1,6 +1,5 @@
 package info.alihabibi.onboarding
 
-import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -12,8 +11,10 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
@@ -21,15 +22,15 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import info.alihabibi.designsystem.R
@@ -45,13 +46,12 @@ fun OnBoardingDestination(
     viewModel: OnBoardingViewModel = koinViewModel()
 ) {
 
-    val orientation = LocalConfiguration.current.orientation
+    val windowAdaptiveInfo = currentWindowAdaptiveInfoV2()
+    val isWide = windowAdaptiveInfo.windowSizeClass.isWidthAtLeastBreakpoint(widthDpBreakpoint = 600)
 
-    val pagerContent =
-        providePagerContent(isLandScape = orientation)
+    val pagerContent = providePagerContent(isWide = isWide)
 
     OnBoardingScreen(
-        screenOrientation = orientation,
         pages = pagerContent,
         onEnterApplication = {
             viewModel.onEvent(OnBoardingUiIntent.ChangeIsFirstLaunchFlag(false))
@@ -63,45 +63,37 @@ fun OnBoardingDestination(
 
 @Composable
 private fun OnBoardingScreen(
-    screenOrientation: Int = Configuration.ORIENTATION_PORTRAIT,
     pages: Array<@Composable () -> Unit>,
     onEnterApplication: () -> Unit
 ) {
 
-    /*if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S_V2)
-        CheckPermission(
-            requestPermission = android.Manifest.permission.POST_NOTIFICATIONS,
-            rationalDialogTitle = stringResource(R.string.notification_access),
-            rationalDialogMessage = stringResource(id = R.string.notification_access_message),
-            rationalDialogConfirmButtonText = stringResource(id = R.string.I_give_permission),
-            rationalDialogCancelButtonText = stringResource(id = R.string.dismiss)
-        )*/
-
     val pagerState = rememberPagerState(pageCount = { pages.size })
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
 
         HorizontalPager(
             modifier = Modifier
-                .fillMaxSize()
-                .align(Alignment.Center),
+                .fillMaxWidth()
+                .weight(1f),
             state = pagerState
         ) { page ->
             pages[page]()
         }
 
         PagerIndicator(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = if (screenOrientation == Configuration.ORIENTATION_PORTRAIT) 250.dp else 50.dp),
+            modifier = Modifier.padding(vertical = 16.dp),
             pagerState = pagerState
         )
 
         AppButton(
             modifier = Modifier
-                .align(Alignment.BottomCenter)
+                .widthIn(max = 400.dp)
                 .fillMaxWidth()
-                .padding(bottom = 62.dp, start = 20.dp, end = 20.dp),
+                .padding(horizontal = 20.dp)
+                .padding(bottom = 32.dp),
             onClick = onEnterApplication,
             text = stringResource(R.string.enter_app)
         )
@@ -117,37 +109,38 @@ private fun PagerContentVertical(
     description: String
 ) {
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 20.dp, vertical = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
 
-        Column(
+        Image(
+            painter = image,
+            contentDescription = null,
             modifier = Modifier
-                .align(Alignment.Center)
-                .padding(start = 20.dp, end = 20.dp, bottom = 90.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+                .fillMaxWidth()
+                .heightIn(max = 280.dp),
+            contentScale = ContentScale.Fit
+        )
 
-            Image(
-                painter = image,
-                contentDescription = null,
-                modifier = Modifier.fillMaxWidth(),
-                contentScale = ContentScale.Fit
-            )
+        Spacer(modifier = Modifier.height(24.dp))
 
-            Spacer(modifier = Modifier.height(32.dp))
+        Text(
+            text = title,
+            style = MaterialTheme.typography.headlineSmall,
+            textAlign = TextAlign.Center
+        )
 
-            Text(
-                text = title,
-                style = MaterialTheme.typography.headlineSmall
-            )
+        Spacer(modifier = Modifier.height(16.dp))
 
-            Spacer(modifier = Modifier.height(28.dp))
-
-            Text(
-                text = description,
-                style = MaterialTheme.typography.bodyMedium.copy(color = Gray8)
-            )
-
-        }
+        Text(
+            text = description,
+            style = MaterialTheme.typography.bodyMedium.copy(color = Gray8),
+            textAlign = TextAlign.Center
+        )
 
     }
 
@@ -160,39 +153,45 @@ private fun PagerContentLandscape(
     description: String
 ) {
 
-    Row(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(20.dp),
-        verticalAlignment = Alignment.CenterVertically
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
     ) {
-
-        Image(
-            painter = image,
-            contentDescription = null,
+        Row(
             modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight(),
-            contentScale = ContentScale.Fit
-        )
-
-        Spacer(Modifier.width(24.dp))
-
-        Column(
-            modifier = Modifier.weight(1f),
-            horizontalAlignment = AbsoluteAlignment.Right,
-            verticalArrangement = Arrangement.Center
+                .fillMaxSize()
+                .widthIn(max = 800.dp)
+                .padding(horizontal = 32.dp, vertical = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
 
-            Text(title, style = MaterialTheme.typography.headlineSmall)
-
-            Spacer(Modifier.height(12.dp))
-
-            Text(
-                description,
-                style = MaterialTheme.typography.bodyMedium.copy(color = Gray8)
+            Image(
+                painter = image,
+                contentDescription = null,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight(),
+                contentScale = ContentScale.Fit
             )
 
+            Spacer(Modifier.width(32.dp))
+
+            Column(
+                modifier = Modifier.weight(1f),
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.Center
+            ) {
+
+                Text(title, style = MaterialTheme.typography.headlineSmall)
+
+                Spacer(Modifier.height(12.dp))
+
+                Text(
+                    description,
+                    style = MaterialTheme.typography.bodyMedium.copy(color = Gray8)
+                )
+
+            }
         }
     }
 
@@ -227,10 +226,10 @@ private fun PagerIndicator(
 }
 
 private fun providePagerContent(
-    isLandScape: Int
+    isWide: Boolean
 ): Array<@Composable () -> Unit> {
 
-    return if (isLandScape == Configuration.ORIENTATION_LANDSCAPE) {
+    return if (isWide) {
         arrayOf<@Composable () -> Unit>(
             {
                 PagerContentLandscape(

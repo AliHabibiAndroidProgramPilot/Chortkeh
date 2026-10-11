@@ -15,14 +15,17 @@ object PersianDateFormatter {
 
     fun format(year: Int, month: Int, dayOfWeekName: String, dayOfMonth: Int, time: String): String {
         require(month in 1..12) { return "" }
+        require(dayOfMonth in 1..31) { return "" }
+        val hour = time.substringBefore(':')
+        val minute = time.substringAfter(':')
         return StringBuilder()
             .append(dayOfWeekName)
-            .append(", ")
+            .append("، ")
             .append("$dayOfMonth ")
             .append("${persianMonths[month -1]} ")
             .append(year)
-            .append(", ")
-            .append(time)
+            .append("، ")
+            .append("\u202A$hour : $minute\u202C")
             .toString()
     }
 

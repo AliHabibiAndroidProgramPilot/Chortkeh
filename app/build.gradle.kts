@@ -58,6 +58,9 @@ dependencies {
     // profile
     implementation(projects.features.profile)
 
+    // Reminder
+    implementation(projects.features.reminder)
+
     // Unit Tests
     testImplementation(libs.junit)
 

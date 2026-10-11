@@ -1,7 +1,8 @@
 package info.alihabibi.chortkeh.navigation
 
 import info.alihabibi.designsystem.R
-import info.alihabibi.profile.Profile
+import info.alihabibi.profile.ProfileGraphRoute
+import info.alihabibi.reminder.ReminderGraphRoute
 import info.alihabibi.ui.navigation.BottomNavItemData
 
 enum class BottomNavItems(
@@ -22,14 +23,14 @@ enum class BottomNavItems(
         R.string.profile,
         R.drawable.profile,
         R.drawable.profile_enabled,
-        Profile
+        ProfileGraphRoute
     ),
 
     REMINDER(
         R.string.reminder,
         R.drawable.reminder,
         R.drawable.reminder_enabled,
-        Reminder
+        ReminderGraphRoute
     ),
 
     REPORTS(

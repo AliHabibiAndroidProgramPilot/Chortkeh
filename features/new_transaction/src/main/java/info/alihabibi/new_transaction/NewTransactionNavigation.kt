@@ -33,18 +33,18 @@ fun NavGraphBuilder.newTransactionGraph(
             }
             val viewModel: NewTransactionViewModel = koinViewModel(viewModelStoreOwner = parentEntry)
             val editingTransactionId = remember(parentEntry) {
-                parentEntry.toRoute<NewTransactionGraphRoute>().editingTransactionId
+                parentEntry.toRoute<NewTransactionGraphRoute>()
             }
 
             NewTransactionDestination(
                 viewModel = viewModel,
-                editingTransactionId = editingTransactionId,
+                editingTransactionId = editingTransactionId.editingTransactionId,
                 onAddNewCategory = {
-                    navController.navigate(AddCategory(editingCategoryId = null))
+                    navController.navigate(AddCategory())
                 },
                 onAddNewChannel = onAddNewChannel,
                 onEditCategory = { categoryId ->
-                    navController.navigate(AddCategory(editingCategoryId = categoryId))
+                    navController.navigate(AddCategory(categoryId))
                 },
                 onBackPressed = {
                     navController.navigateUp()

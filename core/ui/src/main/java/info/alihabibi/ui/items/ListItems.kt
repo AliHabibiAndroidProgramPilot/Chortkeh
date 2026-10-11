@@ -17,6 +17,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -29,13 +31,18 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.ErrorRed
 import info.alihabibi.designsystem.theme.Gray3
+import info.alihabibi.designsystem.theme.Gray5
 import info.alihabibi.designsystem.theme.Gray8
+import info.alihabibi.designsystem.theme.Primary
+import info.alihabibi.designsystem.theme.White
 
 @Composable
 fun AppSimpleListItem(
@@ -203,6 +210,79 @@ fun ListedChannelItem(
                 contentDescription = null,
                 tint = Color.Unspecified
             )
+
+        }
+
+    }
+
+}
+
+@Composable
+fun ListedReminderItem(
+    title: String,
+    subTitle: String = "",
+    isEnabled: Boolean = true,
+    isPassed: Boolean? = null,
+    onCheckedChange: (isChecked: Boolean) -> Unit,
+    onClick: () -> Unit,
+) {
+
+    val shape = RoundedCornerShape(size = 10.dp)
+
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+
+        Row(
+            modifier = Modifier
+                .height(height = 65.dp)
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 4.dp)
+                .border(width = 1.dp, color = MaterialTheme.colorScheme.outlineVariant, shape = shape)
+                .clip(shape = shape)
+                .clickable(onClick = onClick),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.End
+        ) {
+
+            Switch(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                checked = when(isPassed) {
+                    true -> false
+                    else -> isEnabled
+                },
+                onCheckedChange = onCheckedChange,
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = White,
+                    uncheckedThumbColor = White,
+                    checkedTrackColor = Primary,
+                    uncheckedTrackColor = Gray5,
+                    uncheckedBorderColor = Gray5
+                )
+            )
+
+            Spacer(modifier = Modifier.weight(weight = 1f))
+
+            Column(horizontalAlignment = Alignment.End) {
+
+                Text(
+                    modifier = Modifier.padding(end = 10.dp, bottom = 8.dp),
+                    text = title,
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        textAlign = TextAlign.End,
+                        textDecoration = if (isPassed == true) TextDecoration.LineThrough else TextDecoration.None
+                    )
+                )
+
+                Text(
+                    modifier = Modifier.padding(end = 10.dp),
+                    text = subTitle,
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        textDirection = TextDirection.Rtl,
+                        textAlign = TextAlign.End,
+                        color = Gray8
+                    )
+                )
+
+            }
 
         }
 

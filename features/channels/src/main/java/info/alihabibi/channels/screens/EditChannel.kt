@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -106,7 +107,9 @@ private fun EditChannelScreen(
     ) {
 
         Column(
-            modifier = Modifier.weight(weight = 1f),
+            modifier = Modifier
+                .widthIn(max = 600.dp)
+                .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
@@ -151,6 +154,7 @@ private fun EditChannelScreen(
 
             AppButton(
                 modifier = Modifier
+                    .widthIn(max = 400.dp)
                     .fillMaxWidth(fraction = 0.9f)
                     .padding(bottom = 12.dp),
                 onClick = onEditChannel,

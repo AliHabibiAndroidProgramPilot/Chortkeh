@@ -17,6 +17,8 @@ import info.alihabibi.new_transaction.newTransactionGraph
 import info.alihabibi.onboarding.OnBoardingDestination
 import info.alihabibi.profile.Profile
 import info.alihabibi.profile.profileGraph
+import info.alihabibi.reminder.RemindersList
+import info.alihabibi.reminder.reminderGraph
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -35,11 +37,7 @@ object AllTransactions
 @Serializable
 object Report
 
-/** non usable here, should be in its own module with a sub graph here! currently using it as help for Bottom nav bar implementation */
-@Serializable
-object Reminder
-
-val topLevelDestinations = setOfNotNull(Home, Profile, Report, Reminder)
+val topLevelDestinations = setOfNotNull(Home, Profile, Report, RemindersList)
 
 @Composable
 fun DemoNavHost(
@@ -109,10 +107,6 @@ fun DemoNavHost(
             Text("REPORTS")
         }
 
-        composable<Reminder> {
-            Text("REminder")
-        }
-
         profileGraph(navController = navController)
 
         newTransactionGraph(
@@ -124,6 +118,8 @@ fun DemoNavHost(
         )
 
         channelsGraph(navController = navController)
+
+        reminderGraph(navController = navController)
 
     }
 

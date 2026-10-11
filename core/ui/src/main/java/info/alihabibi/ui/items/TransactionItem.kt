@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,6 +28,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -83,13 +85,14 @@ fun TransactionItem(
 
             }
 
-            Spacer(modifier = Modifier.weight(weight = 1f))
-
-            Column(horizontalAlignment = Alignment.End) {
+            Column(
+                modifier = Modifier.weight(weight = 1f),
+                horizontalAlignment = Alignment.End
+            ) {
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(space = 4.dp)
+                    horizontalArrangement = Arrangement.spacedBy(space = 4.dp, alignment = Alignment.End)
                 ) {
 
                     if (needsTypeTag)
@@ -99,6 +102,8 @@ fun TransactionItem(
                                 .background(color = tagColor, shape = RoundedCornerShape(percent = 22))
                                 .padding(vertical = 4.dp, horizontal = 6.dp),
                             text = tag,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.labelMedium.copy(
                                 textAlign = TextAlign.End,
                                 color = MaterialTheme.colorScheme.onSurface
@@ -106,8 +111,12 @@ fun TransactionItem(
                         )
 
                     Text(
-                        modifier = Modifier.padding(end = 10.dp, bottom = 8.dp),
+                        modifier = Modifier
+                            .weight(weight = 1f, fill = false)
+                            .padding(end = 10.dp, bottom = 8.dp),
                         text = title,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
                         style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.End)
                     )
 
@@ -116,6 +125,8 @@ fun TransactionItem(
                 Text(
                     modifier = Modifier.padding(end = 10.dp),
                     text = subTitle,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.bodySmall.copy(
                         textAlign = TextAlign.End,
                         color = Gray8
@@ -127,7 +138,7 @@ fun TransactionItem(
             Icon(
                 modifier = Modifier
                     .padding(end = 12.dp)
-                    .size(size = 28.dp),
+                    .requiredSize(size = 28.dp),
                 painter = painterResource(iconResId),
                 contentDescription = null,
                 tint = Color.Unspecified

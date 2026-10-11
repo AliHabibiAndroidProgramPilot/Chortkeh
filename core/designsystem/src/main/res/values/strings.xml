@@ -43,6 +43,7 @@
     <string name="piggy_bank_subtitle">ذخیره پس‌انداز</string>
     <string name="stairs_subtitle">هدف‌گذاری مالی</string>
     <string name="all_transactions">همه تراکنش ها</string>
+    <string name="not_available">این بخش هنوز در دسترس نیست</string>
 
     // On Boarding
     <string name="piggy_bank">قلک</string>
@@ -132,6 +133,7 @@
     <string name="channel_icon">آیکون کانال</string>
     <string name="read_sms">خواندن پیامک ها</string>
     <string name="read_sms_description">دریافتی‌ها و پرداختی‌ها مسقیم از پیامک خونده میشه</string>
+    <string name="channel_name_error">نام کانال نمیتواند بیشتر از 30 کاراکتر باشد</string>
     <string name="edit_channel">ویرایش کانال</string>
     <string name="save_changes">ذخیره تغییرات</string>
     <string name="delete_channel">حذف کانال</string>
@@ -141,5 +143,22 @@
         در صورت حذف، تمام تراکنش‌های مربوط به کانال فاقد اطلاعات کانال خواهند بود.
     </string>
     <string name="delete">حذف کردن</string>
+
+    // Reminders
+    <string name="add_new_reminder">ثبت یادآور جدید</string>
+    <string name="register_reminder">ثبت یادآور</string>
+    <string name="chortkeh_reminder">یادآور چرتکه</string>
+    <string name="edit_reminder">ویرایش یادآور</string>
+    <string name="delete_reminder">حذف یادآور</string>
+    <string name="delete_reminder_description">مطمعنی میخوای این یادآور رو حذف کنی؟</string>
+    <string name="reminder_title">عنوان یادآور</string>
+    <string name="reminder_saved_successfully">یادآور با موفیت ذخیره شد</string>
+    <string name="register">ثبت</string>
+    <string name="reminder_name_error">نام یادآور نمیتواند بیشتر از 30 کاراکتر باشد</string>
+    <string name="empty_reminder_list_message">هنوز یادآوری ثبت نکردی</string>
+    <string name="exact_alarm_permission_title">اجازه تنظیم آلارم</string>
+    <string name="exact_alarm_permission_message">برای اینکه بتونی سر ساعت از یادآور هایی که تنظیم کردی مطلع بشی، لازمه دسترسی آلارم رو فعال کنی</string>
+    <string name="reminder_notification_channel_name">یادآورها</string>
+    <string name="reminder_notification_channel_description">یادآور هایی که ثبت کردی</string>
 
 </resources>

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
@@ -53,46 +54,55 @@ private fun AllTransactionsScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        AppHeader(
-            title = stringResource(id = R.string.all_transactions),
-            isActionAvailable = false,
-            onNavigationClicked = onBackPressed
-        )
-
-        LazyColumn(
+        Column(
             modifier = Modifier
-                .weight(weight = 1f)
-                .fillMaxWidth(),
-            contentPadding = PaddingValues(vertical = 12.dp)
+                .widthIn(max = 700.dp)
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            items(
-                items = transactions,
-                key = { it.id }
-            ) { transaction ->
+            AppHeader(
+                title = stringResource(id = R.string.all_transactions),
+                isActionAvailable = false,
+                onNavigationClicked = onBackPressed
+            )
 
-                TransactionItem(
-                    title = transaction.category?.title.orEmpty(),
-                    transactionAmount = transaction.amount,
-                    subTitle = PersianDateFormatter.format(
-                        transaction.year,
-                        transaction.month,
-                        transaction.dayOfWeekName,
-                        transaction.day,
-                        transaction.time
-                    ),
-                    iconResId = transaction.category?.icon?.iconResId ?: R.drawable.category_ic_others,
-                    needsTypeTag = true,
-                    tag = stringResource(id = transaction.type.labelRes),
-                    tagColor = if (transaction.type == TransactionTypeOptionUiModel.INCOME)
-                        GreenSuccessLight.copy(alpha = 0.25f)
-                    else
-                        ErrorRed.copy(alpha = 0.25f),
-                    clickable = true,
-                    onClick = {
-                        onEditTransaction(transaction.id)
-                    }
-                )
+            LazyColumn(
+                modifier = Modifier
+                    .weight(weight = 1f)
+                    .fillMaxWidth(),
+                contentPadding = PaddingValues(vertical = 12.dp)
+            ) {
+
+                items(
+                    items = transactions,
+                    key = { it.id }
+                ) { transaction ->
+
+                    TransactionItem(
+                        title = transaction.category?.title.orEmpty(),
+                        transactionAmount = transaction.amount,
+                        subTitle = PersianDateFormatter.format(
+                            transaction.year,
+                            transaction.month,
+                            transaction.dayOfWeekName,
+                            transaction.day,
+                            transaction.time
+                        ),
+                        iconResId = transaction.category?.icon?.iconResId ?: R.drawable.category_ic_others,
+                        needsTypeTag = true,
+                        tag = stringResource(id = transaction.type.labelRes),
+                        tagColor = if (transaction.type == TransactionTypeOptionUiModel.INCOME)
+                            GreenSuccessLight.copy(alpha = 0.25f)
+                        else
+                            ErrorRed.copy(alpha = 0.25f),
+                        clickable = true,
+                        onClick = {
+                            onEditTransaction(transaction.id)
+                        }
+                    )
+
+                }
 
             }
 
