@@ -18,9 +18,11 @@ internal class AlarmManagerReminderScheduler(private val context: Context) : Rem
         }
         val pendingIntent = PendingIntent.getBroadcast(
             context,
-            0, // resolve pending intents identity by intent data (each data contains unique reminder id)
+            // resolve pending intents identity by intent data (each data contains unique reminder id) so we ignore requestCode
+            0,
             intent,
-            PendingIntent.FLAG_IMMUTABLE
+            // since user can update the reminder trigger time FLAG_UPDATE_CURRENT is also needed
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
         if (AndroidUtils.canScheduleExactAlarms(context))
