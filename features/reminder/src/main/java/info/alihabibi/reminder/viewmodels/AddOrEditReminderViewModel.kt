@@ -126,11 +126,12 @@ class AddOrEditReminderViewModel(
             val state = uiState.value
             if (state.reminderTitle.isBlank() || state.formattedReminderTime.isBlank() || state.triggerTimeStamp == null)
                 return@launch
+            val triggerAtMillis = Utils.mergeTimeIntoEpochMillis(state.triggerTimeStamp, state.formattedReminderTime)
             val reminder = ReminderUiModel(
                 id = id,
                 title = state.reminderTitle,
                 isEnabled = true,
-                triggerTimeStamp = Utils.mergeTimeIntoEpochMillis(state.triggerTimeStamp, state.formattedReminderTime),
+                triggerTimeStamp = triggerAtMillis,
                 isPassed = null,
                 year = state.reminderYear,
                 month = state.reminderMonth,
@@ -139,6 +140,7 @@ class AddOrEditReminderViewModel(
                 time = state.formattedReminderTime
             ).toDomain()
             reminderUseCases.updateReminderUseCase.invoke(reminder)
+            reminderScheduler.schedule(id, triggerAtMillis)
         }
     }
 
