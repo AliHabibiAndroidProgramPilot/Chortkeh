@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import info.alihabibi.common.ApplicationScope
-import info.alihabibi.common.PersianDateFormatter
 import info.alihabibi.domain.local.usecases.database.reminder.usecase.ReminderUseCases
 import info.alihabibi.reminder.notification.ReminderNotifier
 import kotlinx.coroutines.launch

@@ -5,10 +5,12 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.media.AudioAttributes
 import android.media.RingtoneManager
+import androidx.core.net.toUri
 import info.alihabibi.designsystem.R
-import info.alihabibi.designsystem.theme.Primary
+import info.alihabibi.reminder.REMINDER_DEEP_LINK_BASE_URI
 
 internal class ReminderNotifier(private val context: Context) {
 
@@ -27,7 +29,7 @@ internal class ReminderNotifier(private val context: Context) {
             .setContentTitle(context.getString(R.string.chortkeh_reminder))
             .setContentText(text)
             .setCategory(Notification.CATEGORY_REMINDER)
-            .setContentIntent(buildContentIntent())
+            .setContentIntent(buildContentIntent(reminderId))
             .setAutoCancel(true)
             .build()
         notificationManager.notify("reminder_$reminderId", 0, notification)
@@ -52,9 +54,18 @@ internal class ReminderNotifier(private val context: Context) {
         notificationManager.createNotificationChannel(channel)
     }
 
-    private fun buildContentIntent(): PendingIntent? {
-        val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
-        return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+    private fun buildContentIntent(reminderId: Long): PendingIntent {
+        val deepLinkUri = "$REMINDER_DEEP_LINK_BASE_URI/$reminderId".toUri()
+        val intent = Intent(Intent.ACTION_VIEW, deepLinkUri).apply {
+            setPackage(context.packageName)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        return PendingIntent.getActivity(
+            context,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
     }
 
 }
