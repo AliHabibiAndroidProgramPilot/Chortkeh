@@ -24,9 +24,28 @@ class ReportViewModel(
         }.launchIn(viewModelScope)
     }
 
+    fun onEvent(event: ReportUiIntent) {
+        when (event) {
+
+            is ReportUiIntent.ReportTimingOptionChanged -> changeReportTimingOption(event.timingOption)
+
+        }
+    }
+
+    private fun changeReportTimingOption(timingOption: ReportTimingOption) {
+        uiState.update { it.copy(reportTimingOption = timingOption) }
+    }
+
+}
+
+sealed interface ReportUiIntent {
+
+    data class ReportTimingOptionChanged(val timingOption: ReportTimingOption) : ReportUiIntent
+
 }
 
 @Immutable
 data class ReportUiState(
-    val hasTransaction: Boolean = false
+    val hasTransaction: Boolean = false,
+    val reportTimingOption: ReportTimingOption = ReportTimingOption.WEEKLY
 )

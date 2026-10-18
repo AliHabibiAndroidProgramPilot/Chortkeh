@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
@@ -23,7 +25,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray7
+import info.alihabibi.report.ReportTimingOption
+import info.alihabibi.report.ReportUiIntent
+import info.alihabibi.report.ReportUiState
 import info.alihabibi.report.ReportViewModel
+import info.alihabibi.ui.buttons.AppToggle
 import info.alihabibi.ui.headrs.AppHeader
 import org.koin.androidx.compose.koinViewModel
 
@@ -35,14 +41,18 @@ fun ReportDestination(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     ReportScreen(
-        hasTransaction = uiState.hasTransaction
+        uiState = uiState,
+        onReportTimingOptionChanged = { timingOption ->
+            viewModel.onEvent(ReportUiIntent.ReportTimingOptionChanged(timingOption))
+        }
     )
 
 }
 
 @Composable
 private fun ReportScreen(
-    hasTransaction: Boolean
+    uiState: ReportUiState,
+    onReportTimingOptionChanged: (timingOption: ReportTimingOption) -> Unit = {}
 ) {
 
     Column(
@@ -63,7 +73,7 @@ private fun ReportScreen(
                 isNavigationAvailable = false
             )
 
-            if (!hasTransaction)
+            if (!uiState.hasTransaction)
                 EmptyReportState(
                     modifier = Modifier
                         .weight(1f)
@@ -74,6 +84,9 @@ private fun ReportScreen(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxWidth()
+                        .verticalScroll(state = rememberScrollState()),
+                    uiState = uiState,
+                    onReportTimingOptionChanged = onReportTimingOptionChanged
                 )
 
         }
@@ -84,9 +97,24 @@ private fun ReportScreen(
 
 @Composable
 private fun ReportContent(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    uiState: ReportUiState,
+    onReportTimingOptionChanged: (timingOption: ReportTimingOption) -> Unit = {}
 ) {
 
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        AppToggle(
+            toggleItems = ReportTimingOption.entries.toList(),
+            itemTitle = { timingOption -> stringResource(id = timingOption.labelRes) },
+            selectedOption = uiState.reportTimingOption,
+            onToggleSelectionChanged = onReportTimingOptionChanged
+        )
+
+    }
 
 }
 

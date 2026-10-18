@@ -161,4 +161,9 @@
     <string name="reminder_notification_channel_name">یادآورها</string>
     <string name="reminder_notification_channel_description">یادآور هایی که ثبت کردی</string>
 
+    // Report
+    <string name="weekly">هفتگی</string>
+    <string name="monthly">ماهانه</string>
+    <string name="yearly">سالانه</string>
+
 </resources>
