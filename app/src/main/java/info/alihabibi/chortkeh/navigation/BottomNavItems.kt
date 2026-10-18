@@ -3,6 +3,7 @@ package info.alihabibi.chortkeh.navigation
 import info.alihabibi.designsystem.R
 import info.alihabibi.profile.ProfileGraphRoute
 import info.alihabibi.reminder.ReminderGraphRoute
+import info.alihabibi.report.ReportGraphRoute
 import info.alihabibi.ui.navigation.BottomNavItemData
 
 enum class BottomNavItems(
@@ -37,7 +38,7 @@ enum class BottomNavItems(
         R.string.reports,
         R.drawable.reports,
         R.drawable.reports_enabled,
-        Report
+        ReportGraphRoute
     );
 
     fun toUiData(): BottomNavItemData = BottomNavItemData(labelResId, iconResId, enabledIconResId, route)

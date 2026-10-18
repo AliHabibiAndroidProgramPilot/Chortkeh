@@ -1,6 +1,5 @@
 package info.alihabibi.chortkeh.navigation
 
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -19,6 +18,8 @@ import info.alihabibi.profile.Profile
 import info.alihabibi.profile.profileGraph
 import info.alihabibi.reminder.RemindersList
 import info.alihabibi.reminder.reminderGraph
+import info.alihabibi.report.Report
+import info.alihabibi.report.reportGraph
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -32,10 +33,6 @@ object Announcements
 
 @Serializable
 object AllTransactions
-
-/** non usable here, should be in its own module with a sub graph here! currently using it as help for Bottom nav bar implementation */
-@Serializable
-object Report
 
 val topLevelDestinations = setOfNotNull(Home, Profile, Report, RemindersList)
 
@@ -100,10 +97,6 @@ fun DemoNavHost(
             )
         }
 
-        composable<Report> {
-            Text("REPORTS")
-        }
-
         profileGraph(navController = navController)
 
         newTransactionGraph(
@@ -117,6 +110,8 @@ fun DemoNavHost(
         channelsGraph(navController = navController)
 
         reminderGraph(navController = navController)
+
+        reportGraph()
 
     }
 
