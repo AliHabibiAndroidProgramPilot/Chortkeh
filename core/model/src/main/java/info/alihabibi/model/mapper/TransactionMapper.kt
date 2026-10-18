@@ -4,6 +4,8 @@ import info.alihabibi.common.Utils
 import info.alihabibi.domain.models.transaction.CategoryTransactionExpenses
 import info.alihabibi.domain.models.transaction.Transaction
 import info.alihabibi.domain.models.transaction.TransactionType
+import info.alihabibi.domain.models.transaction.chart_data.BarChartTimingOption
+import info.alihabibi.model.ui_model.transaction.BarChartTimingOptionUiModel
 import info.alihabibi.model.ui_model.transaction.CategoryTransactionExpensesUiModel
 import info.alihabibi.model.ui_model.transaction.TransactionTypeOptionUiModel
 import info.alihabibi.model.ui_model.transaction.TransactionUiModel
@@ -48,4 +50,16 @@ fun TransactionType.toUiOption(): TransactionTypeOptionUiModel = when(this) {
 fun TransactionTypeOptionUiModel.toDomain(): TransactionType = when(this) {
     TransactionTypeOptionUiModel.INCOME -> TransactionType.INCOME
     TransactionTypeOptionUiModel.OUTCOME -> TransactionType.OUTCOME
+}
+
+fun BarChartTimingOption.toUiOption(): BarChartTimingOptionUiModel = when(this) {
+    BarChartTimingOption.WEEKLY -> BarChartTimingOptionUiModel.WEEKLY
+    BarChartTimingOption.MONTHLY -> BarChartTimingOptionUiModel.MONTHLY
+    BarChartTimingOption.YEARLY -> BarChartTimingOptionUiModel.YEARLY
+}
+
+fun BarChartTimingOptionUiModel.toDomain(): BarChartTimingOption = when(this) {
+    BarChartTimingOptionUiModel.WEEKLY -> BarChartTimingOption.WEEKLY
+    BarChartTimingOptionUiModel.MONTHLY -> BarChartTimingOption.MONTHLY
+     BarChartTimingOptionUiModel.YEARLY -> BarChartTimingOption.YEARLY
 }
