@@ -8,6 +8,7 @@ import androidx.room.Transaction
 import androidx.room.Update
 import info.alihabibi.database.entities.CategoryTransactionExpensesData
 import info.alihabibi.database.entities.DetailedTransaction
+import info.alihabibi.database.entities.IncomeExpenseBucketData
 import info.alihabibi.database.entities.TransactionEntity
 import info.alihabibi.domain.Keys
 import kotlinx.coroutines.flow.Flow
@@ -74,5 +75,36 @@ interface TransactionDao {
     @Transaction
     @Query("SELECT * FROM ${Keys.TRANSACTION_TABLE_NAME} WHERE id = :id")
     suspend fun getTransactionById(id: Long): DetailedTransaction
+
+    @Query("""
+    SELECT month AS bucket,
+           COALESCE(SUM(CASE WHEN transactionType = 'INCOME'  THEN amount END), 0) AS incomeAmount,
+           COALESCE(SUM(CASE WHEN transactionType = 'OUTCOME' THEN amount END), 0) AS expenseAmount
+    FROM ${Keys.TRANSACTION_TABLE_NAME}
+    WHERE year = :year
+    GROUP BY month
+""")
+    fun getYearBuckets(year: Int): Flow<List<IncomeExpenseBucketData>>
+
+    @Query("""
+    SELECT (day - 1) / 7 AS bucket,
+           COALESCE(SUM(CASE WHEN transactionType = 'INCOME'  THEN amount END), 0) AS incomeAmount,
+           COALESCE(SUM(CASE WHEN transactionType = 'OUTCOME' THEN amount END), 0) AS expenseAmount
+    FROM ${Keys.TRANSACTION_TABLE_NAME}
+    WHERE year = :year AND month = :month
+    GROUP BY (day - 1) / 7
+""")
+    fun getMonthBuckets(year: Int, month: Int): Flow<List<IncomeExpenseBucketData>>
+
+    @Query("""
+    SELECT (year * 10000 + month * 100 + day) AS bucket,
+           COALESCE(SUM(CASE WHEN transactionType = 'INCOME'  THEN amount END), 0) AS incomeAmount,
+           COALESCE(SUM(CASE WHEN transactionType = 'OUTCOME' THEN amount END), 0) AS expenseAmount
+    FROM ${Keys.TRANSACTION_TABLE_NAME}
+    WHERE year BETWEEN :startYear AND :endYear
+      AND (year * 10000 + month * 100 + day) BETWEEN :startKey AND :endKey
+    GROUP BY year, month, day
+""")
+    fun getDayBuckets(startYear: Int, endYear: Int, startKey: Int, endKey: Int): Flow<List<IncomeExpenseBucketData>>
 
 }
