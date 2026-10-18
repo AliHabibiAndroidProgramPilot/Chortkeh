@@ -1,9 +1,9 @@
-package info.alihabibi.report
+package info.alihabibi.model.ui_model.transaction
 
 import androidx.annotation.StringRes
 import info.alihabibi.designsystem.R
 
-enum class ReportTimingOption(
+enum class BarChartTimingOptionUiModel(
     @get:StringRes val labelRes: Int
 ) {
 

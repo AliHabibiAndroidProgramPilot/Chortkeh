@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray7
-import info.alihabibi.report.ReportTimingOption
+import info.alihabibi.model.ui_model.transaction.BarChartTimingOptionUiModel
 import info.alihabibi.report.ReportUiIntent
 import info.alihabibi.report.ReportUiState
 import info.alihabibi.report.ReportViewModel
@@ -52,7 +52,7 @@ fun ReportDestination(
 @Composable
 private fun ReportScreen(
     uiState: ReportUiState,
-    onReportTimingOptionChanged: (timingOption: ReportTimingOption) -> Unit = {}
+    onReportTimingOptionChanged: (timingOption: BarChartTimingOptionUiModel) -> Unit = {}
 ) {
 
     Column(
@@ -99,7 +99,7 @@ private fun ReportScreen(
 private fun ReportContent(
     modifier: Modifier = Modifier,
     uiState: ReportUiState,
-    onReportTimingOptionChanged: (timingOption: ReportTimingOption) -> Unit = {}
+    onReportTimingOptionChanged: (timingOption: BarChartTimingOptionUiModel) -> Unit = {}
 ) {
 
     Column(
@@ -108,7 +108,7 @@ private fun ReportContent(
     ) {
 
         AppToggle(
-            toggleItems = ReportTimingOption.entries.toList(),
+            toggleItems = BarChartTimingOptionUiModel.entries.toList(),
             itemTitle = { timingOption -> stringResource(id = timingOption.labelRes) },
             selectedOption = uiState.reportTimingOption,
             onToggleSelectionChanged = onReportTimingOptionChanged
