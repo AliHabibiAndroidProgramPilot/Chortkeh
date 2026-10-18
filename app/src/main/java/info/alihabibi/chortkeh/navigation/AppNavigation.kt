@@ -77,9 +77,6 @@ fun DemoNavHost(
                 onNewChannel = {
                     navController.navigate(ChannelGraphRoute)
                     navController.navigate(AddChannel)
-                },
-                onTransactionsList = {
-                    navController.navigate(AllTransactions)
                 }
             )
         }
