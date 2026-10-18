@@ -5,10 +5,12 @@ import info.alihabibi.domain.models.transaction.CategoryTransactionExpenses
 import info.alihabibi.domain.models.transaction.Transaction
 import info.alihabibi.domain.models.transaction.TransactionType
 import info.alihabibi.domain.models.transaction.chart_data.BarChartTimingOption
+import info.alihabibi.domain.models.transaction.chart_data.IncomeExpenseBucket
 import info.alihabibi.model.ui_model.transaction.BarChartTimingOptionUiModel
 import info.alihabibi.model.ui_model.transaction.CategoryTransactionExpensesUiModel
 import info.alihabibi.model.ui_model.transaction.TransactionTypeOptionUiModel
 import info.alihabibi.model.ui_model.transaction.TransactionUiModel
+import info.alihabibi.model.ui_model.transaction.chart_data.IncomeExpenseBucketUiModel
 
 fun Transaction.toUiModel(needsAmountFormat: Boolean = true): TransactionUiModel = TransactionUiModel(
     id = id,
@@ -63,3 +65,9 @@ fun BarChartTimingOptionUiModel.toDomain(): BarChartTimingOption = when(this) {
     BarChartTimingOptionUiModel.MONTHLY -> BarChartTimingOption.MONTHLY
      BarChartTimingOptionUiModel.YEARLY -> BarChartTimingOption.YEARLY
 }
+
+fun IncomeExpenseBucket.toUiModel(): IncomeExpenseBucketUiModel = IncomeExpenseBucketUiModel(
+    index = index,
+    expenseAmount = expenseAmount,
+    incomeAmount = incomeAmount
+)
