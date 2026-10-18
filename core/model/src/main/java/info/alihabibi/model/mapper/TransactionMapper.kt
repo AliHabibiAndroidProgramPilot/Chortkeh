@@ -54,12 +54,6 @@ fun TransactionTypeOptionUiModel.toDomain(): TransactionType = when(this) {
     TransactionTypeOptionUiModel.OUTCOME -> TransactionType.OUTCOME
 }
 
-fun BarChartTimingOption.toUiOption(): BarChartTimingOptionUiModel = when(this) {
-    BarChartTimingOption.WEEKLY -> BarChartTimingOptionUiModel.WEEKLY
-    BarChartTimingOption.MONTHLY -> BarChartTimingOptionUiModel.MONTHLY
-    BarChartTimingOption.YEARLY -> BarChartTimingOptionUiModel.YEARLY
-}
-
 fun BarChartTimingOptionUiModel.toDomain(): BarChartTimingOption = when(this) {
     BarChartTimingOptionUiModel.WEEKLY -> BarChartTimingOption.WEEKLY
     BarChartTimingOptionUiModel.MONTHLY -> BarChartTimingOption.MONTHLY

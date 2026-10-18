@@ -165,5 +165,6 @@
     <string name="weekly">هفتگی</string>
     <string name="monthly">ماهانه</string>
     <string name="yearly">سالانه</string>
+    <string name="week_of_month">هفته %1$d</string>
 
 </resources>
