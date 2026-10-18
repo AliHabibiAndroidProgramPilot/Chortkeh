@@ -1,18 +1,20 @@
 package info.alihabibi.ui.buttons
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -21,95 +23,93 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import info.alihabibi.designsystem.theme.Gray7
 import info.alihabibi.designsystem.theme.Primary
 import info.alihabibi.designsystem.theme.White
 
 @Composable
 fun <T> AppToggle(
+    modifier: Modifier = Modifier,
     toggleItems: List<T>,
     itemTitle: @Composable (T) -> String,
     selectedOption: T,
     onToggleSelectionChanged: (item: T) -> Unit
 ) {
 
-    val shape = RoundedCornerShape(20)
-    val selectedColor = Primary
-    val unselectedColor = Gray7
+    val selectedIndex = toggleItems.indexOf(selectedOption).coerceAtLeast(0)
+    val shape = RoundedCornerShape(percent = 25)
 
-    Row(
-        modifier = Modifier.height(height = 45.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
+    BoxWithConstraints(
+        modifier = modifier
+            .height(height = 48.dp)
+            .padding(horizontal = 12.dp)
+            .border(width = 1.2.dp, color = Gray7, shape = shape)
     ) {
-        toggleItems.forEachIndexed { index, item ->
 
-            val containerColor by animateColorAsState(
-                targetValue = if (selectedOption == item) selectedColor else Color.Transparent,
-                animationSpec = tween(easing = FastOutLinearInEasing, durationMillis = 180)
-            )
+        val totalWidth = maxWidth
+        val itemCount = toggleItems.size.coerceAtLeast(1)
+        val itemWidth = totalWidth / itemCount
 
-            val contentColor by animateColorAsState(
-                targetValue = if (selectedOption == item) White else unselectedColor,
-                animationSpec = tween(easing = FastOutLinearInEasing, durationMillis = 180)
-            )
+        val targetOffset = itemWidth * selectedIndex
 
-            val borderColor by animateColorAsState(
-                targetValue = if (selectedOption == item) Color.Transparent else unselectedColor,
-                animationSpec = tween(easing = FastOutLinearInEasing, durationMillis = 180)
-            )
+        val animatedOffset by animateDpAsState(
+            targetValue = targetOffset,
+            animationSpec = tween(durationMillis = 180),
+            label = "indicatorOffset"
+        )
 
-            val boxOffset = when (index) {
-                0 -> 15.dp / 2
-                else -> -(15.dp / 2)
-            }
+        Box(
+            modifier = Modifier
+                .offset { IntOffset(x = animatedOffset.roundToPx(), y = 0) }
+                .width(itemWidth)
+                .fillMaxHeight()
+                .clip(shape)
+                .background(Primary)
+        )
 
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
-                    .offset(x = boxOffset)
-                    .zIndex(zIndex = if (selectedOption == item) 1f else 0f)
-                    .padding(
-                        start = if (index == 0) 14.dp else 0.dp,
-                        end = if (index == toggleItems.lastIndex) 14.dp else 0.dp
-                    )
-                    .border(
-                        width = 1.5.dp,
-                        color = borderColor,
-                        shape = shape
-                    )
-                    .clip(shape)
-                    .background(color = containerColor)
-                    .clickable {
-                        onToggleSelectionChanged(item)
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = itemTitle(item),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = contentColor
+        Row(modifier = Modifier.fillMaxSize()) {
+
+            toggleItems.forEach { item ->
+                val isSelected = selectedOption == item
+                val contentColor by animateColorAsState(
+                    targetValue = if (isSelected) White else Gray7,
+                    animationSpec = tween(durationMillis = 180),
+                    label = "textColor"
                 )
+
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .clip(shape)
+                        .clickable { onToggleSelectionChanged(item) },
+                    contentAlignment = Alignment.Center
+                ) {
+
+                    Text(
+                        text = itemTitle(item),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = contentColor
+                    )
+
+                }
+
             }
+
         }
     }
 }
 
-
-@Preview
+@Preview(showBackground = true)
 @Composable
-private fun AppTogglePreview() {
-
+private fun AppToggle2ItemsPreview() {
     AppToggle(
         toggleItems = listOf("بانکی", "چرتکه"),
         itemTitle = { it },
-        selectedOption = "",
+        selectedOption = "بانکی",
         onToggleSelectionChanged = {}
     )
-
 }

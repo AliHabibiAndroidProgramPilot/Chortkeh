@@ -15,6 +15,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -71,11 +75,13 @@ private fun AnnouncementsScreen(
 
             Spacer(Modifier.height(height = 8.dp))
 
+            var selectedOption by remember(toggleItems) { mutableStateOf(toggleItems.firstOrNull() ?: "") }
+
             AppToggle(
                 toggleItems = toggleItems,
                 itemTitle = { it },
-                selectedOption = toggleItems.first(),
-                onToggleSelectionChanged = {}
+                selectedOption = selectedOption,
+                onToggleSelectionChanged = { selectedOption = it }
             )
 
             Spacer(Modifier.height(height = 8.dp))
