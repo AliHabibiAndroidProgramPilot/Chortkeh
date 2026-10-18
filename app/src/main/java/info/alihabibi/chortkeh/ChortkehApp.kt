@@ -12,6 +12,7 @@ import info.alihabibi.new_transaction.di.newTransactionModule
 import info.alihabibi.onboarding.di.onBoardingModule
 import info.alihabibi.profile.di.profileModule
 import info.alihabibi.reminder.di.reminderModule
+import info.alihabibi.report.di.reportModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
@@ -33,7 +34,8 @@ class ChortkehApp : Application() {
                     newTransactionModule,
                     profileModule,
                     channelsModule,
-                    reminderModule
+                    reminderModule,
+                    reportModule
                 )
             )
         }
