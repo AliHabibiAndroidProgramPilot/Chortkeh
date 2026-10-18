@@ -1,4 +1,4 @@
-package info.alihabibi.ui.charts
+package info.alihabibi.ui.charts.gauge_chart
 
 import androidx.annotation.DrawableRes
 

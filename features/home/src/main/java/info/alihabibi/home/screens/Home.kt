@@ -69,11 +69,11 @@ import info.alihabibi.home.HomeViewModel
 import info.alihabibi.ui.buttons.AppFeatureBotton
 import info.alihabibi.ui.buttons.AppFeatures
 import info.alihabibi.ui.buttons.AppOutlinedButton
-import info.alihabibi.ui.charts.AppPieChart
-import info.alihabibi.ui.charts.GaugeChart
-import info.alihabibi.ui.charts.GaugeChartData
-import info.alihabibi.ui.charts.GaugeChartState
-import info.alihabibi.ui.charts.PieChartData
+import info.alihabibi.ui.charts.pie_chart.AppPieChart
+import info.alihabibi.ui.charts.gauge_chart.GaugeChart
+import info.alihabibi.ui.charts.gauge_chart.GaugeChartData
+import info.alihabibi.ui.charts.gauge_chart.GaugeChartState
+import info.alihabibi.ui.charts.pie_chart.PieChartData
 import info.alihabibi.ui.dialogs.ChannelListedBottomSheet
 import info.alihabibi.ui.headrs.HomePageHeader
 import info.alihabibi.ui.items.TransactionItem

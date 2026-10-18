@@ -1,4 +1,4 @@
-package info.alihabibi.ui.charts
+package info.alihabibi.ui.charts.pie_chart
 
 import androidx.compose.ui.graphics.Color
 
