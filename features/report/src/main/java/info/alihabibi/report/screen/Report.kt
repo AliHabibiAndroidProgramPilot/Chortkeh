@@ -4,8 +4,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
@@ -23,13 +25,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import info.alihabibi.common.PersianDateFormatter
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray7
-import info.alihabibi.report.ReportTimingOption
+import info.alihabibi.model.ui_model.transaction.BarChartTimingOptionUiModel
 import info.alihabibi.report.ReportUiIntent
 import info.alihabibi.report.ReportUiState
 import info.alihabibi.report.ReportViewModel
 import info.alihabibi.ui.buttons.AppToggle
+import info.alihabibi.ui.charts.IncomeExpenseBarChart
 import info.alihabibi.ui.headrs.AppHeader
 import org.koin.androidx.compose.koinViewModel
 
@@ -52,7 +56,7 @@ fun ReportDestination(
 @Composable
 private fun ReportScreen(
     uiState: ReportUiState,
-    onReportTimingOptionChanged: (timingOption: ReportTimingOption) -> Unit = {}
+    onReportTimingOptionChanged: (timingOption: BarChartTimingOptionUiModel) -> Unit = {}
 ) {
 
     Column(
@@ -99,7 +103,7 @@ private fun ReportScreen(
 private fun ReportContent(
     modifier: Modifier = Modifier,
     uiState: ReportUiState,
-    onReportTimingOptionChanged: (timingOption: ReportTimingOption) -> Unit = {}
+    onReportTimingOptionChanged: (timingOption: BarChartTimingOptionUiModel) -> Unit = {}
 ) {
 
     Column(
@@ -108,10 +112,18 @@ private fun ReportContent(
     ) {
 
         AppToggle(
-            toggleItems = ReportTimingOption.entries.toList(),
+            toggleItems = BarChartTimingOptionUiModel.entries.toList(),
             itemTitle = { timingOption -> stringResource(id = timingOption.labelRes) },
             selectedOption = uiState.reportTimingOption,
             onToggleSelectionChanged = onReportTimingOptionChanged
+        )
+
+        Spacer(modifier = Modifier.height(height = 16.dp))
+
+        IncomeExpenseBarChart(
+            labels = dynamicBarChartLabels(uiState.chartTimingOption),
+            incomes = uiState.chartIncome,
+            expenses = uiState.chartExpense
         )
 
     }
@@ -161,4 +173,11 @@ private fun EmptyReportState(modifier: Modifier = Modifier) {
 
     }
 
+}
+
+@Composable
+fun dynamicBarChartLabels(timing: BarChartTimingOptionUiModel): List<String> = when (timing) {
+    BarChartTimingOptionUiModel.YEARLY -> PersianDateFormatter.persianMonths
+    BarChartTimingOptionUiModel.MONTHLY -> (1..5).map { stringResource(id = R.string.week_of_month, it) }
+    BarChartTimingOptionUiModel.WEEKLY -> PersianDateFormatter.persianWeekDays
 }

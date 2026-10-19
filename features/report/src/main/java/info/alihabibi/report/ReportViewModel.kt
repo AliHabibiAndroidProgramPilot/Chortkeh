@@ -4,21 +4,48 @@ import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import info.alihabibi.domain.local.usecases.database.transaction.usecase.TransactionUseCases
+import info.alihabibi.domain.models.transaction.chart_data.IncomeExpenseBucket
+import info.alihabibi.model.mapper.toDomain
+import info.alihabibi.model.mapper.toUiModel
+import info.alihabibi.model.ui_model.transaction.BarChartTimingOptionUiModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class ReportViewModel(
-    transactionUseCases: TransactionUseCases
+    private val transactionUseCases: TransactionUseCases
 ) : ViewModel() {
 
     val uiState: StateFlow<ReportUiState>
         field = MutableStateFlow(ReportUiState())
 
-
     init {
+        uiState
+            .map { it.reportTimingOption }
+            .distinctUntilChanged()
+            .flatMapLatest { timingOption ->
+                transactionUseCases.getIncomeExpenseChartUseCase.invoke(timingOption.toDomain())
+                    .map { buckets -> timingOption to buckets }
+            }
+            .onEach { (timingOption, bucket) ->
+                val bucketUiOption = bucket.map(IncomeExpenseBucket::toUiModel)
+                uiState.update {
+                    it.copy(
+                        chartTimingOption = timingOption,
+                        chartIncome = bucketUiOption.map { bucketData -> bucketData.incomeAmount },
+                        chartExpense = bucketUiOption.map { bucketData -> bucketData.expenseAmount }
+                    )
+                }
+            }
+            .launchIn(viewModelScope)
+
         transactionUseCases.hasTransactionUseCases.invoke().onEach { hasTransaction ->
             uiState.update { it.copy(hasTransaction = hasTransaction) }
         }.launchIn(viewModelScope)
@@ -32,7 +59,7 @@ class ReportViewModel(
         }
     }
 
-    private fun changeReportTimingOption(timingOption: ReportTimingOption) {
+    private fun changeReportTimingOption(timingOption: BarChartTimingOptionUiModel) {
         uiState.update { it.copy(reportTimingOption = timingOption) }
     }
 
@@ -40,12 +67,18 @@ class ReportViewModel(
 
 sealed interface ReportUiIntent {
 
-    data class ReportTimingOptionChanged(val timingOption: ReportTimingOption) : ReportUiIntent
+    data class ReportTimingOptionChanged(val timingOption: BarChartTimingOptionUiModel) : ReportUiIntent
 
 }
 
+// todo -> both `reportTimingOption` and `chartTimingOption` reference the same data, we distinguished it for chart correspond and stop glitching, fix it later
 @Immutable
 data class ReportUiState(
     val hasTransaction: Boolean = false,
-    val reportTimingOption: ReportTimingOption = ReportTimingOption.WEEKLY
+    // describes user's latest selection -> works with toggle
+    val reportTimingOption: BarChartTimingOptionUiModel = BarChartTimingOptionUiModel.WEEKLY,
+    // describes the chart data, not the user's latest selection
+    val chartTimingOption: BarChartTimingOptionUiModel = BarChartTimingOptionUiModel.WEEKLY,
+    val chartIncome: List<Long> = emptyList(),
+    val chartExpense: List<Long> = emptyList()
 )

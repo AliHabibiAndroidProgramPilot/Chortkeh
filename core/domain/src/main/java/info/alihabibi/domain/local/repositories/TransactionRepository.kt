@@ -2,6 +2,7 @@ package info.alihabibi.domain.local.repositories
 
 import info.alihabibi.domain.models.transaction.CategoryTransactionExpenses
 import info.alihabibi.domain.models.transaction.Transaction
+import info.alihabibi.domain.models.transaction.chart_data.IncomeExpenseBucket
 import kotlinx.coroutines.flow.Flow
 
 interface TransactionRepository {
@@ -27,5 +28,11 @@ interface TransactionRepository {
     fun getAllTransactions(): Flow<List<Transaction>>
 
     suspend fun getTransactionById(id: Long): Transaction
+
+    fun getYearBuckets(year: Int): Flow<List<IncomeExpenseBucket>>
+
+    fun getMonthBuckets(year: Int, month: Int): Flow<List<IncomeExpenseBucket>>
+
+    fun getDayBuckets(startKey: Int, endKey: Int): Flow<List<IncomeExpenseBucket>>
 
 }

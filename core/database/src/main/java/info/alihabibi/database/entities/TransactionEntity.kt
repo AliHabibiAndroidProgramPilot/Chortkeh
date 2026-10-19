@@ -57,3 +57,9 @@ data class CategoryTransactionExpensesData(
     val categoryTitle: String,
     val totalAmount: Long
 )
+
+data class IncomeExpenseBucketData(
+    val bucket: Int,
+    val incomeAmount: Long,
+    val expenseAmount: Long
+)

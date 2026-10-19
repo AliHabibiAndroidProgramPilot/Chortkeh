@@ -3,12 +3,13 @@ package info.alihabibi.database.repositories
 import info.alihabibi.database.dao.TransactionDao
 import info.alihabibi.database.entities.CategoryTransactionExpensesData
 import info.alihabibi.database.entities.DetailedTransaction
-import info.alihabibi.database.entities.TransactionEntity
+import info.alihabibi.database.entities.IncomeExpenseBucketData
 import info.alihabibi.database.mappers.asEntity
 import info.alihabibi.database.mappers.asExternalModel
 import info.alihabibi.domain.local.repositories.TransactionRepository
 import info.alihabibi.domain.models.transaction.CategoryTransactionExpenses
 import info.alihabibi.domain.models.transaction.Transaction
+import info.alihabibi.domain.models.transaction.chart_data.IncomeExpenseBucket
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -73,6 +74,31 @@ class TransactionRepositoryImpl(private val dao: TransactionDao) : TransactionRe
 
     override suspend fun getTransactionById(id: Long): Transaction {
         return dao.getTransactionById(id).asExternalModel()
+    }
+
+    override fun getYearBuckets(year: Int): Flow<List<IncomeExpenseBucket>> {
+        return dao.getYearBuckets(year).map { bucketData ->
+            bucketData.map(IncomeExpenseBucketData::asExternalModel)
+        }
+            .flowOn(Dispatchers.IO)
+    }
+
+    override fun getMonthBuckets(year: Int, month: Int): Flow<List<IncomeExpenseBucket>> {
+        return dao.getMonthBuckets(year, month).map { bucketData ->
+            bucketData.map(IncomeExpenseBucketData::asExternalModel)
+        }
+            .flowOn(Dispatchers.IO)
+    }
+
+    override fun getDayBuckets(startKey: Int, endKey: Int): Flow<List<IncomeExpenseBucket>> {
+        return dao.getDayBuckets(
+            startYear = startKey / 10_000,
+            endYear = endKey / 10_000,
+            startKey = startKey,
+            endKey = endKey
+        )
+            .map { bucketData -> bucketData.map(IncomeExpenseBucketData::asExternalModel) }
+            .flowOn(Dispatchers.IO)
     }
 
 }
