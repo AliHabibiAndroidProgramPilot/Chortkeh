@@ -1,4 +1,4 @@
-package info.alihabibi.home.screens
+package info.alihabibi.home
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -63,9 +63,6 @@ import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray8
 import info.alihabibi.designsystem.theme.NeutralGray
 import info.alihabibi.designsystem.theme.Primary
-import info.alihabibi.home.HomeUiIntent
-import info.alihabibi.home.HomeUiState
-import info.alihabibi.home.HomeViewModel
 import info.alihabibi.ui.buttons.AppFeatureBotton
 import info.alihabibi.ui.buttons.AppFeatures
 import info.alihabibi.ui.buttons.AppOutlinedButton

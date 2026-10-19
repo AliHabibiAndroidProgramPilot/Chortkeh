@@ -82,7 +82,7 @@ class TransactionRepositoryImpl(private val dao: TransactionDao) : TransactionRe
             .flowOn(Dispatchers.IO)
     }
 
-    override fun getLastTransactions(count: Int, type: String): Flow<List<Transaction>> {
+    override fun getLastTransactions(count: Int, type: String?): Flow<List<Transaction>> {
         return dao.getLastTransactions(count, type).map { transactionDataList ->
             transactionDataList.map(DetailedTransaction::asExternalModel)
         }

@@ -1,4 +1,4 @@
-package info.alihabibi.report
+package info.alihabibi.report.viewmodels
 
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
@@ -12,9 +12,11 @@ import info.alihabibi.model.mapper.toUiOption
 import info.alihabibi.model.ui_model.transaction.BarChartTimingOptionUiModel
 import info.alihabibi.model.ui_model.transaction.CategoryTransactionExpensesUiModel
 import info.alihabibi.model.ui_model.transaction.TransactionTypeOptionUiModel
+import info.alihabibi.model.ui_model.transaction.TransactionUiModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
@@ -50,14 +52,18 @@ class ReportViewModel(
             }
             .launchIn(viewModelScope)
 
-        transactionUseCases.hasTransactionUseCases.invoke().onEach { hasTransaction ->
-            uiState.update { it.copy(hasTransaction = hasTransaction) }
-        }.launchIn(viewModelScope)
-
-        transactionUseCases.hasOutcomeTransactionUseCase.invoke().onEach { hasOutcomeTransaction ->
+        combine(
+            transactionUseCases.hasTransactionUseCases.invoke(),
+            transactionUseCases.hasOutcomeTransactionUseCase.invoke(),
+            transactionUseCases.getLastTransactions.invoke(5, null)
+        ) { hasTransaction, hasOutcomeTransaction, last5transactions ->
             uiState.update {
                 it.copy(
+                    hasTransaction = hasTransaction,
                     hasOutcomeTransaction = hasOutcomeTransaction,
+                    lastTransactions = last5transactions
+                        .map { transaction -> transaction.toUiModel() }
+                        .take(5)
                 )
             }
         }.launchIn(viewModelScope)
@@ -124,5 +130,6 @@ data class ReportUiState(
     val pieChartTransactionType: TransactionTypeOptionUiModel = TransactionTypeOptionUiModel.OUTCOME,
     val chartIncome: List<Long> = emptyList(),
     val chartExpense: List<Long> = emptyList(),
-    val expensesByCategories: List<CategoryTransactionExpensesUiModel> = emptyList()
+    val expensesByCategories: List<CategoryTransactionExpensesUiModel> = emptyList(),
+    val lastTransactions: List<TransactionUiModel> = emptyList()
 )

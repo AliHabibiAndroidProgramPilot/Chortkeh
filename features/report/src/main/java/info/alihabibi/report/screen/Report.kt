@@ -15,10 +15,12 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,13 +28,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastMapIndexed
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import info.alihabibi.common.PersianDateFormatter
@@ -42,19 +43,21 @@ import info.alihabibi.designsystem.theme.Gray7
 import info.alihabibi.designsystem.theme.NeutralGray
 import info.alihabibi.model.ui_model.transaction.BarChartTimingOptionUiModel
 import info.alihabibi.model.ui_model.transaction.TransactionTypeOptionUiModel
-import info.alihabibi.report.ReportUiIntent
-import info.alihabibi.report.ReportUiState
-import info.alihabibi.report.ReportViewModel
+import info.alihabibi.report.viewmodels.ReportUiIntent
+import info.alihabibi.report.viewmodels.ReportUiState
+import info.alihabibi.report.viewmodels.ReportViewModel
 import info.alihabibi.ui.buttons.AppToggle
 import info.alihabibi.ui.charts.IncomeExpenseBarChart
 import info.alihabibi.ui.charts.pie_chart.AppPieChart
 import info.alihabibi.ui.charts.pie_chart.PieChartData
 import info.alihabibi.ui.headrs.AppHeader
+import info.alihabibi.ui.items.TransactionItem
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ReportDestination(
-    viewModel: ReportViewModel = koinViewModel()
+    viewModel: ReportViewModel = koinViewModel(),
+    onTransactionsList: () -> Unit = {}
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -66,7 +69,8 @@ fun ReportDestination(
         },
         onPieChartTransactionTypeChanged = { transactionType ->
             viewModel.onEvent(ReportUiIntent.PieChartTransactionTypeChanged(transactionType))
-        }
+        },
+        onTransactionsList = onTransactionsList
     )
 
 }
@@ -74,6 +78,7 @@ fun ReportDestination(
 @Composable
 private fun ReportScreen(
     uiState: ReportUiState,
+    onTransactionsList: () -> Unit = {},
     onReportTimingOptionChanged: (timingOption: BarChartTimingOptionUiModel) -> Unit = {},
     onPieChartTransactionTypeChanged: (type: TransactionTypeOptionUiModel) -> Unit = {}
 ) {
@@ -110,7 +115,8 @@ private fun ReportScreen(
                         .verticalScroll(state = rememberScrollState()),
                     uiState = uiState,
                     onReportTimingOptionChanged = onReportTimingOptionChanged,
-                    onPieChartTransactionTypeChanged = onPieChartTransactionTypeChanged
+                    onPieChartTransactionTypeChanged = onPieChartTransactionTypeChanged,
+                    onTransactionsList = onTransactionsList
                 )
 
         }
@@ -123,6 +129,7 @@ private fun ReportScreen(
 private fun ReportContent(
     modifier: Modifier = Modifier,
     uiState: ReportUiState,
+    onTransactionsList: () -> Unit = {},
     onReportTimingOptionChanged: (timingOption: BarChartTimingOptionUiModel) -> Unit = {},
     onPieChartTransactionTypeChanged: (type: TransactionTypeOptionUiModel) -> Unit = {}
 ) {
@@ -159,6 +166,53 @@ private fun ReportContent(
         Spacer(modifier = Modifier.height(height = 16.dp))
 
         PieChartSection(uiState = uiState)
+
+        Spacer(modifier = Modifier.height(height = 16.dp))
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            val lastTransactions = uiState.lastTransactions
+            repeat(lastTransactions.size) { index ->
+                TransactionItem(
+                    title = lastTransactions[index].category?.title.orEmpty(),
+                    transactionAmount = lastTransactions[index].amount,
+                    subTitle = PersianDateFormatter.format(
+                        lastTransactions[index].year,
+                        lastTransactions[index].month,
+                        lastTransactions[index].dayOfWeekName,
+                        lastTransactions[index].day,
+                        lastTransactions[index].time
+                    ),
+                    iconResId = lastTransactions[index].category?.icon?.iconResId ?: R.drawable.category_ic_others
+                )
+            }
+
+            if (uiState.hasTransaction)
+                TextButton(
+                    modifier = Modifier
+                        .fillMaxWidth(fraction = 0.7f)
+                        .padding(vertical = 8.dp),
+                    onClick = onTransactionsList,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Transparent,
+                        contentColor = MaterialTheme.colorScheme.secondary
+                    )
+                ) {
+
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = stringResource(id = R.string.all_transactions),
+                        style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center)
+                    )
+
+                }
+
+        }
 
     }
 

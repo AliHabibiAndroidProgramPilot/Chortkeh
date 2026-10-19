@@ -9,8 +9,7 @@ import info.alihabibi.announcements.AnnouncementsDestination
 import info.alihabibi.channels.AddChannel
 import info.alihabibi.channels.ChannelGraphRoute
 import info.alihabibi.channels.channelsGraph
-import info.alihabibi.home.screens.AllTransactionsDestination
-import info.alihabibi.home.screens.HomeDestination
+import info.alihabibi.home.HomeDestination
 import info.alihabibi.new_transaction.NewTransactionGraphRoute
 import info.alihabibi.new_transaction.newTransactionGraph
 import info.alihabibi.onboarding.OnBoardingDestination
@@ -30,9 +29,6 @@ object Home
 
 @Serializable
 object Announcements
-
-@Serializable
-object AllTransactions
 
 val topLevelDestinations = setOfNotNull(Home, Profile, Report, RemindersList)
 
@@ -86,17 +82,6 @@ fun DemoNavHost(
             )
         }
 
-        composable<AllTransactions> {
-            AllTransactionsDestination(
-                onEditTransaction = { transactionId ->
-                    navController.navigate(NewTransactionGraphRoute(transactionId))
-                },
-                onBackPressed = {
-                    navController.navigateUp()
-                }
-            )
-        }
-
         profileGraph(navController = navController)
 
         newTransactionGraph(
@@ -107,11 +92,16 @@ fun DemoNavHost(
             }
         )
 
+        reportGraph(
+            navController = navController,
+            onEditTransaction = { transactionId ->
+                navController.navigate(NewTransactionGraphRoute(transactionId))
+            }
+        )
+
         channelsGraph(navController = navController)
 
         reminderGraph(navController = navController)
-
-        reportGraph()
 
     }
 

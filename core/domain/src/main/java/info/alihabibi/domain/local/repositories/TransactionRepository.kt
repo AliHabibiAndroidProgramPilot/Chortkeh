@@ -29,7 +29,7 @@ interface TransactionRepository {
 
     fun getWeeklyCategoryExpenses(startKey: Int, endKey: Int, type: String): Flow<List<CategoryTransactionExpenses>>
 
-    fun getLastTransactions(count: Int, type: String): Flow<List<Transaction>>
+    fun getLastTransactions(count: Int, type: String?): Flow<List<Transaction>>
 
     fun getAllTransactions(): Flow<List<Transaction>>
 
