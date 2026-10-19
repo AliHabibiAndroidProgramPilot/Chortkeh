@@ -48,6 +48,7 @@ import info.alihabibi.model.ui_model.transaction.TransactionUiModel
 import info.alihabibi.report.viewmodels.ReportUiIntent
 import info.alihabibi.report.viewmodels.ReportUiState
 import info.alihabibi.report.viewmodels.ReportViewModel
+import info.alihabibi.ui.ReportScreenShimmerLoading
 import info.alihabibi.ui.buttons.AppToggle
 import info.alihabibi.ui.charts.IncomeExpenseBarChart
 import info.alihabibi.ui.charts.pie_chart.AppPieChart
@@ -88,55 +89,59 @@ private fun ReportScreen(
     val windowAdaptiveInfo = currentWindowAdaptiveInfoV2()
     val isCompact = !windowAdaptiveInfo.windowSizeClass.isWidthAtLeastBreakpoint(600)
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+    ReportScreenShimmerLoading(isLoading = uiState.loading) {
 
         Column(
-            modifier = Modifier
-                .widthIn(max = 1000.dp)
-                .fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            AppHeader(
-                title = stringResource(id = R.string.reports),
-                isActionAvailable = false,
-                isNavigationAvailable = false
-            )
+            Column(
+                modifier = Modifier
+                    .widthIn(max = 1000.dp)
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
 
-            if (!uiState.hasTransaction)
-                EmptyReportState(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth(),
-                    isCompact = isCompact
+                AppHeader(
+                    title = stringResource(id = R.string.reports),
+                    isActionAvailable = false,
+                    isNavigationAvailable = false
                 )
-            else {
-                if (isCompact) {
-                    ReportContentCompact(
+
+                if (!uiState.hasTransaction)
+                    EmptyReportState(
                         modifier = Modifier
                             .weight(1f)
-                            .fillMaxWidth()
-                            .verticalScroll(state = rememberScrollState()),
-                        uiState = uiState,
-                        onReportTimingOptionChanged = onReportTimingOptionChanged,
-                        onPieChartTransactionTypeChanged = onPieChartTransactionTypeChanged,
-                        onTransactionsList = onTransactionsList
+                            .fillMaxWidth(),
+                        isCompact = isCompact
                     )
-                } else {
-                    ReportContentWide(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxWidth()
-                            .verticalScroll(state = rememberScrollState()),
-                        uiState = uiState,
-                        onReportTimingOptionChanged = onReportTimingOptionChanged,
-                        onPieChartTransactionTypeChanged = onPieChartTransactionTypeChanged,
-                        onTransactionsList = onTransactionsList
-                    )
+                else {
+                    if (isCompact) {
+                        ReportContentCompact(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxWidth()
+                                .verticalScroll(state = rememberScrollState()),
+                            uiState = uiState,
+                            onReportTimingOptionChanged = onReportTimingOptionChanged,
+                            onPieChartTransactionTypeChanged = onPieChartTransactionTypeChanged,
+                            onTransactionsList = onTransactionsList
+                        )
+                    } else {
+                        ReportContentWide(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxWidth()
+                                .verticalScroll(state = rememberScrollState()),
+                            uiState = uiState,
+                            onReportTimingOptionChanged = onReportTimingOptionChanged,
+                            onPieChartTransactionTypeChanged = onPieChartTransactionTypeChanged,
+                            onTransactionsList = onTransactionsList
+                        )
+                    }
                 }
+
             }
 
         }

@@ -38,3 +38,6 @@ val WarningYellowLight = Color(0xFFF4B740)
 val ErrorRed = Color(0xFFC30000)
 val ErrorLight = Color(0xFFFFF2F2)
 val ErrorDark = Color(0x3E850808)
+
+val shimmerStartColor = NeutralGray.copy(alpha = 0.4f)
+val shimmerMiddleColor = Gray6.copy(alpha = 0.4f)

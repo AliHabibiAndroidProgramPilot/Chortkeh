@@ -52,22 +52,6 @@ class ReportViewModel(
             }
             .launchIn(viewModelScope)
 
-        combine(
-            transactionUseCases.hasTransactionUseCases.invoke(),
-            transactionUseCases.hasOutcomeTransactionUseCase.invoke(),
-            transactionUseCases.getLastTransactions.invoke(5, null)
-        ) { hasTransaction, hasOutcomeTransaction, last5transactions ->
-            uiState.update {
-                it.copy(
-                    hasTransaction = hasTransaction,
-                    hasOutcomeTransaction = hasOutcomeTransaction,
-                    lastTransactions = last5transactions
-                        .map { transaction -> transaction.toUiModel() }
-                        .take(5)
-                )
-            }
-        }.launchIn(viewModelScope)
-
         uiState
             .map { Pair(it.reportTimingOption, it.pieChartTransactionType) }
             .distinctUntilChanged()
@@ -88,6 +72,24 @@ class ReportViewModel(
                 }
             }
             .launchIn(viewModelScope)
+
+        combine(
+            transactionUseCases.hasTransactionUseCases.invoke(),
+            transactionUseCases.hasOutcomeTransactionUseCase.invoke(),
+            transactionUseCases.getLastTransactions.invoke(5, null)
+        ) { hasTransaction, hasOutcomeTransaction, last5transactions ->
+            uiState.update {
+                it.copy(
+                    loading = false,
+                    hasTransaction = hasTransaction,
+                    hasOutcomeTransaction = hasOutcomeTransaction,
+                    lastTransactions = last5transactions
+                        .map { transaction -> transaction.toUiModel() }
+                        .take(5)
+                )
+            }
+        }.launchIn(viewModelScope)
+
     }
 
     fun onEvent(event: ReportUiIntent) {
@@ -121,6 +123,7 @@ sealed interface ReportUiIntent {
 // todo -> both `reportTimingOption` and `chartTimingOption` reference the same data, we distinguished it for chart correspond and stop glitching, fix it later
 @Immutable
 data class ReportUiState(
+    val loading: Boolean = true,
     val hasTransaction: Boolean = false,
     val hasOutcomeTransaction: Boolean = false,
     // describes user's latest selection -> works with toggle
