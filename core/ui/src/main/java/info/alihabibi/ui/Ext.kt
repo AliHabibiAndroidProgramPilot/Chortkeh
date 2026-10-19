@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
@@ -30,11 +29,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import info.alihabibi.designsystem.theme.Gray1
-import info.alihabibi.designsystem.theme.Gray4
-import info.alihabibi.designsystem.theme.Gray6
-import info.alihabibi.designsystem.theme.Gray8
-import info.alihabibi.designsystem.theme.NeutralGray
 import info.alihabibi.designsystem.theme.shimmerMiddleColor
 import info.alihabibi.designsystem.theme.shimmerStartColor
 
@@ -77,7 +71,7 @@ fun ReportScreenShimmerLoading(
 ) {
     if (isLoading) {
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
                 .statusBarsPadding()
                 .navigationBarsPadding(),
