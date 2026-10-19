@@ -71,6 +71,7 @@ sealed interface ReportUiIntent {
 
 }
 
+// todo -> both `reportTimingOption` and `chartTimingOption` reference the same data, we distinguished it for chart correspond and stop glitching, fix it later
 @Immutable
 data class ReportUiState(
     val hasTransaction: Boolean = false,
