@@ -4,7 +4,6 @@ import info.alihabibi.database.dao.TransactionDao
 import info.alihabibi.database.entities.CategoryTransactionExpensesData
 import info.alihabibi.database.entities.DetailedTransaction
 import info.alihabibi.database.entities.IncomeExpenseBucketData
-import info.alihabibi.database.entities.TransactionEntity
 import info.alihabibi.database.mappers.asEntity
 import info.alihabibi.database.mappers.asExternalModel
 import info.alihabibi.domain.local.repositories.TransactionRepository

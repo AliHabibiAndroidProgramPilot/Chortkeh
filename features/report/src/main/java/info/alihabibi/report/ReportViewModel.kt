@@ -26,7 +26,6 @@ class ReportViewModel(
     val uiState: StateFlow<ReportUiState>
         field = MutableStateFlow(ReportUiState())
 
-
     init {
         uiState
             .map { it.reportTimingOption }
