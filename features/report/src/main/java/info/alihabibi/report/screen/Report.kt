@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -43,6 +44,7 @@ import info.alihabibi.designsystem.theme.Gray7
 import info.alihabibi.designsystem.theme.NeutralGray
 import info.alihabibi.model.ui_model.transaction.BarChartTimingOptionUiModel
 import info.alihabibi.model.ui_model.transaction.TransactionTypeOptionUiModel
+import info.alihabibi.model.ui_model.transaction.TransactionUiModel
 import info.alihabibi.report.viewmodels.ReportUiIntent
 import info.alihabibi.report.viewmodels.ReportUiState
 import info.alihabibi.report.viewmodels.ReportViewModel
@@ -83,6 +85,9 @@ private fun ReportScreen(
     onPieChartTransactionTypeChanged: (type: TransactionTypeOptionUiModel) -> Unit = {}
 ) {
 
+    val windowAdaptiveInfo = currentWindowAdaptiveInfoV2()
+    val isCompact = !windowAdaptiveInfo.windowSizeClass.isWidthAtLeastBreakpoint(600)
+
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -90,7 +95,7 @@ private fun ReportScreen(
 
         Column(
             modifier = Modifier
-                .widthIn(max = 700.dp)
+                .widthIn(max = 1000.dp)
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -105,19 +110,34 @@ private fun ReportScreen(
                 EmptyReportState(
                     modifier = Modifier
                         .weight(1f)
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
+                    isCompact = isCompact
                 )
-            else
-                ReportContent(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
-                        .verticalScroll(state = rememberScrollState()),
-                    uiState = uiState,
-                    onReportTimingOptionChanged = onReportTimingOptionChanged,
-                    onPieChartTransactionTypeChanged = onPieChartTransactionTypeChanged,
-                    onTransactionsList = onTransactionsList
-                )
+            else {
+                if (isCompact) {
+                    ReportContentCompact(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                            .verticalScroll(state = rememberScrollState()),
+                        uiState = uiState,
+                        onReportTimingOptionChanged = onReportTimingOptionChanged,
+                        onPieChartTransactionTypeChanged = onPieChartTransactionTypeChanged,
+                        onTransactionsList = onTransactionsList
+                    )
+                } else {
+                    ReportContentWide(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                            .verticalScroll(state = rememberScrollState()),
+                        uiState = uiState,
+                        onReportTimingOptionChanged = onReportTimingOptionChanged,
+                        onPieChartTransactionTypeChanged = onPieChartTransactionTypeChanged,
+                        onTransactionsList = onTransactionsList
+                    )
+                }
+            }
 
         }
 
@@ -126,7 +146,7 @@ private fun ReportScreen(
 }
 
 @Composable
-private fun ReportContent(
+private fun ReportContentCompact(
     modifier: Modifier = Modifier,
     uiState: ReportUiState,
     onTransactionsList: () -> Unit = {},
@@ -169,50 +189,132 @@ private fun ReportContent(
 
         Spacer(modifier = Modifier.height(height = 16.dp))
 
+        LastTransactionsSection(
+            lastTransactions = uiState.lastTransactions,
+            hasTransaction = uiState.hasTransaction,
+            onTransactionsList = onTransactionsList
+        )
+
+    }
+
+}
+
+@Composable
+private fun ReportContentWide(
+    modifier: Modifier = Modifier,
+    uiState: ReportUiState,
+    onTransactionsList: () -> Unit = {},
+    onReportTimingOptionChanged: (timingOption: BarChartTimingOptionUiModel) -> Unit = {},
+    onPieChartTransactionTypeChanged: (type: TransactionTypeOptionUiModel) -> Unit = {}
+) {
+
+    Row(
+        modifier = modifier.padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(24.dp)
+    ) {
+
+        // Left Column: Income & Expense Bar Chart
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 32.dp),
+            modifier = Modifier.weight(1f),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            val lastTransactions = uiState.lastTransactions
-            repeat(lastTransactions.size) { index ->
-                TransactionItem(
-                    title = lastTransactions[index].category?.title.orEmpty(),
-                    transactionAmount = lastTransactions[index].amount,
-                    subTitle = PersianDateFormatter.format(
-                        lastTransactions[index].year,
-                        lastTransactions[index].month,
-                        lastTransactions[index].dayOfWeekName,
-                        lastTransactions[index].day,
-                        lastTransactions[index].time
-                    ),
-                    iconResId = lastTransactions[index].category?.icon?.iconResId ?: R.drawable.category_ic_others
-                )
-            }
+            AppToggle(
+                toggleItems = BarChartTimingOptionUiModel.entries.toList(),
+                itemTitle = { timingOption -> stringResource(id = timingOption.labelRes) },
+                selectedOption = uiState.reportTimingOption,
+                onToggleSelectionChanged = onReportTimingOptionChanged
+            )
 
-            if (uiState.hasTransaction)
-                TextButton(
-                    modifier = Modifier
-                        .fillMaxWidth(fraction = 0.7f)
-                        .padding(vertical = 8.dp),
-                    onClick = onTransactionsList,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Transparent,
-                        contentColor = MaterialTheme.colorScheme.secondary
-                    )
-                ) {
+            Spacer(modifier = Modifier.height(16.dp))
 
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = stringResource(id = R.string.all_transactions),
-                        style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center)
-                    )
-
-                }
+            IncomeExpenseBarChart(
+                labels = dynamicBarChartLabels(uiState.chartTimingOption),
+                incomes = uiState.chartIncome,
+                expenses = uiState.chartExpense
+            )
 
         }
+
+        // Right Column: Pie Chart Breakdown & Recent Transactions
+        Column(
+            modifier = Modifier.weight(1f),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            AppToggle(
+                toggleItems = TransactionTypeOptionUiModel.entries.toList(),
+                itemTitle = { transactionType -> stringResource(id = transactionType.labelRes) },
+                selectedOption = uiState.pieChartTransactionType,
+                onToggleSelectionChanged = onPieChartTransactionTypeChanged
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            PieChartSection(uiState = uiState)
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            LastTransactionsSection(
+                lastTransactions = uiState.lastTransactions,
+                hasTransaction = uiState.hasTransaction,
+                onTransactionsList = onTransactionsList
+            )
+
+        }
+
+    }
+
+}
+
+@Composable
+private fun LastTransactionsSection(
+    lastTransactions: List<TransactionUiModel>,
+    hasTransaction: Boolean,
+    onTransactionsList: () -> Unit
+) {
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        repeat(lastTransactions.size) { index ->
+            TransactionItem(
+                title = lastTransactions[index].category?.title.orEmpty(),
+                transactionAmount = lastTransactions[index].amount,
+                subTitle = PersianDateFormatter.format(
+                    lastTransactions[index].year,
+                    lastTransactions[index].month,
+                    lastTransactions[index].dayOfWeekName,
+                    lastTransactions[index].day,
+                    lastTransactions[index].time
+                ),
+                iconResId = lastTransactions[index].category?.icon?.iconResId ?: R.drawable.category_ic_others
+            )
+        }
+
+        if (hasTransaction)
+            TextButton(
+                modifier = Modifier
+                    .fillMaxWidth(fraction = 0.7f)
+                    .padding(vertical = 8.dp),
+                onClick = onTransactionsList,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Transparent,
+                    contentColor = MaterialTheme.colorScheme.secondary
+                )
+            ) {
+
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = stringResource(id = R.string.all_transactions),
+                    style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center)
+                )
+
+            }
 
     }
 
@@ -279,7 +381,10 @@ private fun PieChartSection(uiState: ReportUiState) {
 }
 
 @Composable
-private fun EmptyReportState(modifier: Modifier = Modifier) {
+private fun EmptyReportState(
+    modifier: Modifier = Modifier,
+    isCompact: Boolean = true
+) {
 
     Box(
         modifier = modifier,
@@ -287,7 +392,6 @@ private fun EmptyReportState(modifier: Modifier = Modifier) {
     ) {
 
         Column(
-            modifier = modifier.align(Alignment.Center),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(space = 12.dp)
         ) {
@@ -295,7 +399,8 @@ private fun EmptyReportState(modifier: Modifier = Modifier) {
             Image(
                 painter = painterResource(id = R.drawable.empty_report),
                 contentDescription = null,
-                contentScale = ContentScale.Fit
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.size(width = 180.dp, height = 180.dp)
             )
 
             Text(
@@ -305,14 +410,11 @@ private fun EmptyReportState(modifier: Modifier = Modifier) {
 
         }
 
-        val windowAdaptiveInfo = currentWindowAdaptiveInfoV2()
-        val isCompact = !windowAdaptiveInfo.windowSizeClass.isWidthAtLeastBreakpoint(widthDpBreakpoint = 600)
-
         if (isCompact)
             Image(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
-                    .padding(start = 68.dp)
+                    .padding(start = 68.dp, bottom = 16.dp)
                     .rotate(degrees = -25f),
                 painter = painterResource(id = R.drawable.arrow_shape_down),
                 contentDescription = null,

@@ -8,11 +8,13 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -157,18 +159,21 @@ private fun RemindersListContent(
 @Composable
 private fun EmptyReminderState(modifier: Modifier = Modifier) {
 
+    val windowAdaptiveInfo = currentWindowAdaptiveInfoV2()
+    val isCompact = !windowAdaptiveInfo.windowSizeClass.isWidthAtLeastBreakpoint(600)
+
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center
     ) {
 
         Column(
-            modifier = modifier.align(Alignment.Center),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(space = 12.dp)
         ) {
 
             Image(
+                modifier = Modifier.size(width = 180.dp, height = 180.dp),
                 painter = painterResource(id = R.drawable.empty_reminder),
                 contentDescription = null,
                 contentScale = ContentScale.Fit
@@ -181,14 +186,16 @@ private fun EmptyReminderState(modifier: Modifier = Modifier) {
 
         }
 
-        Image(
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(start = 48.dp),
-            painter = painterResource(id = R.drawable.arrow_shape_down),
-            contentDescription = null,
-            contentScale = ContentScale.Fit
-        )
+        if (isCompact) {
+            Image(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(start = 48.dp, bottom = 16.dp),
+                painter = painterResource(id = R.drawable.arrow_shape_down),
+                contentDescription = null,
+                contentScale = ContentScale.Fit
+            )
+        }
 
     }
 
