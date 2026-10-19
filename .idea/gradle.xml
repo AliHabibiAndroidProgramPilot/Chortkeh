@@ -41,6 +41,7 @@
             <option value="$PROJECT_DIR$/features/onboarding" />
             <option value="$PROJECT_DIR$/features/profile" />
             <option value="$PROJECT_DIR$/features/reminder" />
+            <option value="$PROJECT_DIR$/features/report" />
           </set>
         </option>
       </GradleProjectSettings>

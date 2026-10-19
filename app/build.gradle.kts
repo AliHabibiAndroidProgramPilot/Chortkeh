@@ -61,6 +61,9 @@ dependencies {
     // Reminder
     implementation(projects.features.reminder)
 
+    // Report
+    implementation(projects.features.report)
+
     // Unit Tests
     testImplementation(libs.junit)
 

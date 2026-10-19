@@ -8,6 +8,6 @@ class GetLastTransactions(
     private val repository: TransactionRepository
 ) {
 
-    operator fun invoke(count: Int, type: String): Flow<List<Transaction>> = repository.getLastTransactions(count, type)
+    operator fun invoke(count: Int, type: String? = null): Flow<List<Transaction>> = repository.getLastTransactions(count, type)
 
 }

@@ -7,6 +7,8 @@ object PersianDateFormatter {
         "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"
     )
 
+    val persianWeekDays = listOf("شنبه", "یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنجشنبه", "جمعه")
+
     fun format(year: Int, month: Int, day: Int): String {
         require(month in 1..12) { return "" }
         require(day in 1..31) { return "" }

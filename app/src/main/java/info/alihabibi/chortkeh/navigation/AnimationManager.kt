@@ -15,13 +15,14 @@ import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import info.alihabibi.profile.ProfileGraphRoute
 import info.alihabibi.reminder.ReminderGraphRoute
+import info.alihabibi.report.ReportGraphRoute
 import kotlin.reflect.KClass
 
 private val topLevelRoutes: List<KClass<*>> = listOf(
     Home::class,
     ProfileGraphRoute::class,
     ReminderGraphRoute::class,
-    Report::class
+    ReportGraphRoute::class
 )
 
 private fun NavDestination.bottomNavItemIndex(): Int =

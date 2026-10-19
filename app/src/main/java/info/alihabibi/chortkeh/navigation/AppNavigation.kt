@@ -1,6 +1,5 @@
 package info.alihabibi.chortkeh.navigation
 
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -10,8 +9,7 @@ import info.alihabibi.announcements.AnnouncementsDestination
 import info.alihabibi.channels.AddChannel
 import info.alihabibi.channels.ChannelGraphRoute
 import info.alihabibi.channels.channelsGraph
-import info.alihabibi.home.screens.AllTransactionsDestination
-import info.alihabibi.home.screens.HomeDestination
+import info.alihabibi.home.HomeDestination
 import info.alihabibi.new_transaction.NewTransactionGraphRoute
 import info.alihabibi.new_transaction.newTransactionGraph
 import info.alihabibi.onboarding.OnBoardingDestination
@@ -19,6 +17,8 @@ import info.alihabibi.profile.Profile
 import info.alihabibi.profile.profileGraph
 import info.alihabibi.reminder.RemindersList
 import info.alihabibi.reminder.reminderGraph
+import info.alihabibi.report.Report
+import info.alihabibi.report.reportGraph
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -29,13 +29,6 @@ object Home
 
 @Serializable
 object Announcements
-
-@Serializable
-object AllTransactions
-
-/** non usable here, should be in its own module with a sub graph here! currently using it as help for Bottom nav bar implementation */
-@Serializable
-object Report
 
 val topLevelDestinations = setOfNotNull(Home, Profile, Report, RemindersList)
 
@@ -77,9 +70,6 @@ fun DemoNavHost(
                 onNewChannel = {
                     navController.navigate(ChannelGraphRoute)
                     navController.navigate(AddChannel)
-                },
-                onTransactionsList = {
-                    navController.navigate(AllTransactions)
                 }
             )
         }
@@ -92,21 +82,6 @@ fun DemoNavHost(
             )
         }
 
-        composable<AllTransactions> {
-            AllTransactionsDestination(
-                onEditTransaction = { transactionId ->
-                    navController.navigate(NewTransactionGraphRoute(transactionId))
-                },
-                onBackPressed = {
-                    navController.navigateUp()
-                }
-            )
-        }
-
-        composable<Report> {
-            Text("REPORTS")
-        }
-
         profileGraph(navController = navController)
 
         newTransactionGraph(
@@ -114,6 +89,13 @@ fun DemoNavHost(
             onAddNewChannel = {
                 navController.navigate(ChannelGraphRoute)
                 navController.navigate(AddChannel)
+            }
+        )
+
+        reportGraph(
+            navController = navController,
+            onEditTransaction = { transactionId ->
+                navController.navigate(NewTransactionGraphRoute(transactionId))
             }
         )
 

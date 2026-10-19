@@ -2,18 +2,21 @@ package info.alihabibi.channels.screens
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
@@ -25,9 +28,10 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -121,17 +125,21 @@ private fun AddNewChannelScreen(
                 Spacer(modifier = Modifier.height(height = 8.dp))
 
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-                    Row(
+
+                    FlowRow(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp)
-                            .height(height = 65.dp)
+                            .heightIn(min = 65.dp)
                             .border(
                                 width = 1.dp,
                                 color = Gray3,
                                 shape = RoundedCornerShape(size = 12.dp)
-                            ),
-                        verticalAlignment = Alignment.CenterVertically
+                            )
+                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        itemVerticalAlignment = Alignment.CenterVertically
                     ) {
 
                         Text(
@@ -143,44 +151,20 @@ private fun AddNewChannelScreen(
                             )
                         )
 
-                        Spacer(modifier = Modifier.width(width = 8.dp))
-
-                        RadioButton(
-                            modifier = Modifier.scale(scale = 0.8f),
+                        ChannelOption(
+                            label = stringResource(id = R.string.bank_card),
                             selected = uiState.isBankAccountChannel,
                             onClick = {
-                                if (!uiState.isBankAccountChannel)
-                                    onChannelTypeChange(true)
-                            },
-                            colors = RadioButtonDefaults.colors(
-                                selectedColor = Primary,
-                                unselectedColor = Gray6
-                            )
+                                if (!uiState.isBankAccountChannel) onChannelTypeChange(true)
+                            }
                         )
 
-                        Text(
-                            modifier = Modifier.offset(x = (-12).dp),
-                            text = stringResource(id = R.string.bank_card),
-                            style = MaterialTheme.typography.labelLarge
-                        )
-
-                        RadioButton(
-                            modifier = Modifier.scale(scale = 0.8f),
+                        ChannelOption(
+                            label = stringResource(id = R.string.other_source),
                             selected = !uiState.isBankAccountChannel,
                             onClick = {
-                                if (uiState.isBankAccountChannel)
-                                    onChannelTypeChange(false)
-                            },
-                            colors = RadioButtonDefaults.colors(
-                                selectedColor = Primary,
-                                unselectedColor = Gray6
-                            )
-                        )
-
-                        Text(
-                            modifier = Modifier.offset(x = (-12).dp),
-                            text = stringResource(id = R.string.other_source),
-                            style = MaterialTheme.typography.labelLarge
+                                if (uiState.isBankAccountChannel) onChannelTypeChange(false)
+                            }
                         )
 
                     }
@@ -199,7 +183,8 @@ private fun AddNewChannelScreen(
                             channelName = uiState.channelName,
                             cardNumber = uiState.cardNumber,
                             balance = uiState.channelBalance,
-                            iconResId = uiState.channelIcon?.iconResId ?: R.drawable.channel_ic_default,
+                            iconResId = uiState.channelIcon?.iconResId
+                                ?: R.drawable.channel_ic_default,
                             onChannelNameChange = onChannelNameChanged,
                             onCardNumberChange = onCardNumberChange,
                             onInitialBalanceChange = onInitialBalanceChanged
@@ -234,4 +219,41 @@ private fun AddNewChannelScreen(
 
     }
 
+}
+
+@Composable
+private fun ChannelOption(
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+
+    Row(
+        modifier = Modifier
+            .clip(shape = RoundedCornerShape(size = 8.dp))
+            .selectable(
+                selected = selected,
+                onClick = onClick,
+                role = Role.RadioButton
+            ),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        RadioButton(
+            selected = selected,
+            onClick = null,
+            colors = RadioButtonDefaults.colors(
+                selectedColor = Primary,
+                unselectedColor = Gray6
+            )
+        )
+
+        Spacer(Modifier.width(width = 4.dp))
+
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelLarge
+        )
+
+    }
 }

@@ -1,4 +1,4 @@
-package info.alihabibi.home.screens
+package info.alihabibi.home
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -19,14 +19,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
@@ -65,17 +63,14 @@ import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray8
 import info.alihabibi.designsystem.theme.NeutralGray
 import info.alihabibi.designsystem.theme.Primary
-import info.alihabibi.home.HomeUiIntent
-import info.alihabibi.home.HomeUiState
-import info.alihabibi.home.HomeViewModel
 import info.alihabibi.ui.buttons.AppFeatureBotton
 import info.alihabibi.ui.buttons.AppFeatures
 import info.alihabibi.ui.buttons.AppOutlinedButton
-import info.alihabibi.ui.charts.AppPieChart
-import info.alihabibi.ui.charts.GaugeChart
-import info.alihabibi.ui.charts.GaugeChartData
-import info.alihabibi.ui.charts.GaugeChartState
-import info.alihabibi.ui.charts.PieChartData
+import info.alihabibi.ui.charts.pie_chart.AppPieChart
+import info.alihabibi.ui.charts.gauge_chart.GaugeChart
+import info.alihabibi.ui.charts.gauge_chart.GaugeChartData
+import info.alihabibi.ui.charts.gauge_chart.GaugeChartState
+import info.alihabibi.ui.charts.pie_chart.PieChartData
 import info.alihabibi.ui.dialogs.ChannelListedBottomSheet
 import info.alihabibi.ui.headrs.HomePageHeader
 import info.alihabibi.ui.items.TransactionItem
@@ -87,8 +82,7 @@ fun HomeDestination(
     viewModel: HomeViewModel = koinViewModel(),
     onAnnouncements: () -> Unit = {},
     onNewChannel: () -> Unit = {},
-    onChannels: () -> Unit = {},
-    onTransactionsList: () -> Unit = {}
+    onChannels: () -> Unit = {}
 ) {
 
     val content = LocalContext.current
@@ -110,8 +104,7 @@ fun HomeDestination(
         },
         onAnnouncements = onAnnouncements,
         onNewChannel = onNewChannel,
-        onChannels = onChannels,
-        onTransactionsList = onTransactionsList
+        onChannels = onChannels
     )
 
 }
@@ -125,7 +118,6 @@ private fun HomeScreen(
     onAnnouncements: () -> Unit = {},
     onNewChannel: () -> Unit = {},
     onChannels: () -> Unit = {},
-    onTransactionsList: () -> Unit = {},
     onAppFeature: () -> Unit = {}
 ) {
 
@@ -201,10 +193,7 @@ private fun HomeScreen(
 
             Spacer(modifier = Modifier.height(height = 16.dp))
 
-            LastTransactionsSection(
-                uiState = uiState,
-                onTransactionsList = onTransactionsList
-            )
+            LastTransactionsSection(uiState = uiState)
 
         }
     } else {
@@ -262,10 +251,7 @@ private fun HomeScreen(
 
                     Spacer(modifier = Modifier.height(height = 16.dp))
 
-                    LastTransactionsSection(
-                        uiState = uiState,
-                        onTransactionsList = onTransactionsList
-                    )
+                    LastTransactionsSection(uiState = uiState)
 
                 }
 
@@ -583,8 +569,7 @@ private fun PieChartSection(uiState: HomeUiState) {
 
 @Composable
 private fun LastTransactionsSection(
-    uiState: HomeUiState,
-    onTransactionsList: () -> Unit
+    uiState: HomeUiState
 ) {
     Column(
         modifier = Modifier
@@ -594,7 +579,7 @@ private fun LastTransactionsSection(
     ) {
 
         val lastTransactions = uiState.lastTransactions
-        repeat(lastTransactions.size) { index ->
+        repeat(lastTransactions.size.coerceIn(0..5)) { index ->
             TransactionItem(
                 title = lastTransactions[index].category?.title.orEmpty(),
                 transactionAmount = lastTransactions[index].amount,
@@ -608,26 +593,6 @@ private fun LastTransactionsSection(
                 iconResId = lastTransactions[index].category?.icon?.iconResId ?: R.drawable.category_ic_others
             )
         }
-
-        if (uiState.hasTransaction)
-            TextButton(
-                modifier = Modifier
-                    .fillMaxWidth(fraction = 0.7f)
-                    .padding(vertical = 8.dp),
-                onClick = onTransactionsList,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Transparent,
-                    contentColor = MaterialTheme.colorScheme.secondary
-                )
-            ) {
-
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = stringResource(id = R.string.all_transactions),
-                    style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center)
-                )
-
-            }
 
     }
 }

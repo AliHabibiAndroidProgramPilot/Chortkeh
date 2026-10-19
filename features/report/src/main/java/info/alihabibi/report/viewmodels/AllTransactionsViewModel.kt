@@ -1,4 +1,4 @@
-package info.alihabibi.home
+package info.alihabibi.report.viewmodels
 
 import androidx.compose.ui.util.fastMap
 import androidx.lifecycle.ViewModel
