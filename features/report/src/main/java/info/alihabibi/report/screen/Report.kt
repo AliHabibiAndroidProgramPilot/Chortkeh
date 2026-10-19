@@ -1,5 +1,6 @@
 package info.alihabibi.report.screen
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,31 +10,45 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.fastMapIndexed
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import info.alihabibi.common.PersianDateFormatter
+import info.alihabibi.common_android.AndroidUtils
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray7
+import info.alihabibi.designsystem.theme.NeutralGray
 import info.alihabibi.model.ui_model.transaction.BarChartTimingOptionUiModel
+import info.alihabibi.model.ui_model.transaction.TransactionTypeOptionUiModel
 import info.alihabibi.report.ReportUiIntent
 import info.alihabibi.report.ReportUiState
 import info.alihabibi.report.ReportViewModel
 import info.alihabibi.ui.buttons.AppToggle
 import info.alihabibi.ui.charts.IncomeExpenseBarChart
+import info.alihabibi.ui.charts.pie_chart.AppPieChart
+import info.alihabibi.ui.charts.pie_chart.PieChartData
 import info.alihabibi.ui.headrs.AppHeader
 import org.koin.androidx.compose.koinViewModel
 
@@ -48,6 +63,9 @@ fun ReportDestination(
         uiState = uiState,
         onReportTimingOptionChanged = { timingOption ->
             viewModel.onEvent(ReportUiIntent.ReportTimingOptionChanged(timingOption))
+        },
+        onPieChartTransactionTypeChanged = { transactionType ->
+            viewModel.onEvent(ReportUiIntent.PieChartTransactionTypeChanged(transactionType))
         }
     )
 
@@ -56,7 +74,8 @@ fun ReportDestination(
 @Composable
 private fun ReportScreen(
     uiState: ReportUiState,
-    onReportTimingOptionChanged: (timingOption: BarChartTimingOptionUiModel) -> Unit = {}
+    onReportTimingOptionChanged: (timingOption: BarChartTimingOptionUiModel) -> Unit = {},
+    onPieChartTransactionTypeChanged: (type: TransactionTypeOptionUiModel) -> Unit = {}
 ) {
 
     Column(
@@ -90,7 +109,8 @@ private fun ReportScreen(
                         .fillMaxWidth()
                         .verticalScroll(state = rememberScrollState()),
                     uiState = uiState,
-                    onReportTimingOptionChanged = onReportTimingOptionChanged
+                    onReportTimingOptionChanged = onReportTimingOptionChanged,
+                    onPieChartTransactionTypeChanged = onPieChartTransactionTypeChanged
                 )
 
         }
@@ -103,7 +123,8 @@ private fun ReportScreen(
 private fun ReportContent(
     modifier: Modifier = Modifier,
     uiState: ReportUiState,
-    onReportTimingOptionChanged: (timingOption: BarChartTimingOptionUiModel) -> Unit = {}
+    onReportTimingOptionChanged: (timingOption: BarChartTimingOptionUiModel) -> Unit = {},
+    onPieChartTransactionTypeChanged: (type: TransactionTypeOptionUiModel) -> Unit = {}
 ) {
 
     Column(
@@ -125,6 +146,79 @@ private fun ReportContent(
             incomes = uiState.chartIncome,
             expenses = uiState.chartExpense
         )
+
+        Spacer(modifier = Modifier.height(height = 36.dp))
+
+        AppToggle(
+            toggleItems = TransactionTypeOptionUiModel.entries.toList(),
+            itemTitle = { transactionType -> stringResource(id = transactionType.labelRes) },
+            selectedOption = uiState.pieChartTransactionType,
+            onToggleSelectionChanged = onPieChartTransactionTypeChanged
+        )
+
+        Spacer(modifier = Modifier.height(height = 16.dp))
+
+        PieChartSection(uiState = uiState)
+
+    }
+
+}
+
+@Composable
+private fun PieChartSection(uiState: ReportUiState) {
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .padding(bottom = 32.dp)
+    ) {
+
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            Spacer(modifier = Modifier.height(height = 8.dp))
+
+            if (uiState.expensesByCategories.isEmpty())
+                Image(
+                    modifier = Modifier
+                        .size(width = 154.dp, height = 184.dp)
+                        .padding(top = 24.dp, bottom = 40.dp),
+                    painter = painterResource(id = R.drawable.empty_transaction),
+                    contentDescription = null,
+                    contentScale = ContentScale.FillBounds
+                )
+            else
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(percent = 8),
+                    border = BorderStroke(width = 1.5.dp, color = NeutralGray),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                ) {
+
+                    val data = remember(key1 = uiState.expensesByCategories) {
+                        val colorsList = AndroidUtils.generateDistinctColors(uiState.expensesByCategories.size)
+                        uiState.expensesByCategories.fastMapIndexed { index, category ->
+                            PieChartData(
+                                category.categoryTitle,
+                                category.totalAmount,
+                                colorsList[index]
+                            )
+                        }
+                    }
+
+                    AppPieChart(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(all = 8.dp),
+                        segments = data
+                    )
+
+                }
+
+        }
 
     }
 

@@ -23,6 +23,12 @@ interface TransactionRepository {
 
     fun getMonthExpensesByAllCategories(year: Int, month: Int): Flow<List<CategoryTransactionExpenses>>
 
+    fun getYearCategoryExpenses(year: Int, type: String): Flow<List<CategoryTransactionExpenses>>
+
+    fun getMonthCategoryExpenses(year: Int, month: Int, type: String): Flow<List<CategoryTransactionExpenses>>
+
+    fun getWeeklyCategoryExpenses(startKey: Int, endKey: Int, type: String): Flow<List<CategoryTransactionExpenses>>
+
     fun getLastTransactions(count: Int, type: String): Flow<List<Transaction>>
 
     fun getAllTransactions(): Flow<List<Transaction>>

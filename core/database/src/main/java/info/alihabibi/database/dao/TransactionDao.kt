@@ -64,6 +64,53 @@ interface TransactionDao {
 """)
     fun getMonthExpensesByAllCategories(year: Int, month: Int): Flow<List<CategoryTransactionExpensesData>>
 
+    @Query("""
+    SELECT
+        c.id AS categoryId,
+        c.title AS categoryTitle,
+        COALESCE(SUM(t.amount), 0) AS totalAmount
+    FROM ${Keys.CATEGORY_TABLE_NAME} c
+    LEFT JOIN ${Keys.TRANSACTION_TABLE_NAME} t
+        ON t.transactionCategoryId = c.id
+        AND t.transactionType = :type
+        AND t.year = :year
+    WHERE c.type = :type
+    GROUP BY c.id
+""")
+    fun getYearCategoryExpenses(year: Int, type: String): Flow<List<CategoryTransactionExpensesData>>
+
+    @Query("""
+    SELECT
+        c.id AS categoryId,
+        c.title AS categoryTitle,
+        COALESCE(SUM(t.amount), 0) AS totalAmount
+    FROM ${Keys.CATEGORY_TABLE_NAME} c
+    LEFT JOIN ${Keys.TRANSACTION_TABLE_NAME} t
+        ON t.transactionCategoryId = c.id
+        AND t.transactionType = :type
+        AND t.year = :year
+        AND t.month = :month
+    WHERE c.type = :type
+    GROUP BY c.id
+""")
+    fun getMonthCategoryExpenses(year: Int, month: Int, type: String): Flow<List<CategoryTransactionExpensesData>>
+
+    @Query("""
+    SELECT
+        c.id AS categoryId,
+        c.title AS categoryTitle,
+        COALESCE(SUM(t.amount), 0) AS totalAmount
+    FROM ${Keys.CATEGORY_TABLE_NAME} c
+    LEFT JOIN ${Keys.TRANSACTION_TABLE_NAME} t
+        ON t.transactionCategoryId = c.id
+        AND t.transactionType = :type
+        AND t.year BETWEEN :startYear AND :endYear
+        AND (t.year * 10000 + t.month * 100 + t.day) BETWEEN :startKey AND :endKey
+    WHERE c.type = :type
+    GROUP BY c.id
+""")
+    fun getWeeklyCategoryExpenses(startYear: Int, endYear: Int, startKey: Int, endKey: Int, type: String): Flow<List<CategoryTransactionExpensesData>>
+
     @Transaction
     @Query("SELECT * FROM ${Keys.TRANSACTION_TABLE_NAME} WHERE transactionType = :type ORDER BY id DESC LIMIT :count")
     fun getLastTransactions(count: Int, type: String): Flow<List<DetailedTransaction>>

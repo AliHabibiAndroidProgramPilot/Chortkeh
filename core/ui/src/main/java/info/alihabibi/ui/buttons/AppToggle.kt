@@ -44,7 +44,7 @@ fun <T> AppToggle(
 
     BoxWithConstraints(
         modifier = modifier
-            .height(height = 48.dp)
+            .height(height = 45.dp)
             .padding(horizontal = 12.dp)
             .border(width = 1.2.dp, color = Gray7, shape = shape)
     ) {

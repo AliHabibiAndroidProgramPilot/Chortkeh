@@ -58,6 +58,30 @@ class TransactionRepositoryImpl(private val dao: TransactionDao) : TransactionRe
             .flowOn(Dispatchers.IO)
     }
 
+    override fun getYearCategoryExpenses(year: Int, type: String): Flow<List<CategoryTransactionExpenses>> {
+        return dao.getYearCategoryExpenses(year, type)
+            .map { list -> list.map(CategoryTransactionExpensesData::asExternalModel) }
+            .flowOn(Dispatchers.IO)
+    }
+
+    override fun getMonthCategoryExpenses(year: Int, month: Int, type: String): Flow<List<CategoryTransactionExpenses>> {
+        return dao.getMonthCategoryExpenses(year, month, type)
+            .map { list -> list.map(CategoryTransactionExpensesData::asExternalModel) }
+            .flowOn(Dispatchers.IO)
+    }
+
+    override fun getWeeklyCategoryExpenses(startKey: Int, endKey: Int, type: String): Flow<List<CategoryTransactionExpenses>> {
+        return dao.getWeeklyCategoryExpenses(
+            startYear = startKey / 10_000,
+            endYear = endKey / 10_000,
+            startKey = startKey,
+            endKey = endKey,
+            type = type
+        )
+            .map { list -> list.map(CategoryTransactionExpensesData::asExternalModel) }
+            .flowOn(Dispatchers.IO)
+    }
+
     override fun getLastTransactions(count: Int, type: String): Flow<List<Transaction>> {
         return dao.getLastTransactions(count, type).map { transactionDataList ->
             transactionDataList.map(DetailedTransaction::asExternalModel)
