@@ -1,5 +1,7 @@
 package info.alihabibi.new_transaction.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -33,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -53,6 +56,8 @@ import info.alihabibi.domain.local.coordinators.TransactionUndoManager
 import info.alihabibi.model.ui_model.category.CategoryUiModel
 import info.alihabibi.model.ui_model.channel.ChannelUiModel
 import info.alihabibi.model.ui_model.transaction.TransactionTypeOptionUiModel
+import info.alihabibi.new_transaction.NewTransactionFieldsError
+import info.alihabibi.new_transaction.NewTransactionUiEvents
 import info.alihabibi.new_transaction.NewTransactionUiIntent
 import info.alihabibi.new_transaction.NewTransactionUiState
 import info.alihabibi.new_transaction.NewTransactionViewModel
@@ -90,12 +95,39 @@ fun NewTransactionDestination(
 
     val context = LocalContext.current
 
-    val uiState by viewModel.newTransactionUiState.collectAsStateWithLifecycle()
-    val formattedTransactionDate by viewModel.formattedTransactionDate.collectAsStateWithLifecycle()
-
     val currentOnBackPressed by rememberUpdatedState(onBackPressed)
     val transactionUndoManager: TransactionUndoManager = koinInject()
-    uiState.savedTransactionId?.let { id ->
+
+    val uiState by viewModel.newTransactionUiState.collectAsStateWithLifecycle()
+    val fieldsError by viewModel.fieldsError.collectAsStateWithLifecycle()
+    val formattedTransactionDate by viewModel.formattedTransactionDate.collectAsStateWithLifecycle()
+
+    LaunchedEffect(viewModel) {
+        viewModel.newTransactionEvents.collect { event ->
+            when(event) {
+                is NewTransactionUiEvents.NavigateUp -> currentOnBackPressed()
+                is NewTransactionUiEvents.ShowSuccessSnackBarAndNavigateUp -> {
+                    SnackBarController.sendEvent(
+                        SnackBarEvent(
+                            message = Utils.getStringResources(context, R.string.transaction_registered),
+                            actionTitle = Utils.getStringResources(context, R.string.undo),
+                            action = {
+                                transactionUndoManager.executeUndo(
+                                    event.id,
+                                    event.channelId,
+                                    event.price,
+                                    event.isIncome
+                                )
+                            }
+                        )
+                    )
+                    currentOnBackPressed()
+                }
+            }
+        }
+    }
+
+    /*uiState.savedTransactionId?.let { id ->
         LaunchedEffect(id) {
             SnackBarController.sendEvent(
                 SnackBarEvent(
@@ -114,11 +146,12 @@ fun NewTransactionDestination(
             )
             currentOnBackPressed()
         }
-    }
+    }*/
 
     NewTransactionScreen(
         uiState = uiState,
         isEditingTransaction = editingTransactionId != null,
+        fieldsError = fieldsError,
         formattedTransactionDate = formattedTransactionDate,
         onAddNewCategory = onAddNewCategory,
         onAddNewChannel = onAddNewChannel,
@@ -142,10 +175,9 @@ fun NewTransactionDestination(
             viewModel.onEvent(NewTransactionUiIntent.CategoriesDeleted(categoriesToDelete))
         },
         onSaveOrEditTransaction = {
-            if (editingTransactionId != null) {
+            if (editingTransactionId != null)
                 viewModel.onEvent(NewTransactionUiIntent.EditTransaction(editingTransactionId))
-                onBackPressed()
-            } else
+            else
                 viewModel.onEvent(NewTransactionUiIntent.SaveTransaction)
         },
         onDeleteTransaction = {
@@ -167,6 +199,7 @@ fun NewTransactionDestination(
 private fun NewTransactionScreen(
     uiState: NewTransactionUiState,
     isEditingTransaction: Boolean,
+    fieldsError: NewTransactionFieldsError,
     formattedTransactionDate: String = "",
     onPriceChanged: (price: String) -> Unit = {},
     onDateChanged: (year: Int, month: Int, day: Pair<Int, String>) -> Unit = { _, _, _ -> },
@@ -377,7 +410,9 @@ private fun NewTransactionScreen(
                     placeHolderText = when (uiState.transactionType) {
                         TransactionTypeOptionUiModel.OUTCOME -> stringResource(id = R.string.price_outcome)
                         TransactionTypeOptionUiModel.INCOME -> stringResource(id = R.string.price_income)
-                    }
+                    },
+                    error = fieldsError.priceFiledError == true,
+                    errorText = stringResource(id = R.string.price_error_text)
                 )
 
                 Spacer(modifier = Modifier.height(height = 16.dp))
@@ -389,10 +424,19 @@ private fun NewTransactionScreen(
                         .padding(horizontal = 16.dp)
                         .border(
                             width = 1.dp,
-                            color = MaterialTheme.colorScheme.outline,
-                            shape = RoundedCornerShape(12.dp)
+                            color = if (fieldsError.channelFiledError)
+                                MaterialTheme.colorScheme.error
+                            else
+                                MaterialTheme.colorScheme.outline,
+                            shape = RoundedCornerShape(size = 12.dp)
                         )
-                        .clip(shape = RoundedCornerShape(12.dp))
+                        .clip(shape = RoundedCornerShape(size = 12.dp))
+                        .background(
+                            color = if (fieldsError.channelFiledError)
+                                MaterialTheme.colorScheme.errorContainer
+                            else
+                                Color.Transparent
+                        )
                         .clickable { showChannelsBottomSheet = true },
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -421,6 +465,22 @@ private fun NewTransactionScreen(
 
                 }
 
+                AnimatedVisibility(visible = fieldsError.channelFiledError) {
+
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 3.dp),
+                        text = stringResource(id = R.string.channel_error_text),
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            fontSize = 12.sp,
+                            textAlign = TextAlign.End,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    )
+
+                }
+
                 Spacer(modifier = Modifier.height(height = 16.dp))
 
                 Row(
@@ -430,10 +490,19 @@ private fun NewTransactionScreen(
                         .padding(horizontal = 16.dp)
                         .border(
                             width = 1.dp,
-                            color = MaterialTheme.colorScheme.outline,
-                            shape = RoundedCornerShape(12.dp)
+                            color = if (fieldsError.categoryFiledError)
+                                MaterialTheme.colorScheme.error
+                            else
+                                MaterialTheme.colorScheme.outline,
+                            shape = RoundedCornerShape(size = 12.dp)
                         )
                         .clip(shape = RoundedCornerShape(size = 12.dp))
+                        .background(
+                            color = if (fieldsError.categoryFiledError)
+                                MaterialTheme.colorScheme.errorContainer
+                            else
+                                Color.Transparent
+                        )
                         .clickable { showCategoryBottomSheet = true },
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -458,6 +527,22 @@ private fun NewTransactionScreen(
 
                 }
 
+                AnimatedVisibility(visible = fieldsError.categoryFiledError) {
+
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 3.dp),
+                        text = stringResource(id = R.string.category_error_text),
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            fontSize = 12.sp,
+                            textAlign = TextAlign.End,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    )
+
+                }
+
                 Spacer(modifier = Modifier.height(height = 16.dp))
 
                 Row(
@@ -467,10 +552,19 @@ private fun NewTransactionScreen(
                         .padding(horizontal = 16.dp)
                         .border(
                             width = 1.dp,
-                            color = MaterialTheme.colorScheme.outline,
+                            color = if (fieldsError.dateFieldError)
+                                MaterialTheme.colorScheme.error
+                            else
+                                MaterialTheme.colorScheme.outline,
                             shape = RoundedCornerShape(size = 12.dp)
                         )
                         .clip(shape = RoundedCornerShape(size = 12.dp))
+                        .background(
+                            color = if (fieldsError.dateFieldError)
+                                MaterialTheme.colorScheme.errorContainer
+                            else
+                                Color.Transparent
+                        )
                         .clickable {
                             scope.launch { dateBottomSheetState.show() }
                         },
@@ -494,6 +588,22 @@ private fun NewTransactionScreen(
 
                 }
 
+                AnimatedVisibility(visible = fieldsError.dateFieldError) {
+
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 3.dp),
+                        text = stringResource(id = R.string.date_error_text),
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            fontSize = 12.sp,
+                            textAlign = TextAlign.End,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    )
+
+                }
+
                 Spacer(modifier = Modifier.height(height = 16.dp))
 
                 Row(
@@ -503,10 +613,19 @@ private fun NewTransactionScreen(
                         .padding(horizontal = 16.dp)
                         .border(
                             width = 1.dp,
-                            color = MaterialTheme.colorScheme.outline,
+                            color = if (fieldsError.timeFieldError)
+                                MaterialTheme.colorScheme.error
+                            else
+                                MaterialTheme.colorScheme.outline,
                             shape = RoundedCornerShape(size = 12.dp)
                         )
                         .clip(shape = RoundedCornerShape(size = 12.dp))
+                        .background(
+                            color = if (fieldsError.timeFieldError)
+                                MaterialTheme.colorScheme.errorContainer
+                            else
+                                Color.Transparent
+                        )
                         .clickable {
                             scope.launch { timeBottomSheetState.show() }
                         },
@@ -533,6 +652,22 @@ private fun NewTransactionScreen(
                     )
 
                 }
+
+                AnimatedVisibility(visible = fieldsError.timeFieldError) {
+
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 3.dp),
+                        text = stringResource(id = R.string.time_error_text),
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            fontSize = 12.sp,
+                            textAlign = TextAlign.End,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    )
+
+                }
             }
 
             AppButton(
@@ -547,8 +682,7 @@ private fun NewTransactionScreen(
                         TransactionTypeOptionUiModel.OUTCOME -> stringResource(id = R.string.register_outcome_transaction)
                         TransactionTypeOptionUiModel.INCOME -> stringResource(id = R.string.register_income_transaction)
                     }
-                },
-                enabled = uiState.isRegisterTransactionButtonEnabled
+                }
             )
 
         }
@@ -563,6 +697,7 @@ private fun NewTransactionPreview() {
 
     NewTransactionScreen(
         uiState = NewTransactionUiState(),
+        fieldsError = NewTransactionFieldsError(),
         isEditingTransaction = false,
         onBackPressed = {}
     )

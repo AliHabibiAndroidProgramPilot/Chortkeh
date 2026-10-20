@@ -1,5 +1,6 @@
 package info.alihabibi.ui.inputs
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -138,6 +139,8 @@ fun AppTitledPriceTextField(
     onValueChange: (newValue: String) -> Unit,
     title: String = "",
     placeHolderText: String = "",
+    error: Boolean = false,
+    errorText: String = "",
     enabled: Boolean = true
 ) {
 
@@ -167,6 +170,7 @@ fun AppTitledPriceTextField(
                 textAlign = TextAlign.Left,
                 textDirection = TextDirection.Ltr
             ),
+            isError = error,
             enabled = enabled,
             keyboardOptions = KeyboardOptions(
                 autoCorrectEnabled = false,
@@ -195,6 +199,7 @@ fun AppTitledPriceTextField(
                 unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                errorContainerColor = MaterialTheme.colorScheme.errorContainer,
                 errorBorderColor = MaterialTheme.colorScheme.error,
                 errorTextColor = MaterialTheme.colorScheme.error
             ),
@@ -209,6 +214,22 @@ fun AppTitledPriceTextField(
             } else null,
             visualTransformation = PriceVisualTransformation()
         )
+
+        AnimatedVisibility(visible = error) {
+
+            Text(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 3.dp),
+                text = errorText,
+                style = MaterialTheme.typography.labelLarge.copy(
+                    fontSize = 12.sp,
+                    textAlign = TextAlign.End,
+                    color = MaterialTheme.colorScheme.error
+                )
+            )
+
+        }
 
     }
 

@@ -117,6 +117,11 @@
     <string name="category_name_error">نام دسته‌بندی نمیتواند بیشتر از 30 کاراکتر باشد</string>
     <string name="delete_transaction">حذف تراکنش؟</string>
     <string name="delete_transaction_description">مطمعنی میخوای این تراکنش رو حذف کنی؟</string>
+    <string name="price_error_text">مبلغ نمیتونه خالی باشه</string>
+    <string name="channel_error_text">کانال تراکنشت رو مشخص کن</string>
+    <string name="category_error_text">دسته‌بندی تراکنشت رو مشخص کن</string>
+    <string name="date_error_text">تاریخ تراکنشت رو مشخص کن</string>
+    <string name="time_error_text">ساعت تراکنشت رو مشخص کن</string>
 
     // Channels
     <string name="channels">کانال‌ها</string>
