@@ -7,16 +7,15 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -28,9 +27,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import kotlin.math.cos
@@ -39,68 +41,73 @@ import kotlin.math.sin
 
 @Composable
 fun AppPieChart(
-    modifier: Modifier = Modifier,
     segments: List<PieChartData>,
+    modifier: Modifier = Modifier,
     strokeWidth: Dp = 18.dp,
-    gapWidth: Dp = 4.dp
+    gapWidth: Dp = 4.dp,
+    maxLabelLines: Int = 2
 ) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
+    BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
+        // Chart takes ~38% of the width (clamped) so the legend gets the rest
+        val chartSize = (maxWidth * 0.45f).coerceAtLeast(110.dp)
 
-        PieChart(
-            modifier = Modifier
-                .weight(weight = 1f)
-                .width(width = 200.dp)
-                .heightIn(min = 80.dp)
-                .aspectRatio(ratio = 1f),
-            segments = segments,
-            strokeWidth = strokeWidth,
-            gapWidth = gapWidth
-        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
 
-        Spacer(modifier = Modifier.width(24.dp))
+            PieChart(
+                modifier = Modifier.size(chartSize),
+                segments = segments,
+                strokeWidth = strokeWidth,
+                gapWidth = gapWidth
+            )
 
-        LegendLabels(
-            modifier = Modifier
-                .weight(1f)
-                .padding(vertical = 8.dp),
-            labelItems = segments
-        )
+            Spacer(modifier = Modifier.width(16.dp))
 
+            // takes ALL the remaining width, split into 2 equal columns
+            LegendLabels(
+                modifier = Modifier.weight(1f),
+                labelItems = segments,
+                maxLabelLines = maxLabelLines
+            )
+        }
     }
 }
 
 @Composable
 private fun PieChart(
-    modifier: Modifier = Modifier,
     segments: List<PieChartData>,
     strokeWidth: Dp,
     gapWidth: Dp,
+    modifier: Modifier = Modifier,
     cornerRadius: Dp = 6.5.dp
 ) {
-
-    val total = segments.sumOf { it.value.toDouble() }.toFloat()
+    val total = remember(segments) { segments.sumOf { it.value.toDouble() }.toFloat() }
 
     val animatedProgress =
-        remember(key1 = segments) { List(segments.size) { Animatable(initialValue = 0f) } }
-    LaunchedEffect(key1 = segments) {
+        remember(segments) { List(segments.size) { Animatable(initialValue = 0f) } }
+
+    LaunchedEffect(segments) {
         animatedProgress.forEach { it.snapTo(0f) }
         animatedProgress.forEach {
-            // each segment should have independent coroutin scope to all segments animate simultaneously
+            // independent coroutine per segment so they all animate simultaneously
             launch {
                 it.animateTo(
                     targetValue = 1f,
-                    animationSpec = tween(durationMillis = 1500, delayMillis = 130, easing = LinearOutSlowInEasing)
+                    animationSpec = tween(
+                        durationMillis = 1500,
+                        delayMillis = 130,
+                        easing = LinearOutSlowInEasing
+                    )
                 )
             }
         }
     }
 
     Canvas(modifier = modifier.padding(all = 8.dp)) {
-        val stroke = strokeWidth.toPx()
+        if (total <= 0f) return@Canvas // avoid NaN / division by zero
+
         val outerR = size.minDimension / 2f
+        // stroke can never eat more than half of the radius on small charts
+        val stroke = strokeWidth.toPx().coerceAtMost(outerR * 0.5f)
         val innerR = outerR - stroke
         val center = Offset(size.width / 2f, size.height / 2f)
         val gapDeg = Math.toDegrees((gapWidth.toPx() / outerR).toDouble()).toFloat()
@@ -110,16 +117,15 @@ private fun PieChart(
             val fullSweep = (segment.value / total) * 360f
             val targetSweep = (fullSweep - gapDeg).coerceAtLeast(2f)
 
-            val animatedProgress = animatedProgress[index].value
-            val animatedSweep = targetSweep * animatedProgress
+            val progress = animatedProgress[index].value // read in draw phase only
+            val animatedSweep = targetSweep * progress
 
             if (animatedSweep > 0.5f) {
                 val a1 = start + gapDeg / 2f
                 val a2 = a1 + animatedSweep
 
-                // shrink corner radius while the segment is still small, so the
-                // fillet never exceeds half of the currently-visible arc length
-                val maxCornerFromSweep = (animatedSweep / 2f) * (Math.PI.toFloat() / 180f) * outerR
+                val maxCornerFromSweep =
+                    (animatedSweep / 2f) * (Math.PI.toFloat() / 180f) * outerR
                 val safeCornerPx = min(cornerRadius.toPx(), maxCornerFromSweep)
                     .coerceIn(0f, min(stroke / 2f, (outerR - innerR) / 2f))
 
@@ -135,65 +141,66 @@ private fun PieChart(
 
 @Composable
 private fun LegendLabels(
-    modifier: Modifier = Modifier,
-    labelItems: List<PieChartData>
+    labelItems: List<PieChartData>,
+    maxLabelLines: Int,
+    modifier: Modifier = Modifier
 ) {
-
     Column(
         modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(26.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-
         labelItems.chunked(2).forEach { rowItems ->
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 rowItems.forEach { segment ->
-                    Box(modifier = Modifier.weight(1f)) {
-                        LabelItem(segment = segment)
-                    }
+                    LabelItem(
+                        modifier = Modifier.weight(1f),
+                        segment = segment,
+                        maxLines = maxLabelLines
+                    )
                 }
-
+                // keeps the 2-column grid aligned when the last row has one item
+                if (rowItems.size == 1) Spacer(modifier = Modifier.weight(1f))
             }
         }
-
     }
-
 }
 
 @Composable
-private fun LabelItem(segment: PieChartData) {
-
+private fun LabelItem(
+    segment: PieChartData,
+    maxLines: Int,
+    modifier: Modifier = Modifier
+) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier,
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically
     ) {
-
         Text(
-            modifier = Modifier
-                .weight(weight = 1f, fill = false)
-                .widthIn(max = 46.dp),
+            // fill = false: the text hugs the badge instead of leaving a gap,
+            // but can still grow up to the full cell width
+            modifier = Modifier.weight(weight = 1f, fill = false),
             text = segment.label,
             style = MaterialTheme.typography.labelLarge.copy(
                 color = MaterialTheme.colorScheme.onSurface,
-                textAlign = TextAlign.End,
+                textAlign = TextAlign.Right,
+                textDirection = TextDirection.Rtl
             ),
-            maxLines = 2,
+            maxLines = maxLines,
             overflow = TextOverflow.Ellipsis
         )
 
-        Spacer(modifier = Modifier.width(width = 10.dp))
+        Spacer(modifier = Modifier.width(8.dp))
 
         Box(
             modifier = Modifier
-                .requiredSize(size = 10.dp)
+                .size(10.dp)
                 .background(color = segment.color, shape = RoundedCornerShape(size = 2.dp))
         )
-
     }
 }
 
@@ -252,7 +259,7 @@ private fun roundedSegmentPath(
         lineTo(
             endLineInnerPt.x,
             endLineInnerPt.y
-        )                                             // straight edge
+        )// straight edge
         quadraticTo(
             innerEndCorner.x,
             innerEndCorner.y,
