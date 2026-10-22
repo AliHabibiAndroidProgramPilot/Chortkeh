@@ -12,16 +12,16 @@ class SmsSendersSourceImpl(private val context: Context) : SmsSendersSourceRepos
         val smsSenders = linkedMapOf<String, String>()
         try {
             context.contentResolver.query(
-                Telephony.Sms.Inbox.CONTENT_URI,
+                Telephony.Sms.CONTENT_URI,
                 arrayOf(Telephony.Sms.ADDRESS, Telephony.Sms.BODY),
-                null,
-                null,
+                "${Telephony.Sms.TYPE} = ?",
+                arrayOf(Telephony.Sms.MESSAGE_TYPE_INBOX.toString()),
                 "${Telephony.Sms.DATE} DESC"
             )?.use { cursor ->
                 val addressIndex = cursor.getColumnIndexOrThrow(Telephony.Sms.ADDRESS)
                 val bodyIndex = cursor.getColumnIndexOrThrow(Telephony.Sms.BODY)
                 var scannedRows = 0
-                while (cursor.moveToNext() && smsSenders.size <= 20 && scannedRows++ < 200) {
+                while (cursor.moveToNext() && smsSenders.size < 30 && scannedRows++ < 200) {
                     val address = cursor.getString(addressIndex) ?: continue
                     // Rows are sorted newest-first, so the first hit per sender is its latest SMS body
                     if (address !in smsSenders)
