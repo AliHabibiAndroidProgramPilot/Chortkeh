@@ -1,5 +1,6 @@
 package info.alihabibi.channels.screens
 
+import android.Manifest
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -22,11 +23,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -34,19 +37,23 @@ import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import info.alihabibi.common_android.AndroidUtils
 import info.alihabibi.designsystem.R
-import info.alihabibi.designsystem.theme.Gray11
 import info.alihabibi.designsystem.theme.Gray5
 import info.alihabibi.designsystem.theme.Gray7
 import info.alihabibi.designsystem.theme.Gray8
 import info.alihabibi.designsystem.theme.Primary
 import info.alihabibi.designsystem.theme.White
 import info.alihabibi.model.ui_model.channel.ChannelIconOptionUiModel
+import info.alihabibi.ui.dialogs.AppDialog
 import info.alihabibi.ui.dialogs.AppIconSelectionBottomSheet
 import info.alihabibi.ui.inputs.AppCardNumberTextField
 import info.alihabibi.ui.inputs.AppTitledPriceTextField
 import info.alihabibi.ui.inputs.AppTitledTextField
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 internal fun BankAccountChannelContent(
     modifier: Modifier = Modifier,
@@ -57,7 +64,47 @@ internal fun BankAccountChannelContent(
     onCardNumberChange: (value: String) -> Unit = {},
     onInitialBalanceChange: (value: String) -> Unit = {},
     onChannelNameChange: (value: String) -> Unit = {},
+    onFetchSmsSenders: () -> Unit = {}
 ) {
+
+    val context = LocalContext.current
+
+    var readSMSSwitch by rememberSaveable { mutableStateOf(false) }
+
+    val smsPermissions = rememberMultiplePermissionsState(
+        permissions = listOf(
+            Manifest.permission.RECEIVE_SMS,
+            Manifest.permission.READ_SMS
+        )
+    )
+    var hasRequestedSmsPermissions by rememberSaveable { mutableStateOf(false) }
+    var showSMSRequestDialog by rememberSaveable { mutableStateOf(false) }
+    if (showSMSRequestDialog)
+        AppDialog(
+            title = stringResource(id = R.string.sms_access),
+            message = stringResource(id = R.string.need_sms_permission),
+            confirmButtonText = stringResource(id = R.string.I_give_permission),
+            cancelButtonText = stringResource(id = R.string.dismiss),
+            onConfirmClicked = {
+                when {
+                    hasRequestedSmsPermissions && !smsPermissions.shouldShowRationale -> {
+                        AndroidUtils.openAppSetting(context)
+                    }
+                    else -> {
+                        hasRequestedSmsPermissions = true
+                        smsPermissions.launchMultiplePermissionRequest()
+                    }
+                }
+            },
+            onCancelClicked = {
+                showSMSRequestDialog = false
+                readSMSSwitch = false
+            },
+            onDismissRequest = {
+                showSMSRequestDialog = false
+                readSMSSwitch = false
+            }
+        )
 
     Column(
         modifier = modifier,
@@ -101,16 +148,25 @@ internal fun BankAccountChannelContent(
         Spacer(modifier = Modifier.height(16.dp))
 
         Row(
-            modifier = Modifier.padding(horizontal = 16.dp),
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .clip(shape = RoundedCornerShape(size = 12.dp))
+                .clickable {
+                    if (smsPermissions.allPermissionsGranted) {
+                        readSMSSwitch = true
+                        onFetchSmsSenders()
+                    }
+                    else
+                        showSMSRequestDialog = true
+                }
+                .padding(horizontal = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
 
             Switch(
-                checked = false,
-                onCheckedChange = {
-
-                },
+                checked = readSMSSwitch,
+                onCheckedChange = null,
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = White,
                     uncheckedThumbColor = White,
@@ -120,24 +176,73 @@ internal fun BankAccountChannelContent(
                 )
             )
 
-            Text(
-                modifier = Modifier
-                    .weight(weight = 1f)
-                    .offset(y = 8.dp),
-                text = stringResource(id = R.string.read_sms),
-                style = MaterialTheme.typography.bodyLarge
-            )
+            Column(
+                modifier = Modifier.weight(weight = 1f),
+                verticalArrangement = Arrangement.spacedBy(space = 2.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = stringResource(id = R.string.read_sms),
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        textAlign = TextAlign.Right
+                    )
+                )
+
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = stringResource(id = R.string.read_sms_description),
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        color = Gray7,
+                        textAlign = TextAlign.Right,
+                        textDirection = TextDirection.Rtl
+                    ),
+                    overflow = TextOverflow.Ellipsis
+                )
+
+            }
 
         }
 
-        Text(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(end = 16.dp),
-            text = stringResource(id = R.string.read_sms_description),
-            style = MaterialTheme.typography.labelMedium.copy(color = Gray7, textAlign = TextAlign.Right, textDirection = TextDirection.Rtl),
-            overflow = TextOverflow.Ellipsis
-        )
+        if (smsPermissions.allPermissionsGranted && readSMSSwitch) {
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(height = 50.dp)
+                    .padding(horizontal = 16.dp)
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.outline,
+                        shape = RoundedCornerShape(size = 12.dp)
+                    )
+                    .clip(shape = RoundedCornerShape(size = 12.dp))
+                    .clickable {},
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                Icon(
+                    modifier = Modifier.padding(start = 18.dp),
+                    painter = painterResource(id = R.drawable.sms),
+                    contentDescription = null,
+                    tint = Gray8
+                )
+
+                Text(
+                    modifier = Modifier
+                        .padding(horizontal = 12.dp)
+                        .weight(weight = 1f),
+                    text = "",
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontSize = 16.sp,
+                        textDirection = TextDirection.Ltr
+                    )
+                )
+
+            }
+        }
 
     }
 

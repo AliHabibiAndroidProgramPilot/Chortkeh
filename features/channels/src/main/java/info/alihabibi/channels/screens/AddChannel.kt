@@ -19,6 +19,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
@@ -26,6 +27,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,6 +50,7 @@ import info.alihabibi.designsystem.theme.Gray6
 import info.alihabibi.designsystem.theme.Primary
 import info.alihabibi.model.ui_model.channel.ChannelIconOptionUiModel
 import info.alihabibi.ui.buttons.AppButton
+import info.alihabibi.ui.dialogs.SmsInboxSelectionBottomSheet
 import info.alihabibi.ui.headrs.AppHeader
 import org.koin.androidx.compose.koinViewModel
 
@@ -74,6 +79,9 @@ fun AddChannelDestination(
         onChannelIconChanged = { icon ->
             viewModel.onEvent(ChannelsUiIntent.ChannelIconChanged(icon))
         },
+        onFetchSmsSenders = {
+            viewModel.onEvent(ChannelsUiIntent.FetchSmsSenders)
+        },
         onSaveChannel = {
             viewModel.onEvent(ChannelsUiIntent.SaveChannel)
             onBackPressed()
@@ -83,6 +91,7 @@ fun AddChannelDestination(
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AddNewChannelScreen(
     uiState: ChannelUiState,
@@ -92,8 +101,23 @@ private fun AddNewChannelScreen(
     onCardNumberChange: (cardNumber: String) -> Unit = {},
     onInitialBalanceChanged: (balance: String) -> Unit = {},
     onChannelIconChanged: (icon: ChannelIconOptionUiModel) -> Unit = {},
+    onFetchSmsSenders: () -> Unit = {},
     onBackPressed: () -> Unit
 ) {
+
+    var showSmsInboxSelectionModal by remember { mutableStateOf(false) }
+    if (uiState.smsSenders.isNotEmpty() && showSmsInboxSelectionModal)
+        SmsInboxSelectionBottomSheet(
+            smsSenders = uiState.smsSenders,
+            smsSendersContent = uiState.smsSendersLatestMessage,
+            bottomSheetTitle = stringResource(id = R.string.choose_sms_number),
+            onSelectItem = {
+                showSmsInboxSelectionModal = false
+            },
+            onDismissRequest = {
+                showSmsInboxSelectionModal = false
+            }
+        )
 
     Column(
         modifier = Modifier
@@ -187,7 +211,11 @@ private fun AddNewChannelScreen(
                                 ?: R.drawable.channel_ic_default,
                             onChannelNameChange = onChannelNameChanged,
                             onCardNumberChange = onCardNumberChange,
-                            onInitialBalanceChange = onInitialBalanceChanged
+                            onInitialBalanceChange = onInitialBalanceChanged,
+                            onFetchSmsSenders = {
+                                onFetchSmsSenders()
+                                showSmsInboxSelectionModal = true
+                            }
                         )
                     else
                         OtherChannelContent(

@@ -45,6 +45,8 @@ import info.alihabibi.domain.local.usecases.datastore.SavePreferredCurrencyUseCa
 import info.alihabibi.domain.local.usecases.datastore.SaveSmsModalShownStateUseCase
 import info.alihabibi.domain.local.usecases.datastore.SaveUserAccountInfoUseCase
 import info.alihabibi.domain.local.usecases.datastore.usecase.DatastoreUseCases
+import info.alihabibi.domain.local.usecases.sms.GetSmsSendersSourceUseCase
+import info.alihabibi.domain.local.usecases.sms.usecase.SmsUseCases
 import org.koin.dsl.module
 
 val domainModule = module {
@@ -170,6 +172,18 @@ val domainModule = module {
             getAllRemindersUseCase = get(),
             updateReminderIsEnabledUseCase = get(),
             getReminderByIdUseCase = get()
+        )
+    }
+
+    // endregion
+
+    // region Sms
+
+    factory { GetSmsSendersSourceUseCase(get()) }
+
+    factory {
+        SmsUseCases(
+            getSmsSendersSourceUseCase = get()
         )
     }
 

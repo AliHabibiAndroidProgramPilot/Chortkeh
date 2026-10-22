@@ -127,27 +127,6 @@ fun NewTransactionDestination(
         }
     }
 
-    /*uiState.savedTransactionId?.let { id ->
-        LaunchedEffect(id) {
-            SnackBarController.sendEvent(
-                SnackBarEvent(
-                    message = Utils.getStringResources(context, R.string.transaction_registered),
-                    actionTitle = Utils.getStringResources(context, R.string.undo),
-                    action = {
-                        val channelId = uiState.transactionChannel?.id ?: return@SnackBarEvent
-                        transactionUndoManager.executeUndo(
-                            id,
-                            channelId,
-                            uiState.transactionPrice,
-                            uiState.transactionType == TransactionTypeOptionUiModel.INCOME
-                        )
-                    }
-                )
-            )
-            currentOnBackPressed()
-        }
-    }*/
-
     NewTransactionScreen(
         uiState = uiState,
         isEditingTransaction = editingTransactionId != null,

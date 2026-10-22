@@ -148,6 +148,8 @@
         در صورت حذف، تمام تراکنش‌های مربوط به کانال فاقد اطلاعات کانال خواهند بود.
     </string>
     <string name="delete">حذف کردن</string>
+    <string name="need_sms_permission">برای استفاده از این قابلیت چرتکه باید به پیامک های بانکی دسترسی داشته باشه</string>
+    <string name="choose_sms_number">شماره ای که از طریق اون برای این حسابت پیامک میاد رو انتخاب کن</string>
 
     // Reminders
     <string name="add_new_reminder">ثبت یادآور جدید</string>

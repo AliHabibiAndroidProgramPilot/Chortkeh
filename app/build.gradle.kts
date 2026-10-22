@@ -55,6 +55,9 @@ dependencies {
     // Room Database
     implementation(projects.core.database)
 
+    // sms
+    implementation(projects.core.sms)
+
     // profile
     implementation(projects.features.profile)
 

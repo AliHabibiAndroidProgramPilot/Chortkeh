@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import info.alihabibi.common.banks.Bank
 import info.alihabibi.common.banks.BankCardIdentifier
 import info.alihabibi.domain.local.usecases.database.channel.usecase.ChannelUseCases
+import info.alihabibi.domain.local.usecases.sms.usecase.SmsUseCases
 import info.alihabibi.domain.models.channel.Channel
 import info.alihabibi.model.mapper.toDomain
 import info.alihabibi.model.mapper.toUiModel
@@ -21,7 +22,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ChannelsViewModel(
-    private val channelsUseCases: ChannelUseCases
+    private val channelsUseCases: ChannelUseCases,
+    private val smsUseCases: SmsUseCases
 ) : ViewModel() {
 
     private val _channelUiState = MutableStateFlow(ChannelUiState())
@@ -60,6 +62,8 @@ class ChannelsViewModel(
             is ChannelsUiIntent.DeleteChannel -> deleteChannel(event.id)
 
             is ChannelsUiIntent.SaveChannel -> saveChannel()
+
+            is ChannelsUiIntent.FetchSmsSenders -> fetchSmsSenders()
 
             is ChannelsUiIntent.ResetChannelsDraft -> resetDraft()
 
@@ -161,7 +165,8 @@ class ChannelsViewModel(
 
     private fun getChannelById(id: Int) {
         viewModelScope.launch {
-            val channel = channelsUseCases.getChannelByIdUseCase.invoke(id).first().toUiModel(needsBalanceFormat = false)
+            val channel = channelsUseCases.getChannelByIdUseCase.invoke(id).first()
+                .toUiModel(needsBalanceFormat = false)
             _channelUiState.update {
                 ChannelUiState(
                     isBankAccountChannel = channel.isBankCardChannel,
@@ -169,6 +174,18 @@ class ChannelsViewModel(
                     channelBalance = channel.channelBalance,
                     cardNumber = channel.cardNumber,
                     channelIcon = channel.icon
+                )
+            }
+        }
+    }
+
+    private fun fetchSmsSenders() {
+        viewModelScope.launch {
+            val smsInbox = smsUseCases.getSmsSendersSourceUseCase.invoke()
+            _channelUiState.update {
+                it.copy(
+                    smsSenders = smsInbox.keys.toList(),
+                    smsSendersLatestMessage = smsInbox.values.toList()
                 )
             }
         }
@@ -207,6 +224,8 @@ sealed interface ChannelsUiIntent {
 
     data object SaveChannel : ChannelsUiIntent
 
+    data object FetchSmsSenders : ChannelsUiIntent
+
     data object ResetChannelsDraft : ChannelsUiIntent
 
 }
@@ -217,7 +236,9 @@ data class ChannelUiState(
     val channelName: String = "",
     val channelBalance: String = "",
     val cardNumber: String = "",
-    val channelIcon: ChannelIconOptionUiModel? = null
+    val channelIcon: ChannelIconOptionUiModel? = null,
+    val smsSenders: List<String> = emptyList(),
+    val smsSendersLatestMessage: List<String> = emptyList()
 ) {
     val isChannelRegisterButtonEnabled: Boolean
         get() {

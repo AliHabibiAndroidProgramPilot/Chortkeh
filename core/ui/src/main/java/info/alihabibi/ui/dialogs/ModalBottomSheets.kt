@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -43,9 +44,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import info.alihabibi.designsystem.R
-import info.alihabibi.designsystem.theme.Primary
 import info.alihabibi.ui.items.ListedBottomSheetItem
 import info.alihabibi.ui.items.ListedChannelItem
+import info.alihabibi.ui.items.SmsListItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -225,6 +226,65 @@ fun <T> ListedBottomSheet(
 
                         }
 
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SmsInboxSelectionBottomSheet(
+    smsSenders: List<String>,
+    smsSendersContent: List<String>,
+    bottomSheetTitle: String = "",
+    onDismissRequest: () -> Unit,
+    onSelectItem: (item: String) -> Unit
+) {
+
+    ModalBottomSheet(
+        containerColor = MaterialTheme.colorScheme.surface,
+        onDismissRequest = onDismissRequest
+    ) {
+
+        Surface(modifier = Modifier.fillMaxWidth()) {
+
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
+                Box(modifier = Modifier.fillMaxWidth()) {
+
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(alignment = Alignment.Center),
+                        text = bottomSheetTitle,
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+
+                }
+
+                Spacer(modifier = Modifier.height(height = 12.dp))
+
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                ) {
+
+                    itemsIndexed(items = smsSenders) { index, item ->
+                        SmsListItem(
+                            title = item,
+                            description = smsSendersContent[index]
+                        )
                     }
 
                 }
