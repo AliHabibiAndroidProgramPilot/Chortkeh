@@ -130,7 +130,7 @@ private fun AddNewChannelScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp)
-                            .heightIn(min = 65.dp)
+                            .heightIn(min = 60.dp)
                             .border(
                                 width = 1.dp,
                                 color = Gray3,
