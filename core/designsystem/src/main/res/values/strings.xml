@@ -176,4 +176,14 @@
     <string name="yearly">سالانه</string>
     <string name="week_of_month">هفته %1$d</string>
 
+    // SMS Detection
+    <string name="sms_detection_notification_channel_name">پیامک‌های بانکی و مالی</string>
+    <string name="sms_detection_notification_channel_description">اطلاع‌رسانی پیامک‌های دریافتی از کانال‌های تعریف‌شده</string>
+    <string name="sms_detected_title">تراکنش جدید از حساب %1$s</string>
+    <string name="sms_detected_description">
+    روی کانال %1$s تراکنش جدید داری
+    \n
+    اضافه بشه به تراکنش های این ماه؟
+</string>
+
 </resources>

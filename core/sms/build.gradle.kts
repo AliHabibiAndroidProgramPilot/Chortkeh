@@ -11,4 +11,10 @@ dependencies {
     // domain
     implementation(projects.core.domain)
 
+    // common
+    implementation(projects.core.common)
+
+    // design system
+    implementation(projects.core.designsystem)
+
 }
