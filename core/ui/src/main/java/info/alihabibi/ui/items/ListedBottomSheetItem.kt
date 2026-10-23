@@ -5,6 +5,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -87,7 +88,8 @@ fun ListedBottomSheetItem(
 @Composable
 fun SmsListItem(
     title: String,
-    description: String
+    description: String,
+    onItemClicked: (selected: String) -> Unit
 ) {
 
     Row(
@@ -96,7 +98,10 @@ fun SmsListItem(
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 4.dp)
             .border(width = 1.dp, color = MaterialTheme.colorScheme.outlineVariant, shape = RoundedCornerShape(size = 12.dp))
-            .clip(shape = RoundedCornerShape(size = 12.dp)),
+            .clip(shape = RoundedCornerShape(size = 12.dp))
+            .clickable {
+                onItemClicked(title)
+            },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.End
     ) {

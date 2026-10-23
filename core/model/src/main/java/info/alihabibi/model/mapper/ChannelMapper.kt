@@ -11,6 +11,7 @@ fun Channel.toUiModel(needsBalanceFormat: Boolean = true): ChannelUiModel = Chan
     channelName = channelName,
     channelBalance = if (needsBalanceFormat) Utils.decimalFormatterPattern.format(channelBalance) else channelBalance.toString(),
     isBankCardChannel = isBankCardChannel,
+    smsSource = smsSource,
     cardNumber = cardNumber.orEmpty(),
     isAppDefaultChannel = isAppDefaultChannel,
     icon = icon.toUiOption(),
@@ -23,6 +24,7 @@ fun ChannelUiModel.toDomain(): Channel = Channel(
     channelBalance = channelBalance.toLongOrNull() ?: 0L,
     isBankCardChannel = isBankCardChannel,
     cardNumber = cardNumber,
+    smsSource = smsSource,
     isAppDefaultChannel = isAppDefaultChannel,
     icon = icon.toDomain(),
     bankName = bankName

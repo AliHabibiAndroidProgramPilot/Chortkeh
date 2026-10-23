@@ -289,7 +289,7 @@ private fun AccountSelectorRow(
         )
 
         Text(
-            text = "${stringResource(id = R.string.bookkeeping)} ${uiState.persianMonthName}${stringResource(id = R.string.month)}",
+            text = "${stringResource(id = R.string.bookkeeping)} ${uiState.persianMonthName} ${stringResource(id = R.string.month)}",
             style = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp),
             overflow = TextOverflow.Ellipsis
         )

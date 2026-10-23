@@ -283,7 +283,8 @@ fun SmsInboxSelectionBottomSheet(
                     itemsIndexed(items = smsSenders) { index, item ->
                         SmsListItem(
                             title = item,
-                            description = smsSendersContent[index]
+                            description = smsSendersContent[index],
+                            onItemClicked = onSelectItem
                         )
                     }
 

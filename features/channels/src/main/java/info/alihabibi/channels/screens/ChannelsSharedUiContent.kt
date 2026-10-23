@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -61,6 +60,7 @@ internal fun BankAccountChannelContent(
     cardNumber: String,
     balance: String,
     @DrawableRes iconResId: Int,
+    selectedSmsSource: String = "",
     onCardNumberChange: (value: String) -> Unit = {},
     onInitialBalanceChange: (value: String) -> Unit = {},
     onChannelNameChange: (value: String) -> Unit = {},
@@ -68,8 +68,6 @@ internal fun BankAccountChannelContent(
 ) {
 
     val context = LocalContext.current
-
-    var readSMSSwitch by rememberSaveable { mutableStateOf(false) }
 
     val smsPermissions = rememberMultiplePermissionsState(
         permissions = listOf(
@@ -98,11 +96,9 @@ internal fun BankAccountChannelContent(
             },
             onCancelClicked = {
                 showSMSRequestDialog = false
-                readSMSSwitch = false
             },
             onDismissRequest = {
                 showSMSRequestDialog = false
-                readSMSSwitch = false
             }
         )
 
@@ -153,7 +149,6 @@ internal fun BankAccountChannelContent(
                 .clip(shape = RoundedCornerShape(size = 12.dp))
                 .clickable {
                     if (smsPermissions.allPermissionsGranted) {
-                        readSMSSwitch = true
                         onFetchSmsSenders()
                     }
                     else
@@ -165,7 +160,7 @@ internal fun BankAccountChannelContent(
         ) {
 
             Switch(
-                checked = readSMSSwitch,
+                checked = selectedSmsSource.isNotEmpty(),
                 onCheckedChange = null,
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = White,
@@ -205,7 +200,7 @@ internal fun BankAccountChannelContent(
 
         }
 
-        if (smsPermissions.allPermissionsGranted && readSMSSwitch) {
+        if (selectedSmsSource.isNotEmpty()) {
             Spacer(modifier = Modifier.height(16.dp))
 
             Row(
@@ -234,7 +229,7 @@ internal fun BankAccountChannelContent(
                     modifier = Modifier
                         .padding(horizontal = 12.dp)
                         .weight(weight = 1f),
-                    text = "",
+                    text = selectedSmsSource,
                     style = MaterialTheme.typography.bodyLarge.copy(
                         fontSize = 16.sp,
                         textDirection = TextDirection.Ltr

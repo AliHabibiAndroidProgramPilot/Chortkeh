@@ -79,6 +79,9 @@ fun AddChannelDestination(
         onChannelIconChanged = { icon ->
             viewModel.onEvent(ChannelsUiIntent.ChannelIconChanged(icon))
         },
+        onSmsSourceSelected = { smsSource ->
+            viewModel.onEvent(ChannelsUiIntent.SelectChannelSmsSource(smsSource))
+        },
         onFetchSmsSenders = {
             viewModel.onEvent(ChannelsUiIntent.FetchSmsSenders)
         },
@@ -101,6 +104,7 @@ private fun AddNewChannelScreen(
     onCardNumberChange: (cardNumber: String) -> Unit = {},
     onInitialBalanceChanged: (balance: String) -> Unit = {},
     onChannelIconChanged: (icon: ChannelIconOptionUiModel) -> Unit = {},
+    onSmsSourceSelected: (smsSource: String) -> Unit = {},
     onFetchSmsSenders: () -> Unit = {},
     onBackPressed: () -> Unit
 ) {
@@ -111,7 +115,8 @@ private fun AddNewChannelScreen(
             smsSenders = uiState.smsSenders,
             smsSendersContent = uiState.smsSendersLatestMessage,
             bottomSheetTitle = stringResource(id = R.string.choose_sms_number),
-            onSelectItem = {
+            onSelectItem = { smsSource ->
+                onSmsSourceSelected(smsSource)
                 showSmsInboxSelectionModal = false
             },
             onDismissRequest = {
@@ -209,6 +214,7 @@ private fun AddNewChannelScreen(
                             balance = uiState.channelBalance,
                             iconResId = uiState.channelIcon?.iconResId
                                 ?: R.drawable.channel_ic_default,
+                            selectedSmsSource = uiState.selectedSmsSource,
                             onChannelNameChange = onChannelNameChanged,
                             onCardNumberChange = onCardNumberChange,
                             onInitialBalanceChange = onInitialBalanceChanged,
