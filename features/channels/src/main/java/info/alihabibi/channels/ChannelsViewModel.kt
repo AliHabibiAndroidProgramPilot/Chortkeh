@@ -63,6 +63,8 @@ class ChannelsViewModel(
 
             is ChannelsUiIntent.DeleteChannel -> deleteChannel(event.id)
 
+            is ChannelsUiIntent.RemoveChannelSmsSource -> removeChannelSmsSource()
+
             is ChannelsUiIntent.SaveChannel -> saveChannel()
 
             is ChannelsUiIntent.FetchSmsSenders -> fetchSmsSenders()
@@ -153,6 +155,7 @@ class ChannelsViewModel(
                 channelName = state.channelName,
                 channelBalance = state.channelBalance,
                 isBankCardChannel = state.isBankAccountChannel,
+                smsSource = state.selectedSmsSource,
                 cardNumber = state.cardNumber,
                 icon = state.channelIcon ?: ChannelIconOptionUiModel.UNKNOWN,
                 bankName = if (bank == Bank.UNKNOWN) null else bank.name
@@ -170,6 +173,10 @@ class ChannelsViewModel(
         }
     }
 
+    private fun removeChannelSmsSource() {
+        _channelUiState.update { it.copy(selectedSmsSource = null) }
+    }
+
     private fun getChannelById(id: Int) {
         viewModelScope.launch {
             val channel = channelsUseCases.getChannelByIdUseCase.invoke(id).first()
@@ -179,7 +186,7 @@ class ChannelsViewModel(
                     isBankAccountChannel = channel.isBankCardChannel,
                     channelName = channel.channelName,
                     channelBalance = channel.channelBalance,
-                    selectedSmsSource = channel.smsSource.orEmpty(),
+                    selectedSmsSource = channel.smsSource?.takeIf { it.isNotBlank() },
                     cardNumber = channel.cardNumber,
                     channelIcon = channel.icon
                 )
@@ -232,6 +239,8 @@ sealed interface ChannelsUiIntent {
 
     data class SelectChannelSmsSource(val smsSource: String) : ChannelsUiIntent
 
+    data object RemoveChannelSmsSource : ChannelsUiIntent
+
     data object SaveChannel : ChannelsUiIntent
 
     data object FetchSmsSenders : ChannelsUiIntent
@@ -249,7 +258,7 @@ data class ChannelUiState(
     val channelIcon: ChannelIconOptionUiModel? = null,
     val smsSenders: List<String> = emptyList(),
     val smsSendersLatestMessage: List<String> = emptyList(),
-    val selectedSmsSource: String = ""
+    val selectedSmsSource: String? = null
 ) {
     val isChannelRegisterButtonEnabled: Boolean
         get() {

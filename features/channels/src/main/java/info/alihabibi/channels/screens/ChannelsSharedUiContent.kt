@@ -60,11 +60,13 @@ internal fun BankAccountChannelContent(
     cardNumber: String,
     balance: String,
     @DrawableRes iconResId: Int,
-    selectedSmsSource: String = "",
+    selectedSmsSource: String? = null,
+    isEditing: Boolean = false,
     onCardNumberChange: (value: String) -> Unit = {},
     onInitialBalanceChange: (value: String) -> Unit = {},
     onChannelNameChange: (value: String) -> Unit = {},
-    onFetchSmsSenders: () -> Unit = {}
+    onFetchSmsSenders: () -> Unit = {},
+    onRemoveSmsSource: () -> Unit = {}
 ) {
 
     val context = LocalContext.current
@@ -76,7 +78,7 @@ internal fun BankAccountChannelContent(
         )
     )
     var hasRequestedSmsPermissions by rememberSaveable { mutableStateOf(false) }
-    var showSMSRequestDialog by rememberSaveable { mutableStateOf(false) }
+    var showSMSRequestDialog by remember { mutableStateOf(false) }
     if (showSMSRequestDialog)
         AppDialog(
             title = stringResource(id = R.string.sms_access),
@@ -99,6 +101,25 @@ internal fun BankAccountChannelContent(
             },
             onDismissRequest = {
                 showSMSRequestDialog = false
+            }
+        )
+
+    var showSmsSourceRemovingDialog by remember { mutableStateOf(false) }
+    if (showSmsSourceRemovingDialog && isEditing)
+        AppDialog(
+            title = stringResource(id = R.string.sms_remove_title),
+            message = stringResource(id = R.string.sms_remove_description),
+            confirmButtonText = stringResource(id = R.string.dismiss),
+            cancelButtonText = stringResource(id = R.string.delete),
+            onCancelClicked = {
+                onRemoveSmsSource()
+                showSmsSourceRemovingDialog = false
+            },
+            onConfirmClicked = {
+                showSmsSourceRemovingDialog = false
+            },
+            onDismissRequest = {
+                showSmsSourceRemovingDialog = false
             }
         )
 
@@ -148,11 +169,13 @@ internal fun BankAccountChannelContent(
                 .padding(horizontal = 16.dp)
                 .clip(shape = RoundedCornerShape(size = 12.dp))
                 .clickable {
-                    if (smsPermissions.allPermissionsGranted) {
+                    if (isEditing && selectedSmsSource != null) {
+                        showSmsSourceRemovingDialog = true
+                    } else if (smsPermissions.allPermissionsGranted) {
                         onFetchSmsSenders()
-                    }
-                    else
+                    } else {
                         showSMSRequestDialog = true
+                    }
                 }
                 .padding(horizontal = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -160,7 +183,7 @@ internal fun BankAccountChannelContent(
         ) {
 
             Switch(
-                checked = selectedSmsSource.isNotEmpty(),
+                checked = selectedSmsSource != null,
                 onCheckedChange = null,
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = White,
@@ -200,7 +223,7 @@ internal fun BankAccountChannelContent(
 
         }
 
-        if (selectedSmsSource.isNotEmpty()) {
+        if (selectedSmsSource != null) {
             Spacer(modifier = Modifier.height(16.dp))
 
             Row(
@@ -213,8 +236,7 @@ internal fun BankAccountChannelContent(
                         color = MaterialTheme.colorScheme.outline,
                         shape = RoundedCornerShape(size = 12.dp)
                     )
-                    .clip(shape = RoundedCornerShape(size = 12.dp))
-                    .clickable {},
+                    .clip(shape = RoundedCornerShape(size = 12.dp)),
                 verticalAlignment = Alignment.CenterVertically
             ) {
 

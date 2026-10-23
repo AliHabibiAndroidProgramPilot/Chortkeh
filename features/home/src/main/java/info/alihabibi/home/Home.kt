@@ -514,7 +514,7 @@ private fun PieChartSection(uiState: HomeUiState) {
 
             Text(
                 modifier = Modifier.fillMaxWidth(),
-                text = "${stringResource(id = R.string.last_actions)} ${uiState.persianMonthName}${stringResource(id = R.string.month)}",
+                text = "${stringResource(id = R.string.last_actions)} ${uiState.persianMonthName} ${stringResource(id = R.string.month)}",
                 style = MaterialTheme.typography.bodyLarge.copy(
                     fontSize = 18.sp,
                     textAlign = TextAlign.Right
