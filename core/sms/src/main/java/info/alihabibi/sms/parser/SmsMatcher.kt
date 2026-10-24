@@ -1,4 +1,4 @@
-package info.alihabibi.sms
+package info.alihabibi.sms.parser
 
 object SmsMatcher {
 

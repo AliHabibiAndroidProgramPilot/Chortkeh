@@ -8,39 +8,46 @@ import android.content.Context
 import android.content.Intent
 import android.media.AudioAttributes
 import android.media.RingtoneManager
-import androidx.annotation.StringRes
+import androidx.core.net.toUri
 import info.alihabibi.designsystem.R
+import info.alihabibi.domain.Keys
+import info.alihabibi.sms.parser.TransactionData
 import info.alihabibi.sms.receiver.SmsReceiver
 
 internal class SmsNotifier(private val context: Context) {
 
     internal companion object {
-        private const val CHANNEL_ID = "sms_detection"
-        const val ACTIONS_INTENT_EXTRA_ID = "notification_id"
-        private const val ACTION_DENY_TRANSACTION = "info.alihabibi.ACTION_DENY_TRANSACTION"
-        const val ACTION_ACCEPT_TRANSACTION = "info.alihabibi.ACTION_ACCEPT_TRANSACTION"
+        private const val NOTIFICATION_CHANNEL_ID = "sms_detection"
+        private const val ACTION_ACCEPT_TRANSACTION = "info.alihabibi.ACTION_ACCEPT_TRANSACTION"
+        const val NEW_TRANSACTION_URI = "chortkeh://new_transaction"
+        const val INTENT_EXTRA_ID = "notification_id"
+        const val ACTION_DENY_TRANSACTION = "info.alihabibi.ACTION_DENY_TRANSACTION"
     }
 
     private val notificationManager = context.getSystemService(NotificationManager::class.java)
 
-    internal fun pushNotification(notificationId: Int = System.currentTimeMillis().toInt(), channelName: String) {
+    internal fun pushNotification(
+        notificationId: Int = System.currentTimeMillis().toInt(),
+        channelName: String,
+        transactionData: TransactionData
+    ) {
         if (!notificationManager.areNotificationsEnabled()) return
 
         val title = context.getString(R.string.sms_detected_title, channelName)
         val text = context.getString(R.string.sms_detected_description, channelName)
 
         buildNotificationChannel()
-        val notification = Notification.Builder(context, CHANNEL_ID)
+        val notification = Notification.Builder(context, NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(R.drawable.app_logo)
             .setColor(context.getColor(R.color.primary))
             .setContentTitle(title)
             .setContentText(text)
             .setStyle(Notification.BigTextStyle().bigText(text))
             .setCategory(Notification.CATEGORY_MESSAGE)
-            .setContentIntent(buildContentIntent())
+            .setContentIntent(buildContentIntent(notificationId, transactionData))
             .setAutoCancel(true)
-            .addAction(buildAction(notificationId, ACTION_ACCEPT_TRANSACTION, R.string.register_transaction))
-            .addAction(buildAction(notificationId, ACTION_DENY_TRANSACTION, R.string.dismiss))
+            .addAction(buildAcceptAction(notificationId, transactionData))
+            .addAction(buildDenyAction(notificationId))
             .build()
 
         notificationManager.notify(notificationId, notification)
@@ -50,7 +57,7 @@ internal class SmsNotifier(private val context: Context) {
 
     private fun buildNotificationChannel() {
         val channel = NotificationChannel(
-            CHANNEL_ID,
+            NOTIFICATION_CHANNEL_ID,
             context.getString(R.string.sms_detection_notification_channel_name),
             NotificationManager.IMPORTANCE_HIGH
         ).apply {
@@ -67,36 +74,63 @@ internal class SmsNotifier(private val context: Context) {
         notificationManager.createNotificationChannel(channel)
     }
 
-    private fun buildContentIntent(): PendingIntent? {
-        val launchIntent =
-            context.packageManager.getLaunchIntentForPackage(context.packageName)?.apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-            } ?: return null
-
-        return PendingIntent.getActivity(
+    private fun buildContentIntent(notificationId: Int, transactionData: TransactionData): PendingIntent? {
+        val intent = Intent(Intent.ACTION_VIEW, NEW_TRANSACTION_URI.toUri()).apply {
+            this.setPackage(context.packageName)
+            putExtra(Keys.EXTRA_ID_TRANSACTION_TYPE, transactionData.transactionType.name)
+            putExtra(Keys.EXTRA_ID_TRANSACTION_AMOUNT, transactionData.amount)
+            putExtra(Keys.EXTRA_ID_TRANSACTION_CHANNEL_ID, transactionData.channelId)
+            putExtra(Keys.EXTRA_ID_TRANSACTION_YEAR, transactionData.year)
+            putExtra(Keys.EXTRA_ID_TRANSACTION_MONTH, transactionData.month)
+            putExtra(Keys.EXTRA_ID_TRANSACTION_DAY_OF_MONTH, transactionData.dayOfMonth)
+            putExtra(Keys.EXTRA_ID_TRANSACTION_DAY_OF_WEEK_NAME, transactionData.dayOfWeekName)
+            putExtra(Keys.EXTRA_ID_TRANSACTION_HOUR, transactionData.hour)
+            putExtra(Keys.EXTRA_ID_TRANSACTION_MINUTE, transactionData.minute)
+        }
+         return PendingIntent.getActivity(
             context,
-            0,
-            launchIntent,
+            // unique request code per notification + action, otherwise PendingIntents collide
+            notificationId * 21 + ACTION_ACCEPT_TRANSACTION.hashCode(),
+            intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
     }
 
-    private fun buildAction(
-        notificationId: Int,
-        action: String,
-        @StringRes title: Int
-    ): Notification.Action {
+    private fun buildDenyAction(notificationId: Int): Notification.Action {
         val intent = Intent(context, SmsReceiver::class.java).apply {
-            this.action = action
-            putExtra(ACTIONS_INTENT_EXTRA_ID, notificationId)
+            this.setAction(ACTION_DENY_TRANSACTION)
+            putExtra(INTENT_EXTRA_ID, notificationId)
         }
-        val pending = PendingIntent.getBroadcast(
+        val pendingIntent = PendingIntent.getBroadcast(
             context,
             // unique request code per notification + action, otherwise PendingIntents collide
-            notificationId * 31 + action.hashCode(),
+            notificationId * 21 + ACTION_DENY_TRANSACTION.hashCode(),
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        return Notification.Action.Builder(null, context.getString(title), pending).build()
+        return Notification.Action.Builder(null, context.getString(R.string.dismiss), pendingIntent).build()
+    }
+
+    private fun buildAcceptAction(notificationId: Int, transactionData: TransactionData): Notification.Action {
+        val intent = Intent(Intent.ACTION_VIEW, NEW_TRANSACTION_URI.toUri()).apply {
+            this.setPackage(context.packageName)
+            putExtra(Keys.EXTRA_ID_TRANSACTION_TYPE, transactionData.transactionType.name)
+            putExtra(Keys.EXTRA_ID_TRANSACTION_AMOUNT, transactionData.amount)
+            putExtra(Keys.EXTRA_ID_TRANSACTION_CHANNEL_ID, transactionData.channelId)
+            putExtra(Keys.EXTRA_ID_TRANSACTION_YEAR, transactionData.year)
+            putExtra(Keys.EXTRA_ID_TRANSACTION_MONTH, transactionData.month)
+            putExtra(Keys.EXTRA_ID_TRANSACTION_DAY_OF_MONTH, transactionData.dayOfMonth)
+            putExtra(Keys.EXTRA_ID_TRANSACTION_DAY_OF_WEEK_NAME, transactionData.dayOfWeekName)
+            putExtra(Keys.EXTRA_ID_TRANSACTION_HOUR, transactionData.hour)
+            putExtra(Keys.EXTRA_ID_TRANSACTION_MINUTE, transactionData.minute)
+        }
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            // unique request code per notification + action, otherwise PendingIntents collide
+            notificationId * 21 + ACTION_ACCEPT_TRANSACTION.hashCode(),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        return Notification.Action.Builder(null, context.getString(R.string.register_transaction), pendingIntent).build()
     }
 }

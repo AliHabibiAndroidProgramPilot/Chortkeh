@@ -50,6 +50,15 @@
                     android:host="reminder" />
             </intent-filter>
 
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="chortkeh"
+                    android:host="new_transaction" />
+            </intent-filter>
+
         </activity>
     </application>
 

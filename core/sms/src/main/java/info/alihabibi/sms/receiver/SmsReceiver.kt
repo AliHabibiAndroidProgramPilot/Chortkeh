@@ -4,10 +4,13 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.provider.Telephony
+import android.telephony.SmsMessage
 import info.alihabibi.common.ApplicationScope
 import info.alihabibi.domain.local.usecases.database.channel.usecase.ChannelUseCases
-import info.alihabibi.sms.SmsMatcher
+import info.alihabibi.domain.models.transaction.TransactionType
+import info.alihabibi.sms.parser.SmsMatcher
 import info.alihabibi.sms.notification.SmsNotifier
+import info.alihabibi.sms.parser.TransactionData
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -20,54 +23,54 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
     private val smsNotifier: SmsNotifier by inject()
 
     override fun onReceive(context: Context, intent: Intent) {
-        when (intent.action) {
-            Telephony.Sms.Intents.SMS_RECEIVED_ACTION -> handleIncomingSms(intent)
-            SmsNotifier.ACTION_ACCEPT_TRANSACTION-> handleNotificationAction(intent)
+        when(intent.action) {
+            Telephony.Sms.Intents.SMS_RECEIVED_ACTION -> {
+                val messages = Telephony.Sms.Intents.getMessagesFromIntent(intent)
+                handleIncomingSms(messages)
+            }
+            SmsNotifier.ACTION_DENY_TRANSACTION -> {
+                val notificationId = intent.getIntExtra(SmsNotifier.INTENT_EXTRA_ID, -1)
+                smsNotifier.cancelNotification(notificationId)
+            }
+            else -> return
         }
-
     }
 
-    private fun handleIncomingSms(intent: Intent) {
-        val messages = Telephony.Sms.Intents.getMessagesFromIntent(intent)
+    private fun handleIncomingSms(messages: Array<SmsMessage?>?) {
         if (messages.isNullOrEmpty()) return
 
         val pendingResult = goAsync()
-
         applicationScope.launch {
             try {
                 channelsUseCases.getChannelsUseCase.invoke().firstOrNull()?.let { channels ->
-                    for (message in messages) {
-                        val sender = message.originatingAddress ?: continue
+                    messages.forEach { message ->
+                        val sender = message?.originatingAddress
                         // Find channel that matches the incoming SMS sender
-                        val matchingChannel = channels.find { channel ->
+                        val matchedChannel = channels.find { channel ->
                             SmsMatcher.matches(channel.smsSource, sender)
                         }
+                        val transactionData = TransactionData(
+                            TransactionType.OUTCOME,
+                            568_888,
+                            matchedChannel?.id ?: -1,
+                            1406,
+                            6,
+                            17,
+                            "یکشنبه",
+                            18,
+                            30
+                        )
 
-                        if (matchingChannel != null)
-                            smsNotifier.pushNotification(channelName = matchingChannel.channelName)
+                        if (matchedChannel != null)
+                            smsNotifier.pushNotification(
+                                channelName = matchedChannel.channelName,
+                                transactionData = transactionData
+                            )
                     }
                 } ?: return@launch
             } catch (e: Exception) {
                 e.printStackTrace()
             } finally {
-                pendingResult.finish()
-            }
-        }
-    }
-
-    private fun handleNotificationAction(intent: Intent) {
-        val notificationId = intent.getIntExtra(SmsNotifier.ACTIONS_INTENT_EXTRA_ID, -1)
-        val pendingResult = goAsync()
-
-        applicationScope.launch {
-            try {
-                if (intent.action == SmsNotifier.ACTION_ACCEPT_TRANSACTION) {
-
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            } finally {
-                if (notificationId != -1) smsNotifier.cancelNotification(notificationId)
                 pendingResult.finish()
             }
         }
