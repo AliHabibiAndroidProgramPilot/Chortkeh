@@ -22,8 +22,7 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
     override fun onReceive(context: Context, intent: Intent) {
         when (intent.action) {
             Telephony.Sms.Intents.SMS_RECEIVED_ACTION -> handleIncomingSms(intent)
-            SmsNotifier.ACTION_ACCEPT_TRANSACTION,
-            SmsNotifier.ACTION_DENY_TRANSACTION -> handleNotificationAction(intent)
+            SmsNotifier.ACTION_ACCEPT_TRANSACTION-> handleNotificationAction(intent)
         }
 
     }
@@ -58,19 +57,12 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
 
     private fun handleNotificationAction(intent: Intent) {
         val notificationId = intent.getIntExtra(SmsNotifier.ACTIONS_INTENT_EXTRA_ID, -1)
-        val action = intent.action
         val pendingResult = goAsync()
 
         applicationScope.launch {
             try {
-                when (action) {
-                    SmsNotifier.ACTION_ACCEPT_TRANSACTION -> {
-                        // e.g. channelsUseCases.xxx.invoke(...)
-                    }
+                if (intent.action == SmsNotifier.ACTION_ACCEPT_TRANSACTION) {
 
-                    SmsNotifier.ACTION_DENY_TRANSACTION -> {
-                        // ...
-                    }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()

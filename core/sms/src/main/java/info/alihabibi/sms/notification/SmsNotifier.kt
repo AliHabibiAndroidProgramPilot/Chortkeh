@@ -17,7 +17,7 @@ internal class SmsNotifier(private val context: Context) {
     internal companion object {
         private const val CHANNEL_ID = "sms_detection"
         const val ACTIONS_INTENT_EXTRA_ID = "notification_id"
-        const val ACTION_DENY_TRANSACTION = "info.alihabibi.ACTION_DENY_TRANSACTION"
+        private const val ACTION_DENY_TRANSACTION = "info.alihabibi.ACTION_DENY_TRANSACTION"
         const val ACTION_ACCEPT_TRANSACTION = "info.alihabibi.ACTION_ACCEPT_TRANSACTION"
     }
 
