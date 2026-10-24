@@ -1,12 +1,18 @@
-package info.alihabibi.new_transaction
+package info.alihabibi.new_transaction.navigation
 
+import android.content.Intent
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.core.content.IntentCompat
+import androidx.core.os.BundleCompat
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
+import info.alihabibi.new_transaction.NewTransactionUiIntent
+import info.alihabibi.new_transaction.NewTransactionViewModel
 import info.alihabibi.new_transaction.screens.AddCategoryDestination
 import info.alihabibi.new_transaction.screens.NewTransactionDestination
 import kotlinx.serialization.Serializable
@@ -46,6 +52,18 @@ fun NavGraphBuilder.newTransactionGraph(
                 } catch (_: Exception) {
                     null
                 }
+            }
+
+            val prefill = remember(backStackEntry) {
+                backStackEntry.arguments
+                    ?.let { BundleCompat.getParcelable(it, NavController.KEY_DEEP_LINK_INTENT, Intent::class.java) }
+                    ?.extras
+                    ?.toNewTransactionPrefill()
+            }
+
+            LaunchedEffect(prefill) {
+                if (prefill != null)
+                    viewModel.onEvent(NewTransactionUiIntent.ApplyPrefill(prefill))
             }
 
             NewTransactionDestination(

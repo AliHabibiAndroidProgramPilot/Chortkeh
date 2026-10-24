@@ -7,5 +7,9 @@ enum class TransactionTypeOptionUiModel(
     @get:StringRes val labelRes: Int
 ) {
     OUTCOME(R.string.outcome),
-    INCOME(R.string.income)
+    INCOME(R.string.income);
+
+    companion object {
+        fun findByName(value: String): TransactionTypeOptionUiModel? = entries.find { it.name == value }
+    }
 }

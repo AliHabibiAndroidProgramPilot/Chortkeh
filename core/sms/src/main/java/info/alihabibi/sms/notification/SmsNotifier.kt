@@ -114,6 +114,7 @@ internal class SmsNotifier(private val context: Context) {
     private fun buildAcceptAction(notificationId: Int, transactionData: TransactionData): Notification.Action {
         val intent = Intent(Intent.ACTION_VIEW, NEW_TRANSACTION_URI.toUri()).apply {
             this.setPackage(context.packageName)
+            putExtra(INTENT_EXTRA_ID, notificationId)
             putExtra(Keys.EXTRA_ID_TRANSACTION_TYPE, transactionData.transactionType.name)
             putExtra(Keys.EXTRA_ID_TRANSACTION_AMOUNT, transactionData.amount)
             putExtra(Keys.EXTRA_ID_TRANSACTION_CHANNEL_ID, transactionData.channelId)

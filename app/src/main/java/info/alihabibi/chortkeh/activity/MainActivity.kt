@@ -29,7 +29,7 @@ import info.alihabibi.chortkeh.navigation.topLevelDestinations
 import info.alihabibi.common_android.snackbar.ObserveAsEvents
 import info.alihabibi.common_android.snackbar.SnackBarController
 import info.alihabibi.designsystem.theme.ChortkehTheme
-import info.alihabibi.new_transaction.NewTransactionGraphRoute
+import info.alihabibi.new_transaction.navigation.NewTransactionGraphRoute
 import info.alihabibi.ui.navigation.AppBottomNavigation
 import info.alihabibi.ui.navigation.AppNavigationRail
 import info.alihabibi.ui.scaffolds.BaseScaffold

@@ -16,6 +16,7 @@ import info.alihabibi.model.ui_model.category.CategoryUiModel
 import info.alihabibi.model.ui_model.channel.ChannelUiModel
 import info.alihabibi.model.ui_model.transaction.TransactionTypeOptionUiModel
 import info.alihabibi.model.ui_model.transaction.TransactionUiModel
+import info.alihabibi.new_transaction.navigation.NewTransactionPrefill
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -25,6 +26,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -49,6 +51,8 @@ class NewTransactionViewModel(
 
     private val _newTransactionEvents = MutableSharedFlow<NewTransactionUiEvents>()
     val newTransactionEvents: SharedFlow<NewTransactionUiEvents> = _newTransactionEvents.asSharedFlow()
+
+    private var prefillHasApplied: Boolean = false
 
     val formattedTransactionDate: StateFlow<String> = combine(
         newTransactionUiState.map { it.transactionYear },
@@ -97,6 +101,8 @@ class NewTransactionViewModel(
 
             is NewTransactionUiIntent.SaveCategory -> saveCategory()
 
+            is NewTransactionUiIntent.ApplyPrefill -> applyPrefill(event.prefill)
+
             is NewTransactionUiIntent.EditCategory -> editCategory(event.id)
 
             is NewTransactionUiIntent.EditTransaction -> editTransaction(event.id)
@@ -129,6 +135,30 @@ class NewTransactionViewModel(
 
             is NewTransactionUiIntent.TransactionTypeChanged -> changeTransactionType(event.type)
 
+        }
+    }
+
+    private fun applyPrefill(prefill: NewTransactionPrefill) {
+        if (prefillHasApplied) return
+        viewModelScope.launch {
+            val channel = channelsUseCase.getChannelByIdUseCase.invoke(prefill.channelId.toInt())
+                .firstOrNull()
+                ?.toUiModel()
+            _newTransactionUiState.update {
+                NewTransactionUiState(
+                    transactionType = TransactionTypeOptionUiModel.findByName(prefill.transactionType) ?:
+                    TransactionTypeOptionUiModel.INCOME,
+                    transactionPrice = prefill.amount.toString(),
+                    formattedTransactionTime = String.format(Locale.US, "%02d : %02d", prefill.hour, prefill.minute),
+                    transactionHour = prefill.hour,
+                    transactionMinute = prefill.minute,
+                    transactionYear = prefill.year,
+                    transactionMonth = prefill.month,
+                    transactionDay = Pair(prefill.dayOfMonth, prefill.dayOfWeekName),
+                    transactionChannel = channel
+                )
+            }
+            prefillHasApplied = true
         }
     }
 
@@ -441,6 +471,8 @@ sealed interface NewTransactionUiIntent {
     data object SaveTransaction : NewTransactionUiIntent
 
     data object SaveCategory : NewTransactionUiIntent
+
+    data class ApplyPrefill(val prefill: NewTransactionPrefill) : NewTransactionUiIntent
 
     data class EditCategory(val id: Int) : NewTransactionUiIntent
 
