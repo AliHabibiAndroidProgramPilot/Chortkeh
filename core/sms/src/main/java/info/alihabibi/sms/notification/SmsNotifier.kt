@@ -11,7 +11,7 @@ import android.media.RingtoneManager
 import androidx.core.net.toUri
 import info.alihabibi.designsystem.R
 import info.alihabibi.domain.Keys
-import info.alihabibi.sms.parser.TransactionData
+import info.alihabibi.model.data.TransactionData
 import info.alihabibi.sms.receiver.SmsReceiver
 
 internal class SmsNotifier(private val context: Context) {
@@ -77,15 +77,7 @@ internal class SmsNotifier(private val context: Context) {
     private fun buildContentIntent(notificationId: Int, transactionData: TransactionData): PendingIntent? {
         val intent = Intent(Intent.ACTION_VIEW, NEW_TRANSACTION_URI.toUri()).apply {
             this.setPackage(context.packageName)
-            putExtra(Keys.EXTRA_ID_TRANSACTION_TYPE, transactionData.transactionType.name)
-            putExtra(Keys.EXTRA_ID_TRANSACTION_AMOUNT, transactionData.amount)
-            putExtra(Keys.EXTRA_ID_TRANSACTION_CHANNEL_ID, transactionData.channelId)
-            putExtra(Keys.EXTRA_ID_TRANSACTION_YEAR, transactionData.year)
-            putExtra(Keys.EXTRA_ID_TRANSACTION_MONTH, transactionData.month)
-            putExtra(Keys.EXTRA_ID_TRANSACTION_DAY_OF_MONTH, transactionData.dayOfMonth)
-            putExtra(Keys.EXTRA_ID_TRANSACTION_DAY_OF_WEEK_NAME, transactionData.dayOfWeekName)
-            putExtra(Keys.EXTRA_ID_TRANSACTION_HOUR, transactionData.hour)
-            putExtra(Keys.EXTRA_ID_TRANSACTION_MINUTE, transactionData.minute)
+            putExtra(Keys.EXTRA_ID_TRANSACTION_DATA, transactionData)
         }
          return PendingIntent.getActivity(
             context,
@@ -115,15 +107,7 @@ internal class SmsNotifier(private val context: Context) {
         val intent = Intent(Intent.ACTION_VIEW, NEW_TRANSACTION_URI.toUri()).apply {
             this.setPackage(context.packageName)
             putExtra(INTENT_EXTRA_ID, notificationId)
-            putExtra(Keys.EXTRA_ID_TRANSACTION_TYPE, transactionData.transactionType.name)
-            putExtra(Keys.EXTRA_ID_TRANSACTION_AMOUNT, transactionData.amount)
-            putExtra(Keys.EXTRA_ID_TRANSACTION_CHANNEL_ID, transactionData.channelId)
-            putExtra(Keys.EXTRA_ID_TRANSACTION_YEAR, transactionData.year)
-            putExtra(Keys.EXTRA_ID_TRANSACTION_MONTH, transactionData.month)
-            putExtra(Keys.EXTRA_ID_TRANSACTION_DAY_OF_MONTH, transactionData.dayOfMonth)
-            putExtra(Keys.EXTRA_ID_TRANSACTION_DAY_OF_WEEK_NAME, transactionData.dayOfWeekName)
-            putExtra(Keys.EXTRA_ID_TRANSACTION_HOUR, transactionData.hour)
-            putExtra(Keys.EXTRA_ID_TRANSACTION_MINUTE, transactionData.minute)
+            putExtra(Keys.EXTRA_ID_TRANSACTION_DATA, transactionData)
         }
         val pendingIntent = PendingIntent.getActivity(
             context,

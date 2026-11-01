@@ -11,6 +11,9 @@ dependencies {
     // domain
     implementation(projects.core.domain)
 
+    // model
+    implementation(projects.core.model)
+
     // common
     implementation(projects.core.common)
 

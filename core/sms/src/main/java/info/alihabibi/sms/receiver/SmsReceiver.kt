@@ -8,9 +8,9 @@ import android.telephony.SmsMessage
 import info.alihabibi.common.ApplicationScope
 import info.alihabibi.domain.local.usecases.database.channel.usecase.ChannelUseCases
 import info.alihabibi.domain.models.transaction.TransactionType
-import info.alihabibi.sms.parser.SmsMatcher
+import info.alihabibi.model.data.TransactionData
 import info.alihabibi.sms.notification.SmsNotifier
-import info.alihabibi.sms.parser.TransactionData
+import info.alihabibi.sms.parser.SmsMatcher
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent

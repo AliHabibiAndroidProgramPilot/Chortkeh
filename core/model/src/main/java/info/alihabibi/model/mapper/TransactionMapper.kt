@@ -6,8 +6,10 @@ import info.alihabibi.domain.models.transaction.Transaction
 import info.alihabibi.domain.models.transaction.TransactionType
 import info.alihabibi.domain.models.transaction.chart_data.BarChartTimingOption
 import info.alihabibi.domain.models.transaction.chart_data.IncomeExpenseBucket
+import info.alihabibi.model.data.TransactionData
 import info.alihabibi.model.ui_model.transaction.BarChartTimingOptionUiModel
 import info.alihabibi.model.ui_model.transaction.CategoryTransactionExpensesUiModel
+import info.alihabibi.model.ui_model.transaction.NewTransactionPrefill
 import info.alihabibi.model.ui_model.transaction.TransactionTypeOptionUiModel
 import info.alihabibi.model.ui_model.transaction.TransactionUiModel
 import info.alihabibi.model.ui_model.transaction.chart_data.IncomeExpenseBucketUiModel
@@ -36,6 +38,18 @@ fun TransactionUiModel.toDomain(): Transaction = Transaction(
     day = day,
     dayOfWeekName = dayOfWeekName,
     time = time
+)
+
+fun TransactionData.toUiPrefill(): NewTransactionPrefill = NewTransactionPrefill(
+    transactionType = transactionType.toUiOption(),
+    amount = amount,
+    channelId = channelId,
+    year = year,
+    month = month,
+    dayOfMonth = dayOfMonth,
+    dayOfWeekName = dayOfWeekName,
+    hour = hour,
+    minute = minute
 )
 
 fun CategoryTransactionExpenses.toUiOption(): CategoryTransactionExpensesUiModel = CategoryTransactionExpensesUiModel(

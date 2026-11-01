@@ -1,9 +1,7 @@
-package info.alihabibi.sms.parser
+package info.alihabibi.model.ui_model.transaction
 
-import info.alihabibi.domain.models.transaction.TransactionType
-
-data class TransactionData(
-    val transactionType: TransactionType,
+data class NewTransactionPrefill(
+    val transactionType: TransactionTypeOptionUiModel,
     val amount: Long,
     val channelId: Long,
     val year: Int,

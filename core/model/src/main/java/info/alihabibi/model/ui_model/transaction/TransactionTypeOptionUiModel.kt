@@ -9,7 +9,4 @@ enum class TransactionTypeOptionUiModel(
     OUTCOME(R.string.outcome),
     INCOME(R.string.income);
 
-    companion object {
-        fun findByName(value: String): TransactionTypeOptionUiModel? = entries.find { it.name == value }
-    }
 }

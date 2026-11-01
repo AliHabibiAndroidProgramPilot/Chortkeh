@@ -14,9 +14,9 @@ import info.alihabibi.model.ui_model.category.CategoryIconOptionUiModel
 import info.alihabibi.model.ui_model.category.CategoryTypeOptionUiModel
 import info.alihabibi.model.ui_model.category.CategoryUiModel
 import info.alihabibi.model.ui_model.channel.ChannelUiModel
+import info.alihabibi.model.ui_model.transaction.NewTransactionPrefill
 import info.alihabibi.model.ui_model.transaction.TransactionTypeOptionUiModel
 import info.alihabibi.model.ui_model.transaction.TransactionUiModel
-import info.alihabibi.new_transaction.navigation.NewTransactionPrefill
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -146,8 +146,7 @@ class NewTransactionViewModel(
                 ?.toUiModel()
             _newTransactionUiState.update {
                 NewTransactionUiState(
-                    transactionType = TransactionTypeOptionUiModel.findByName(prefill.transactionType) ?:
-                    TransactionTypeOptionUiModel.INCOME,
+                    transactionType = prefill.transactionType,
                     transactionPrice = prefill.amount.toString(),
                     formattedTransactionTime = String.format(Locale.US, "%02d : %02d", prefill.hour, prefill.minute),
                     transactionHour = prefill.hour,
