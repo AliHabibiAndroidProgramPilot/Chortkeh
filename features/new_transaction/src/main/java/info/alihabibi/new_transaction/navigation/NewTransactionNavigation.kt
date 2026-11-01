@@ -3,7 +3,6 @@ package info.alihabibi.new_transaction.navigation
 import android.content.Intent
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.core.content.IntentCompat
 import androidx.core.os.BundleCompat
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
