@@ -52,7 +52,7 @@ class NewTransactionViewModel(
     private val _newTransactionEvents = MutableSharedFlow<NewTransactionUiEvents>()
     val newTransactionEvents: SharedFlow<NewTransactionUiEvents> = _newTransactionEvents.asSharedFlow()
 
-    private var prefillHasApplied: Boolean = false
+    private var lastAppliedPrefill: NewTransactionPrefill? = null
 
     val formattedTransactionDate: StateFlow<String> = combine(
         newTransactionUiState.map { it.transactionYear },
@@ -139,7 +139,7 @@ class NewTransactionViewModel(
     }
 
     private fun applyPrefill(prefill: NewTransactionPrefill) {
-        if (prefillHasApplied) return
+        if (lastAppliedPrefill == prefill) return
         viewModelScope.launch {
             val channel = channelsUseCase.getChannelByIdUseCase.invoke(prefill.channelId.toInt())
                 .firstOrNull()
@@ -157,7 +157,7 @@ class NewTransactionViewModel(
                     transactionChannel = channel
                 )
             }
-            prefillHasApplied = true
+            lastAppliedPrefill = prefill
         }
     }
 

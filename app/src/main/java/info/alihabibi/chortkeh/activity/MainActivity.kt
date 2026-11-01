@@ -1,5 +1,6 @@
 package info.alihabibi.chortkeh.activity
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -12,12 +13,14 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -34,16 +37,20 @@ import info.alihabibi.ui.navigation.AppBottomNavigation
 import info.alihabibi.ui.navigation.AppNavigationRail
 import info.alihabibi.ui.scaffolds.BaseScaffold
 import info.alihabibi.ui.snackbars.AppSnackBar
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
 
     private val viewModel: MainActivityViewModel by viewModel()
+    private val deepLinkIntentState = MutableStateFlow<Intent?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        deepLinkIntentState.value = intent
 
         splashScreen.setKeepOnScreenCondition { viewModel.uiState.value.shouldKeepSplashScreen() }
 
@@ -51,10 +58,21 @@ class MainActivity : ComponentActivity() {
             ChortkehTheme {
                 val navController = rememberNavController()
                 val uiState = viewModel.uiState.collectAsState()
-
+                val deepLinkIntent by deepLinkIntentState.collectAsStateWithLifecycle()
                 val currentDestination by navController.currentBackStackEntryAsState()
                 val shouldShowBottomBar = topLevelDestinations.any {
                     currentDestination?.destination?.hasRoute(it::class) == true
+                }
+
+                LaunchedEffect(deepLinkIntent, currentDestination) {
+                    val intent = deepLinkIntent ?: return@LaunchedEffect
+                    val isGraphReady = runCatching { navController.graph }.getOrNull() != null
+                    if (isGraphReady && intent.action == Intent.ACTION_VIEW &&
+                        (intent.data?.host == "new_transaction" || intent.data?.toString()?.contains("new_transaction") == true)
+                    ) {
+                        navController.handleDeepLink(intent)
+                        deepLinkIntentState.value = null
+                    }
                 }
 
                 val snackBarHostState = remember { SnackbarHostState() }
@@ -143,6 +161,12 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        deepLinkIntentState.value = intent
     }
 
 }

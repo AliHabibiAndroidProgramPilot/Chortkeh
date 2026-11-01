@@ -57,9 +57,11 @@ fun NavGraphBuilder.newTransactionGraph(
                 }
             }
 
-            val prefill = remember(backStackEntry) {
-                backStackEntry.arguments
-                    ?.let { BundleCompat.getParcelable(it, NavController.KEY_DEEP_LINK_INTENT, Intent::class.java) }
+            val intentExtra = backStackEntry.arguments?.let {
+                BundleCompat.getParcelable(it, NavController.KEY_DEEP_LINK_INTENT, Intent::class.java)
+            }
+            val prefill = remember(intentExtra) {
+                intentExtra
                     ?.let { IntentCompat.getParcelableExtra(it, Keys.EXTRA_ID_TRANSACTION_DATA, TransactionData::class.java) }
                     ?.toUiPrefill()
             }
