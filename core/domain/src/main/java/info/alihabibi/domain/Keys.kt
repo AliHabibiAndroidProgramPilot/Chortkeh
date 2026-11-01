@@ -20,5 +20,6 @@ object Keys {
 
     // Intent Extra Ids
     const val EXTRA_ID_TRANSACTION_DATA = "EXTRA_ID_TRANSACTION_DATA"
+    const val EXTRA_NOTIFICATION_ID = "notification_id"
 
 }

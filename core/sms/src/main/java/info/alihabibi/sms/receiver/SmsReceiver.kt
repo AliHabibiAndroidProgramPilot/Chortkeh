@@ -6,6 +6,7 @@ import android.content.Intent
 import android.provider.Telephony
 import android.telephony.SmsMessage
 import info.alihabibi.common.ApplicationScope
+import info.alihabibi.domain.Keys
 import info.alihabibi.domain.local.usecases.database.channel.usecase.ChannelUseCases
 import info.alihabibi.domain.models.transaction.TransactionType
 import info.alihabibi.model.data.TransactionData
@@ -29,7 +30,7 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                 handleIncomingSms(messages)
             }
             SmsNotifier.ACTION_DENY_TRANSACTION -> {
-                val notificationId = intent.getIntExtra(SmsNotifier.INTENT_EXTRA_ID, -1)
+                val notificationId = intent.getIntExtra(Keys.EXTRA_NOTIFICATION_ID, -1)
                 smsNotifier.cancelNotification(notificationId)
             }
             else -> return

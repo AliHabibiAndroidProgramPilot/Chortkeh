@@ -68,7 +68,12 @@ fun NavGraphBuilder.newTransactionGraph(
 
             LaunchedEffect(prefill) {
                 if (prefill != null)
-                    viewModel.onEvent(NewTransactionUiIntent.ApplyPrefill(prefill))
+                    viewModel.onEvent(
+                        NewTransactionUiIntent.ApplyPrefill(
+                            prefill,
+                            intentExtra?.getIntExtra(Keys.EXTRA_NOTIFICATION_ID, -1) ?: -1
+                        )
+                    )
             }
 
             NewTransactionDestination(

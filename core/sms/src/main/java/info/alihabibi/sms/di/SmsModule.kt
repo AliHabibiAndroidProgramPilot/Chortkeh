@@ -1,5 +1,6 @@
 package info.alihabibi.sms.di
 
+import info.alihabibi.common_android.NotificationCanceler
 import info.alihabibi.domain.local.repositories.SmsSendersSourceRepository
 import info.alihabibi.sms.SmsSendersSourceImpl
 import info.alihabibi.sms.notification.SmsNotifier
@@ -11,5 +12,6 @@ val smsModule = module {
     single<SmsSendersSourceRepository> { SmsSendersSourceImpl(androidContext()) }
 
     single { SmsNotifier(androidContext()) }
+    single<NotificationCanceler> { get<SmsNotifier>() }
 
 }

@@ -17,6 +17,9 @@ dependencies {
     // common
     implementation(projects.core.common)
 
+    // common android
+    implementation(projects.core.commonAndroid)
+
     // design system
     implementation(projects.core.designsystem)
 

@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import info.alihabibi.common.PersianDateFormatter
+import info.alihabibi.common_android.NotificationCanceler
 import info.alihabibi.domain.local.usecases.database.category.usecase.CategoryUseCases
 import info.alihabibi.domain.local.usecases.database.channel.usecase.ChannelUseCases
 import info.alihabibi.domain.local.usecases.database.transaction.usecase.TransactionUseCases
@@ -37,7 +38,8 @@ import java.util.Locale
 class NewTransactionViewModel(
     private val categoryUseCases: CategoryUseCases,
     private val channelsUseCase: ChannelUseCases,
-    private val transactionUseCases: TransactionUseCases
+    private val transactionUseCases: TransactionUseCases,
+    private val notificationCanceler: NotificationCanceler
 ) : ViewModel() {
 
     private val _newTransactionUiState = MutableStateFlow(NewTransactionUiState())
@@ -101,7 +103,7 @@ class NewTransactionViewModel(
 
             is NewTransactionUiIntent.SaveCategory -> saveCategory()
 
-            is NewTransactionUiIntent.ApplyPrefill -> applyPrefill(event.prefill)
+            is NewTransactionUiIntent.ApplyPrefill -> applyPrefill(event.prefill, event.notificationId)
 
             is NewTransactionUiIntent.EditCategory -> editCategory(event.id)
 
@@ -138,7 +140,8 @@ class NewTransactionViewModel(
         }
     }
 
-    private fun applyPrefill(prefill: NewTransactionPrefill) {
+    private fun applyPrefill(prefill: NewTransactionPrefill, notificationId: Int) {
+        notificationCanceler.cancel(notificationId)
         if (lastAppliedPrefill == prefill) return
         viewModelScope.launch {
             val channel = channelsUseCase.getChannelByIdUseCase.invoke(prefill.channelId.toInt())
@@ -471,7 +474,7 @@ sealed interface NewTransactionUiIntent {
 
     data object SaveCategory : NewTransactionUiIntent
 
-    data class ApplyPrefill(val prefill: NewTransactionPrefill) : NewTransactionUiIntent
+    data class ApplyPrefill(val prefill: NewTransactionPrefill, val notificationId: Int) : NewTransactionUiIntent
 
     data class EditCategory(val id: Int) : NewTransactionUiIntent
 

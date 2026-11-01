@@ -6,6 +6,13 @@ import org.koin.dsl.module
 
 val newTransactionModule = module {
 
-    viewModel { NewTransactionViewModel(get(), get(), get()) }
+    viewModel {
+        NewTransactionViewModel(
+            get(),
+            get(),
+            get(),
+            get()
+        )
+    }
 
 }

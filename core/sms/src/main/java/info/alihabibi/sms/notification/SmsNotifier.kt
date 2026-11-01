@@ -9,18 +9,18 @@ import android.content.Intent
 import android.media.AudioAttributes
 import android.media.RingtoneManager
 import androidx.core.net.toUri
+import info.alihabibi.common_android.NotificationCanceler
 import info.alihabibi.designsystem.R
 import info.alihabibi.domain.Keys
 import info.alihabibi.model.data.TransactionData
 import info.alihabibi.sms.receiver.SmsReceiver
 
-internal class SmsNotifier(private val context: Context) {
+internal class SmsNotifier(private val context: Context) : NotificationCanceler {
 
     internal companion object {
         private const val NOTIFICATION_CHANNEL_ID = "sms_detection"
         private const val ACTION_ACCEPT_TRANSACTION = "info.alihabibi.ACTION_ACCEPT_TRANSACTION"
         const val NEW_TRANSACTION_URI = "chortkeh://new_transaction"
-        const val INTENT_EXTRA_ID = "notification_id"
         const val ACTION_DENY_TRANSACTION = "info.alihabibi.ACTION_DENY_TRANSACTION"
     }
 
@@ -54,6 +54,8 @@ internal class SmsNotifier(private val context: Context) {
     }
 
     internal fun cancelNotification(notificationId: Int) = notificationManager.cancel(notificationId)
+
+    override fun cancel(notificationId: Int) = notificationManager.cancel(notificationId)
 
     private fun buildNotificationChannel() {
         val channel = NotificationChannel(
@@ -91,7 +93,7 @@ internal class SmsNotifier(private val context: Context) {
     private fun buildDenyAction(notificationId: Int): Notification.Action {
         val intent = Intent(context, SmsReceiver::class.java).apply {
             this.setAction(ACTION_DENY_TRANSACTION)
-            putExtra(INTENT_EXTRA_ID, notificationId)
+            putExtra(Keys.EXTRA_NOTIFICATION_ID, notificationId)
         }
         val pendingIntent = PendingIntent.getBroadcast(
             context,
@@ -106,7 +108,7 @@ internal class SmsNotifier(private val context: Context) {
     private fun buildAcceptAction(notificationId: Int, transactionData: TransactionData): Notification.Action {
         val intent = Intent(Intent.ACTION_VIEW, NEW_TRANSACTION_URI.toUri()).apply {
             this.setPackage(context.packageName)
-            putExtra(INTENT_EXTRA_ID, notificationId)
+            putExtra(Keys.EXTRA_NOTIFICATION_ID, notificationId)
             putExtra(Keys.EXTRA_ID_TRANSACTION_DATA, transactionData)
         }
         val pendingIntent = PendingIntent.getActivity(
