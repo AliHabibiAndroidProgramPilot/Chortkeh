@@ -15,7 +15,7 @@ import info.alihabibi.model.ui_model.channel.ChannelUiModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -179,17 +179,20 @@ class ChannelsViewModel(
 
     private fun getChannelById(id: Int) {
         viewModelScope.launch {
-            val channel = channelsUseCases.getChannelByIdUseCase.invoke(id).first()
-                .toUiModel(needsBalanceFormat = false)
-            _channelUiState.update {
-                ChannelUiState(
-                    isBankAccountChannel = channel.isBankCardChannel,
-                    channelName = channel.channelName,
-                    channelBalance = channel.channelBalance,
-                    selectedSmsSource = channel.smsSource?.takeIf { it.isNotBlank() },
-                    cardNumber = channel.cardNumber,
-                    channelIcon = channel.icon
-                )
+            val channel = channelsUseCases.getChannelByIdUseCase.invoke(id.toLong())
+                .firstOrNull()
+                ?.toUiModel(needsBalanceFormat = false)
+            if (channel != null) {
+                _channelUiState.update {
+                    ChannelUiState(
+                        isBankAccountChannel = channel.isBankCardChannel,
+                        channelName = channel.channelName,
+                        channelBalance = channel.channelBalance,
+                        selectedSmsSource = channel.smsSource?.takeIf { it.isNotBlank() },
+                        cardNumber = channel.cardNumber,
+                        channelIcon = channel.icon
+                    )
+                }
             }
         }
     }

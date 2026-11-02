@@ -9,11 +9,13 @@ import android.content.Intent
 import android.media.AudioAttributes
 import android.media.RingtoneManager
 import androidx.core.net.toUri
+import info.alihabibi.common.Utils
 import info.alihabibi.common_android.NotificationCanceler
 import info.alihabibi.designsystem.R
 import info.alihabibi.domain.Keys
 import info.alihabibi.model.data.TransactionData
 import info.alihabibi.sms.receiver.SmsReceiver
+import java.util.Locale
 
 internal class SmsNotifier(private val context: Context) : NotificationCanceler {
 
@@ -34,7 +36,13 @@ internal class SmsNotifier(private val context: Context) : NotificationCanceler 
         if (!notificationManager.areNotificationsEnabled()) return
 
         val title = context.getString(R.string.sms_detected_title, channelName)
-        val text = context.getString(R.string.sms_detected_description, channelName)
+        val text = buildNotificationText(
+            transactionData.amount ?: 0,
+            transactionData.dayOfWeekName,
+            transactionData.hour,
+            transactionData.minute,
+            channelName
+        )
 
         buildNotificationChannel()
         val notification = Notification.Builder(context, NOTIFICATION_CHANNEL_ID)
@@ -119,5 +127,28 @@ internal class SmsNotifier(private val context: Context) : NotificationCanceler 
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         return Notification.Action.Builder(null, context.getString(R.string.register_transaction), pendingIntent).build()
+    }
+
+    private fun buildNotificationText(
+        amount: Long?,
+        dayOfWeekName: String?,
+        hour: Int?,
+        minute: Int?,
+        channelName: String
+    ): String {
+        val time = if (hour != null && minute != null)
+            String.format(Locale.US, "%02d:%02d", hour, minute) else null
+        val date = listOfNotNull(dayOfWeekName?.takeIf(String::isNotBlank), time)
+            .takeIf { it.isNotEmpty() }
+            ?.joinToString("، ")
+
+        return buildList {
+            amount?.let {
+                add(context.getString(R.string.sms_detected_amount, Utils.decimalFormatterPattern.format(it)))
+            }
+            date?.let { add(context.getString(R.string.sms_detected_date, it)) }
+            add(context.getString(R.string.sms_detected_channel, channelName))
+            add(context.getString(R.string.sms_detected_question))
+        }.joinToString("\n")
     }
 }

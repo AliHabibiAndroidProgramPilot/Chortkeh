@@ -8,8 +8,6 @@ import android.telephony.SmsMessage
 import info.alihabibi.common.ApplicationScope
 import info.alihabibi.domain.Keys
 import info.alihabibi.domain.local.usecases.database.channel.usecase.ChannelUseCases
-import info.alihabibi.domain.models.transaction.TransactionType
-import info.alihabibi.model.data.TransactionData
 import info.alihabibi.sms.notification.SmsNotifier
 import info.alihabibi.sms.parser.SmsMatcher
 import kotlinx.coroutines.flow.firstOrNull
@@ -40,35 +38,27 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
     private fun handleIncomingSms(messages: Array<SmsMessage?>?) {
         if (messages.isNullOrEmpty()) return
 
+        val sms = messages.firstOrNull() ?: return
+        val fullSmsRawText = messages
+            .filterNotNull()
+            .joinToString("") { it.messageBody.orEmpty() }
+
         val pendingResult = goAsync()
         applicationScope.launch {
             try {
-                channelsUseCases.getChannelsUseCase.invoke().firstOrNull()?.let { channels ->
-                    messages.forEach { message ->
-                        val sender = message?.originatingAddress
-                        // Find channel that matches the incoming SMS sender
-                        val matchedChannel = channels.find { channel ->
-                            SmsMatcher.matches(channel.smsSource, sender)
-                        }
-                        val transactionData = TransactionData(
-                            TransactionType.OUTCOME,
-                            568_888,
-                            matchedChannel?.id ?: -1,
-                            1406,
-                            6,
-                            17,
-                            "یکشنبه",
-                            18,
-                            30
-                        )
-
-                        if (matchedChannel != null)
-                            smsNotifier.pushNotification(
-                                channelName = matchedChannel.channelName,
-                                transactionData = transactionData
-                            )
-                    }
-                } ?: return@launch
+                val channels = channelsUseCases.getChannelsUseCase.invoke().firstOrNull()
+                val matchedChannel = channels?.find { channel ->
+                    SmsMatcher.matches(channel.smsSource, sms.originatingAddress)
+                }
+                if (matchedChannel != null) {
+                    val transactionData = SmsMatcher.createTransactionData(
+                        fullSmsRawText,
+                        matchedChannel.id,
+                        matchedChannel.bankName,
+                        sms.timestampMillis
+                    )
+                    smsNotifier.pushNotification(channelName = matchedChannel.channelName, transactionData = transactionData)
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
             } finally {

@@ -144,7 +144,7 @@ class NewTransactionViewModel(
         notificationCanceler.cancel(notificationId)
         if (lastAppliedPrefill == prefill) return
         viewModelScope.launch {
-            val channel = channelsUseCase.getChannelByIdUseCase.invoke(prefill.channelId.toInt())
+            val channel = channelsUseCase.getChannelByIdUseCase.invoke(prefill.channelId)
                 .firstOrNull()
                 ?.toUiModel()
             _newTransactionUiState.update {
@@ -154,9 +154,9 @@ class NewTransactionViewModel(
                     formattedTransactionTime = String.format(Locale.US, "%02d : %02d", prefill.hour, prefill.minute),
                     transactionHour = prefill.hour,
                     transactionMinute = prefill.minute,
-                    transactionYear = prefill.year,
-                    transactionMonth = prefill.month,
-                    transactionDay = Pair(prefill.dayOfMonth, prefill.dayOfWeekName),
+                    transactionYear = prefill.year ?: 0,
+                    transactionMonth = prefill.month ?: 0,
+                    transactionDay = Pair(prefill.dayOfMonth ?: 0, prefill.dayOfWeekName ?: ""),
                     transactionChannel = channel
                 )
             }

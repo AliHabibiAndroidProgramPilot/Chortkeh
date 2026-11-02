@@ -2,7 +2,7 @@ package info.alihabibi.sms.parser
 
 import info.alihabibi.common.banks.Bank
 
-object BankSmsParserFactory {
+internal object BankSmsParserFactory {
 
     fun parsSms(rawSms: String, bankName: String?): ParsedTransaction? {
         val normalizedText = SmsNormalizer.normalizer(rawSms)

@@ -1,5 +1,9 @@
 package info.alihabibi.sms.parser
 
+import info.alihabibi.common.Utils
+import info.alihabibi.domain.models.transaction.TransactionType
+import info.alihabibi.model.data.TransactionData
+
 object SmsMatcher {
 
     /**
@@ -30,6 +34,27 @@ object SmsMatcher {
         }
 
         return false
+    }
+
+    fun createTransactionData(
+        rawSmsBody: String,
+        channelId: Long?,
+        channelBankName: String?,
+        smsTimeStampMillis: Long
+    ): TransactionData {
+        val parsedTransactionData = BankSmsParserFactory.parsSms(rawSmsBody, channelBankName)
+        val parsedTransactionDateTime = Utils.epochMillisToPersianDate(smsTimeStampMillis)
+        return TransactionData(
+            transactionType = parsedTransactionData?.transactionType ?: TransactionType.OUTCOME,
+            amount = parsedTransactionData?.amount,
+            channelId = channelId ?: -1,
+            year = parsedTransactionDateTime.year,
+            month = parsedTransactionDateTime.month,
+            dayOfMonth = parsedTransactionDateTime.dayOfMonth,
+            dayOfWeekName = parsedTransactionDateTime.dayOfWeekName,
+            hour = parsedTransactionDateTime.hour,
+            minute = parsedTransactionDateTime.minute
+        )
     }
 
 }

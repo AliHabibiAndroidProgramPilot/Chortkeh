@@ -60,6 +60,26 @@ object Utils {
         return DateTimeParts(jy, jm, jd)
     }
 
+    fun epochMillisToPersianDate(epochMillis: Long): DateTimeParts {
+        val zoneDateTime = Instant
+            .ofEpochMilli(epochMillis)
+            .atZone(ZoneId.systemDefault())
+        val (year, month, dayOfMonth) = gregorianToPersianDate(zoneDateTime.toLocalDate())
+        val dayOfWeekName = try {
+            PersianDateFormatter.persianWeekDays[(zoneDateTime.dayOfWeek.value + 1) % 7]
+        } catch (_: IndexOutOfBoundsException) {
+            ""
+        }
+        return DateTimeParts(
+            year = year,
+            month = month,
+            dayOfMonth = dayOfMonth,
+            dayOfWeekName = dayOfWeekName,
+            hour = zoneDateTime.hour,
+            minute = zoneDateTime.minute
+        )
+    }
+
     fun getCurrentPersianMonth(): Pair<String, Int> {
         val date = Instant
             .ofEpochMilli(System.currentTimeMillis())
