@@ -119,4 +119,9 @@ object Utils {
 
     fun getStringResources(context: Context, id: Int): String = context.getString(id)
 
+    fun rialToToman(amountInRial: Long): Long? {
+        if (amountInRial < 10L) return null
+        return amountInRial / 10L
+    }
+
 }

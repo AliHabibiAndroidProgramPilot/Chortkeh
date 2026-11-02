@@ -4,5 +4,5 @@ import info.alihabibi.domain.models.transaction.TransactionType
 
 data class ParsedTransaction(
     val transactionType: TransactionType,
-    val amount: Long
+    val amountInRial: Long
 )
