@@ -8,6 +8,6 @@ class GetChannelByIdUseCase(
     private val repository: ChannelRepository
 ) {
 
-    operator fun invoke(id: Int): Flow<Channel> = repository.getChannelById(id)
+    operator fun invoke(id: Long): Flow<Channel?> = repository.getChannelById(id)
 
 }

@@ -31,4 +31,12 @@ object PersianDateFormatter {
             .toString()
     }
 
+    fun format(dayOfWeekName: String, hour: Int, minute: Int): String {
+        return StringBuilder()
+            .append(dayOfWeekName)
+            .append("، ")
+            .append("\u202A$hour : $minute\u202C")
+            .toString()
+    }
+
 }

@@ -16,6 +16,7 @@ internal class ReminderNotifier(private val context: Context) {
 
     private companion object {
         const val CHANNEL_ID = "reminders"
+        const val MAIN_ACTIVITY_DESTINATION = "info.alihabibi.chortkeh.activity.MainActivity"
     }
 
     private val notificationManager = context.getSystemService(NotificationManager::class.java)
@@ -57,6 +58,7 @@ internal class ReminderNotifier(private val context: Context) {
     private fun buildContentIntent(reminderId: Long): PendingIntent {
         val deepLinkUri = "$REMINDER_DEEP_LINK_BASE_URI/$reminderId".toUri()
         val intent = Intent(Intent.ACTION_VIEW, deepLinkUri).apply {
+            setClassName(context.packageName, MAIN_ACTIVITY_DESTINATION)
             setPackage(context.packageName)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }

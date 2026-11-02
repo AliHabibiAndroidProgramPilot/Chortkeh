@@ -117,6 +117,11 @@
     <string name="category_name_error">نام دسته‌بندی نمیتواند بیشتر از 30 کاراکتر باشد</string>
     <string name="delete_transaction">حذف تراکنش؟</string>
     <string name="delete_transaction_description">مطمعنی میخوای این تراکنش رو حذف کنی؟</string>
+    <string name="price_error_text">مبلغ نمیتونه خالی باشه</string>
+    <string name="channel_error_text">کانال تراکنشت رو مشخص کن</string>
+    <string name="category_error_text">دسته‌بندی تراکنشت رو مشخص کن</string>
+    <string name="date_error_text">تاریخ تراکنشت رو مشخص کن</string>
+    <string name="time_error_text">ساعت تراکنشت رو مشخص کن</string>
 
     // Channels
     <string name="channels">کانال‌ها</string>
@@ -143,6 +148,10 @@
         در صورت حذف، تمام تراکنش‌های مربوط به کانال فاقد اطلاعات کانال خواهند بود.
     </string>
     <string name="delete">حذف کردن</string>
+    <string name="need_sms_permission">برای استفاده از این قابلیت چرتکه باید به پیامک های بانکی دسترسی داشته باشه</string>
+    <string name="choose_sms_number">شماره ای که از طریق اون برای این حسابت پیامک میاد رو انتخاب کن</string>
+    <string name="sms_remove_title">حذف دسترسی چرتکه به پیامک های این حساب؟</string>
+    <string name="sms_remove_description">در این صورت باید برای این حسابت تراکنش هات رو دستی اضافه کنی</string>
 
     // Reminders
     <string name="add_new_reminder">ثبت یادآور جدید</string>
@@ -166,5 +175,14 @@
     <string name="monthly">ماهانه</string>
     <string name="yearly">سالانه</string>
     <string name="week_of_month">هفته %1$d</string>
+
+    // SMS Detection
+    <string name="sms_detection_notification_channel_name">پیامک‌های بانکی و مالی</string>
+    <string name="sms_detection_notification_channel_description">اطلاع‌رسانی پیامک‌های دریافتی از کانال‌های تعریف‌شده</string>
+    <string name="sms_detected_title">تراکنش جدید از حساب %1$s</string>
+    <string name="sms_detected_amount">مبلغ: %1$s</string>
+    <string name="sms_detected_date">تاریخ: %1$s</string>
+    <string name="sms_detected_channel">روی حساب: %1$s</string>
+    <string name="sms_detected_question">اضافه بشه به تراکنش های این ماه؟</string>
 
 </resources>

@@ -331,15 +331,12 @@ private fun DialogContent(
                 ) {
 
                     Row(
+                        modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
 
-                        Box(
-                            modifier = Modifier.fillMaxWidth(),
-                            contentAlignment = Alignment.Center
-                        ) {
-
                             Text(
+                                modifier = Modifier.fillMaxWidth(),
                                 text = title,
                                 maxLines = 2,
                                 overflow = TextOverflow.Ellipsis,
@@ -349,22 +346,6 @@ private fun DialogContent(
                                     fontWeight = FontWeight.Bold
                                 )
                             )
-
-                            IconButton(
-                                onClick = onDismissIconClick,
-                                modifier = Modifier
-                                    .size(40.dp)
-                                    .align(Alignment.CenterStart)
-                            ) {
-
-                                Icon(
-                                    painter = painterResource(id = R.drawable.close_circle),
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    contentDescription = null
-                                )
-
-                            }
-                        }
 
                     }
 

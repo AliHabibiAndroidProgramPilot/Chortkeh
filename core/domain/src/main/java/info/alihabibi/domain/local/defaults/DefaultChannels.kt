@@ -10,6 +10,7 @@ object DefaultChannels {
         channelBalance = 0L,
         isBankCardChannel = false,
         cardNumber = null,
+        smsSource = null,
         isAppDefaultChannel = true,
         icon = ChannelIcon.UNKNOWN
     )

@@ -49,11 +49,17 @@ dependencies {
     // domain
     implementation(projects.core.domain)
 
+    // model
+    implementation(projects.core.model)
+
     // datastore
     implementation(projects.core.datastore)
 
     // Room Database
     implementation(projects.core.database)
+
+    // sms
+    implementation(projects.core.sms)
 
     // profile
     implementation(projects.features.profile)

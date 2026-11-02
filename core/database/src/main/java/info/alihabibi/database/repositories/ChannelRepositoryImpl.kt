@@ -38,9 +38,9 @@ class ChannelRepositoryImpl(private val dao: ChannelDao) : ChannelRepository {
         }
     }
 
-    override fun getChannelById(id: Int): Flow<Channel> {
+    override fun getChannelById(id: Long): Flow<Channel?> {
         return dao.getChannelById(id)
-            .map { it.asExternalModel() }
+            .map { it?.asExternalModel() }
             .flowOn(Dispatchers.IO)
     }
 
