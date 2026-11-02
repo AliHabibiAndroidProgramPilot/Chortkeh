@@ -49,6 +49,9 @@ dependencies {
     // domain
     implementation(projects.core.domain)
 
+    // model
+    implementation(projects.core.model)
+
     // datastore
     implementation(projects.core.datastore)
 

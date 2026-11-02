@@ -6,7 +6,6 @@ import android.content.Intent
 import android.provider.Telephony
 import android.telephony.SmsMessage
 import info.alihabibi.common.ApplicationScope
-import info.alihabibi.domain.Keys
 import info.alihabibi.domain.local.usecases.database.channel.usecase.ChannelUseCases
 import info.alihabibi.sms.notification.SmsNotifier
 import info.alihabibi.sms.parser.SmsMatcher
@@ -22,16 +21,9 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
     private val smsNotifier: SmsNotifier by inject()
 
     override fun onReceive(context: Context, intent: Intent) {
-        when(intent.action) {
-            Telephony.Sms.Intents.SMS_RECEIVED_ACTION -> {
-                val messages = Telephony.Sms.Intents.getMessagesFromIntent(intent)
-                handleIncomingSms(messages)
-            }
-            SmsNotifier.ACTION_DENY_TRANSACTION -> {
-                val notificationId = intent.getIntExtra(Keys.EXTRA_NOTIFICATION_ID, -1)
-                smsNotifier.cancelNotification(notificationId)
-            }
-            else -> return
+        if (intent.action == Telephony.Sms.Intents.SMS_RECEIVED_ACTION) {
+            val messages = Telephony.Sms.Intents.getMessagesFromIntent(intent)
+            handleIncomingSms(messages)
         }
     }
 

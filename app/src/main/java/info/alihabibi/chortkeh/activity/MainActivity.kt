@@ -1,5 +1,6 @@
 package info.alihabibi.chortkeh.activity
 
+import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -19,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.core.content.IntentSanitizer
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -32,6 +34,7 @@ import info.alihabibi.chortkeh.navigation.topLevelDestinations
 import info.alihabibi.common_android.snackbar.ObserveAsEvents
 import info.alihabibi.common_android.snackbar.SnackBarController
 import info.alihabibi.designsystem.theme.ChortkehTheme
+import info.alihabibi.domain.Keys
 import info.alihabibi.new_transaction.navigation.NewTransactionGraphRoute
 import info.alihabibi.ui.navigation.AppBottomNavigation
 import info.alihabibi.ui.navigation.AppNavigationRail
@@ -50,7 +53,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        deepLinkIntentState.value = intent
+        deepLinkIntentState.value = sanitizeIntent(intent)
 
         splashScreen.setKeepOnScreenCondition { viewModel.uiState.value.shouldKeepSplashScreen() }
 
@@ -166,7 +169,29 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        deepLinkIntentState.value = intent
+        deepLinkIntentState.value = sanitizeIntent(intent)
+    }
+
+    private fun sanitizeIntent(intent: Intent?): Intent? {
+        if (intent == null) return null
+        val sanitizer = IntentSanitizer.Builder()
+            .allowComponent(ComponentName(this, MainActivity::class.java))
+            .allowPackage(this.packageName)
+            .allowAction(Intent.ACTION_VIEW)
+            .allowAction(Intent.ACTION_MAIN)
+            .allowCategory(Intent.CATEGORY_LAUNCHER)
+            .allowCategory(Intent.CATEGORY_DEFAULT)
+            .allowCategory(Intent.CATEGORY_BROWSABLE)
+            .allowData { uri -> uri.scheme == "chortkeh" }
+            .allowExtra(Keys.EXTRA_NOTIFICATION_ID, Int::class.javaObjectType)
+            .allowExtra(Keys.EXTRA_ID_TRANSACTION_DATA) { true }
+            .build()
+
+        return try {
+            sanitizer.sanitizeByFiltering(intent)
+        } catch (_: Exception) {
+            intent
+        }
     }
 
 }

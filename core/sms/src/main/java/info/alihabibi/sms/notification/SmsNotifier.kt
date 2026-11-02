@@ -14,7 +14,7 @@ import info.alihabibi.common_android.NotificationCanceler
 import info.alihabibi.designsystem.R
 import info.alihabibi.domain.Keys
 import info.alihabibi.model.data.TransactionData
-import info.alihabibi.sms.receiver.SmsReceiver
+import info.alihabibi.sms.receiver.SmsNotificationReceiver
 import java.util.Locale
 
 internal class SmsNotifier(private val context: Context) : NotificationCanceler {
@@ -24,6 +24,7 @@ internal class SmsNotifier(private val context: Context) : NotificationCanceler 
         private const val ACTION_ACCEPT_TRANSACTION = "info.alihabibi.ACTION_ACCEPT_TRANSACTION"
         const val NEW_TRANSACTION_URI = "chortkeh://new_transaction"
         const val ACTION_DENY_TRANSACTION = "info.alihabibi.ACTION_DENY_TRANSACTION"
+        const val MAIN_ACTIVITY_DESTINATION = "info.alihabibi.chortkeh.activity.MainActivity"
     }
 
     private val notificationManager = context.getSystemService(NotificationManager::class.java)
@@ -86,7 +87,8 @@ internal class SmsNotifier(private val context: Context) : NotificationCanceler 
 
     private fun buildContentIntent(notificationId: Int, transactionData: TransactionData): PendingIntent? {
         val intent = Intent(Intent.ACTION_VIEW, NEW_TRANSACTION_URI.toUri()).apply {
-            this.setPackage(context.packageName)
+            setClassName(context.packageName, MAIN_ACTIVITY_DESTINATION)
+            setPackage(context.packageName)
             putExtra(Keys.EXTRA_ID_TRANSACTION_DATA, transactionData)
         }
          return PendingIntent.getActivity(
@@ -99,8 +101,8 @@ internal class SmsNotifier(private val context: Context) : NotificationCanceler 
     }
 
     private fun buildDenyAction(notificationId: Int): Notification.Action {
-        val intent = Intent(context, SmsReceiver::class.java).apply {
-            this.setAction(ACTION_DENY_TRANSACTION)
+        val intent = Intent(context, SmsNotificationReceiver::class.java).apply {
+            setAction(ACTION_DENY_TRANSACTION)
             putExtra(Keys.EXTRA_NOTIFICATION_ID, notificationId)
         }
         val pendingIntent = PendingIntent.getBroadcast(
@@ -115,7 +117,8 @@ internal class SmsNotifier(private val context: Context) : NotificationCanceler 
 
     private fun buildAcceptAction(notificationId: Int, transactionData: TransactionData): Notification.Action {
         val intent = Intent(Intent.ACTION_VIEW, NEW_TRANSACTION_URI.toUri()).apply {
-            this.setPackage(context.packageName)
+            setClassName(context.packageName, MAIN_ACTIVITY_DESTINATION)
+            setPackage(context.packageName)
             putExtra(Keys.EXTRA_NOTIFICATION_ID, notificationId)
             putExtra(Keys.EXTRA_ID_TRANSACTION_DATA, transactionData)
         }
