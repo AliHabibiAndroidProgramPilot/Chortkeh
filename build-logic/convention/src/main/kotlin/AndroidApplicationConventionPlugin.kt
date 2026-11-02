@@ -16,8 +16,8 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 defaultConfig {
                     targetSdk = 37
                     minSdk = 26
-                    versionCode = 3
-                    versionName = "0.3"
+                    versionCode = 4
+                    versionName = "0.4"
                     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
                 }
 
