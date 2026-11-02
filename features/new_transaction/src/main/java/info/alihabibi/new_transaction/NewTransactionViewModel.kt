@@ -8,6 +8,7 @@ import info.alihabibi.common_android.NotificationCanceler
 import info.alihabibi.domain.local.usecases.database.category.usecase.CategoryUseCases
 import info.alihabibi.domain.local.usecases.database.channel.usecase.ChannelUseCases
 import info.alihabibi.domain.local.usecases.database.transaction.usecase.TransactionUseCases
+import info.alihabibi.domain.models.category.Category
 import info.alihabibi.domain.models.channel.Channel
 import info.alihabibi.model.mapper.toDomain
 import info.alihabibi.model.mapper.toUiModel
@@ -148,7 +149,7 @@ class NewTransactionViewModel(
                 .firstOrNull()
                 ?.toUiModel()
             _newTransactionUiState.update {
-                NewTransactionUiState(
+                it.copy(
                     transactionType = prefill.transactionType,
                     transactionPrice = prefill.amount.toString(),
                     formattedTransactionTime = String.format(Locale.US, "%02d : %02d", prefill.hour, prefill.minute),
