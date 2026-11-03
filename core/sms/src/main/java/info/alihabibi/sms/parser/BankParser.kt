@@ -10,7 +10,7 @@ import info.alihabibi.domain.models.transaction.TransactionType
 object BluBankSmsParser : BaseBankSmsParser() {
     private val amountRegex = Regex("""(\d{1,3}(?:,\d{3})+)\s*ریال""")
 
-    override fun parse(smsText: String): ParsedTransaction? {
+    override fun parse(smsText: String): ParsedTransaction {
         val type = when {
             smsText.contains("به حساب شما نشست") ||
                     smsText.contains("دریافت پل") ||
@@ -19,12 +19,12 @@ object BluBankSmsParser : BaseBankSmsParser() {
             smsText.contains("از حساب شما پرید") ||
                     smsText.contains("برداشت") -> TransactionType.OUTCOME
 
-            else -> return null
+            else -> null
         }
         val amount = extractAmountByRegex(
             getTransactionLines(smsText),
             amountRegex
-        ) ?: return null
+        )
 
         return ParsedTransaction(type, amount)
     }
@@ -38,15 +38,18 @@ object BluBankSmsParser : BaseBankSmsParser() {
 object PasargadSmsParser : BaseBankSmsParser() {
     private val signedLineRegex = Regex("""^([+-])\s*(\d{1,3}(?:,\d{3})+)$""")
 
-    override fun parse(smsText: String): ParsedTransaction? {
+    override fun parse(smsText: String): ParsedTransaction {
         for (line in getTransactionLines(smsText)) {
             val match = signedLineRegex.find(line) ?: continue
-            val sign = match.groupValues[1]
             val amount = match.groupValues[2].replace(",", "").toLongOrNull() ?: continue
-            val type = if (sign == "+") TransactionType.INCOME else TransactionType.OUTCOME
+            val type = when (match.groupValues[1]) {
+                "+" -> TransactionType.INCOME
+                "-" -> TransactionType.OUTCOME
+                else -> null
+            }
             return ParsedTransaction(type, amount)
         }
-        return null
+        return ParsedTransaction(null, null)
     }
 }
 
@@ -58,17 +61,16 @@ object PasargadSmsParser : BaseBankSmsParser() {
 object LabeledPriceSmsParser : BaseBankSmsParser() {
     private val priceRegex = Regex("""مبلغ\s*:?\s*(\d{1,3}(?:,\d{3})+)""")
 
-    override fun parse(smsText: String): ParsedTransaction? {
+    override fun parse(smsText: String): ParsedTransaction {
         val type = when {
             smsText.contains("واریز") -> TransactionType.INCOME
             smsText.contains("برداشت") || smsText.contains("خرید") -> TransactionType.OUTCOME
-            else -> return null
+            else -> null
         }
-        val amount =
-            extractAmountByRegex(
-                getTransactionLines(smsText),
-                priceRegex
-            ) ?: return null
+        val amount = extractAmountByRegex(
+            getTransactionLines(smsText),
+            priceRegex
+        )
 
         return ParsedTransaction(type, amount)
     }
@@ -83,7 +85,7 @@ object ActionLabeledSmsParser : BaseBankSmsParser() {
     private val incomeRegex = Regex("""واریز\s*:?\s*(\d{1,3}(?:,\d{3})+)""")
     private val outcomeRegex = Regex("""برداشت\s*:?\s*(\d{1,3}(?:,\d{3})+)""")
 
-    override fun parse(smsText: String): ParsedTransaction? {
+    override fun parse(smsText: String): ParsedTransaction {
         val lines = getTransactionLines(smsText)
         extractAmountByRegex(lines, incomeRegex)?.let { amount ->
             return ParsedTransaction(TransactionType.INCOME, amount)
@@ -91,8 +93,7 @@ object ActionLabeledSmsParser : BaseBankSmsParser() {
         extractAmountByRegex(lines, outcomeRegex)?.let { amount ->
             return ParsedTransaction(TransactionType.OUTCOME, amount)
         }
-
-        return null
+        return ParsedTransaction(null, null)
     }
 }
 
@@ -104,15 +105,17 @@ object ActionLabeledSmsParser : BaseBankSmsParser() {
 object SuffixSignedSmsParser : BaseBankSmsParser() {
     private val suffixSignRegex = Regex("""(\d{1,3}(?:,\d{3})+)\s*([+-])$""")
 
-    override fun parse(smsText: String): ParsedTransaction? {
+    override fun parse(smsText: String): ParsedTransaction {
         for (line in getTransactionLines(smsText)) {
             val match = suffixSignRegex.find(line) ?: continue
             val amount = match.groupValues[1].replace(",", "").toLongOrNull() ?: continue
-            val sign = match.groupValues[2]
-
-            val type = if (sign == "+") TransactionType.INCOME else TransactionType.OUTCOME
+            val type = when (match.groupValues[2]) {
+                "+" -> TransactionType.INCOME
+                "-" -> TransactionType.OUTCOME
+                else -> null
+            }
             return ParsedTransaction(type, amount)
         }
-        return null
+        return ParsedTransaction(null, null)
     }
 }

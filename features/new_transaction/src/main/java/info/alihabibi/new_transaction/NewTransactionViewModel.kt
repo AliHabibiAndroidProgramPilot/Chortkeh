@@ -150,7 +150,7 @@ class NewTransactionViewModel(
             _newTransactionUiState.update {
                 it.copy(
                     transactionType = prefill.transactionType,
-                    transactionPrice = prefill.amount.toString(),
+                    transactionPrice = if (prefill.amount != null) prefill.amount.toString() else "",
                     formattedTransactionTime = String.format(Locale.US, "%02d : %02d", prefill.hour, prefill.minute),
                     transactionHour = prefill.hour,
                     transactionMinute = prefill.minute,

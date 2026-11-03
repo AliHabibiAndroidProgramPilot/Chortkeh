@@ -41,12 +41,17 @@ object SmsMatcher {
         channelId: Long?,
         channelBankName: String?,
         smsTimeStampMillis: Long
-    ): TransactionData {
-        val parsedTransactionData = BankSmsParserFactory.parsSms(rawSmsBody, channelBankName)
+    ): TransactionData? {
+        val normalizedSmsText = SmsNormalizer.normalizer(rawSmsBody)
+        if (!SmsNormalizer.isLikelyTransactionSms(normalizedSmsText)) return null
+
+        val parsedTransactionData = BankSmsParserFactory.parsSmsByFactory(rawSmsBody, channelBankName)
+        val amountInToman = if (parsedTransactionData.amountInRial != null)
+            Utils.rialToToman(parsedTransactionData.amountInRial)
+        else null
         val parsedTransactionDateTime = Utils.epochMillisToPersianDate(smsTimeStampMillis)
-        val amountInToman = if (parsedTransactionData == null) null else Utils.rialToToman(parsedTransactionData.amountInRial)
         return TransactionData(
-            transactionType = parsedTransactionData?.transactionType ?: TransactionType.OUTCOME,
+            transactionType = parsedTransactionData.transactionType ?: TransactionType.OUTCOME, // TODO later send type as undefined and warn user to select it like other filed errors in NewTransaction screen
             amount = amountInToman,
             channelId = channelId ?: -1,
             year = parsedTransactionDateTime.year,

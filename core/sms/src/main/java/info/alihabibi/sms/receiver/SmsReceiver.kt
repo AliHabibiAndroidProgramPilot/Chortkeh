@@ -49,7 +49,9 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                         matchedChannel.bankName,
                         sms.timestampMillis
                     )
-                    smsNotifier.pushNotification(channelName = matchedChannel.channelName, transactionData = transactionData)
+                    transactionData?.let { transactionData ->
+                        smsNotifier.pushNotification(channelName = matchedChannel.channelName, transactionData = transactionData)
+                    }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
