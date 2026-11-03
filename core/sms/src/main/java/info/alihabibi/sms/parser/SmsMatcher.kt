@@ -41,8 +41,11 @@ object SmsMatcher {
         channelId: Long?,
         channelBankName: String?,
         smsTimeStampMillis: Long
-    ): TransactionData {
-        val parsedTransactionData = BankSmsParserFactory.parsSms(rawSmsBody, channelBankName)
+    ): TransactionData? {
+        val normalizedSmsText = SmsNormalizer.normalizer(rawSmsBody)
+        if (!SmsNormalizer.isLikelyTransactionSms(normalizedSmsText)) return null
+
+        val parsedTransactionData = BankSmsParserFactory.parsSmsByFactory(rawSmsBody, channelBankName)
         val parsedTransactionDateTime = Utils.epochMillisToPersianDate(smsTimeStampMillis)
         val amountInToman = if (parsedTransactionData == null) null else Utils.rialToToman(parsedTransactionData.amountInRial)
         return TransactionData(
