@@ -38,7 +38,7 @@ internal class SmsNotifier(private val context: Context) : NotificationCanceler 
 
         val title = context.getString(R.string.sms_detected_title, channelName)
         val text = buildNotificationText(
-            transactionData.amount ?: 0,
+            transactionData.amount,
             transactionData.dayOfWeekName,
             transactionData.hour,
             transactionData.minute,

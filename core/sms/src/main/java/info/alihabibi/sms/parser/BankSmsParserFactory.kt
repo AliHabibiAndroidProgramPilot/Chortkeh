@@ -4,13 +4,11 @@ import info.alihabibi.common.banks.Bank
 
 internal object BankSmsParserFactory {
 
-    fun parsSmsByFactory(normalizedText: String, bankName: String?): ParsedTransaction? {
+    fun parsSmsByFactory(normalizedText: String, bankName: String?): ParsedTransaction {
         val bank = resolveBankEnum(bankName)
         val primaryParser = getParserForBank(bank)
-        return primaryParser.parse(normalizedText)
-            ?: if (primaryParser !== UniversalBankFallBackParser) {
-                UniversalBankFallBackParser.parse(normalizedText)
-            } else null
+        val parsResult = primaryParser.parse(normalizedText)
+        return if (parsResult.isEmpty()) UniversalBankFallBackParser.parse(normalizedText) else parsResult
     }
 
     private fun getParserForBank(bank: Bank): BaseBankSmsParser {

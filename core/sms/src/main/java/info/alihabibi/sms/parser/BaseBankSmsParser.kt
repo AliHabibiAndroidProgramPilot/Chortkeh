@@ -2,7 +2,7 @@ package info.alihabibi.sms.parser
 
 abstract class BaseBankSmsParser {
 
-    abstract fun parse(smsText: String): ParsedTransaction?
+    abstract fun parse(smsText: String): ParsedTransaction
 
     protected fun getTransactionLines(normalizedSms: String): List<String> {
         return normalizedSms.lines()
