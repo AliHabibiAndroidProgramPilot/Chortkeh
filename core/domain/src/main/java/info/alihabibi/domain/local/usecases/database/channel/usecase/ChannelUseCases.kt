@@ -5,6 +5,7 @@ import info.alihabibi.domain.local.usecases.database.channel.GetChannelByIdUseCa
 import info.alihabibi.domain.local.usecases.database.channel.GetChannelsUseCase
 import info.alihabibi.domain.local.usecases.database.channel.GetTotalBalanceUseCase
 import info.alihabibi.domain.local.usecases.database.channel.SaveChannelUseCase
+import info.alihabibi.domain.local.usecases.database.channel.UpdateChannelBalanceUseCase
 import info.alihabibi.domain.local.usecases.database.channel.UpdateChannelUseCase
 
 data class ChannelUseCases(
@@ -13,5 +14,6 @@ data class ChannelUseCases(
     val deleteChannelUseCase: DeleteChannelUseCase,
     val updateChannelUseCase: UpdateChannelUseCase,
     val getChannelByIdUseCase: GetChannelByIdUseCase,
-    val getTotalBalanceUseCase: GetTotalBalanceUseCase
+    val getTotalBalanceUseCase: GetTotalBalanceUseCase,
+    val updateChannelBalanceUseCase: UpdateChannelBalanceUseCase
 )

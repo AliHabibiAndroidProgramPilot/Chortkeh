@@ -25,9 +25,25 @@ interface ChannelDao {
     suspend fun updateChannel(channel: ChannelEntity)
 
     @Query("SELECT * FROM ${Keys.CHANNELS_TABLE_NAME} WHERE id = :id")
-    fun getChannelById(id: Int): Flow<ChannelEntity>
+    fun getChannelById(id: Long): Flow<ChannelEntity?>
 
     @Query("SELECT COALESCE(SUM(channelBalance), 0) FROM ${Keys.CHANNELS_TABLE_NAME}")
     fun getTotalBalance(): Flow<Long>
+
+    @Query("""
+    UPDATE ${Keys.CHANNELS_TABLE_NAME}
+    SET channelBalance = channelBalance + :amount
+    WHERE id = :id
+""")
+    suspend fun increaseChannelBalance(id: Long, amount: Long)
+
+    @Query(
+        """
+    UPDATE ${Keys.CHANNELS_TABLE_NAME}
+    SET channelBalance = channelBalance - :amount
+    WHERE id = :id
+"""
+    )
+    suspend fun decreaseChannelBalance(id: Long, amount: Long)
 
 }

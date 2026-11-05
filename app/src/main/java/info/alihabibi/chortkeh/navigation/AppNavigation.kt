@@ -1,6 +1,5 @@
 package info.alihabibi.chortkeh.navigation
 
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -11,10 +10,15 @@ import info.alihabibi.channels.AddChannel
 import info.alihabibi.channels.ChannelGraphRoute
 import info.alihabibi.channels.channelsGraph
 import info.alihabibi.home.HomeDestination
-import info.alihabibi.new_transaction.newTransactionGraph
+import info.alihabibi.new_transaction.navigation.NewTransactionGraphRoute
+import info.alihabibi.new_transaction.navigation.newTransactionGraph
 import info.alihabibi.onboarding.OnBoardingDestination
 import info.alihabibi.profile.Profile
 import info.alihabibi.profile.profileGraph
+import info.alihabibi.reminder.RemindersList
+import info.alihabibi.reminder.reminderGraph
+import info.alihabibi.report.Report
+import info.alihabibi.report.reportGraph
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -26,15 +30,7 @@ object Home
 @Serializable
 object Announcements
 
-/** non usable here, should be in its own module with a sub graph here! currently using it as help for Bottom nav bar implementation */
-@Serializable
-object Report
-
-/** non usable here, should be in its own module with a sub graph here! currently using it as help for Bottom nav bar implementation */
-@Serializable
-object Reminder
-
-val topLevelDestinations = setOfNotNull(Home, Profile, Report, Reminder)
+val topLevelDestinations = setOfNotNull(Home, Profile, Report, RemindersList)
 
 @Composable
 fun DemoNavHost(
@@ -86,19 +82,26 @@ fun DemoNavHost(
             )
         }
 
-        composable<Report> {
-            Text("REPORTS")
-        }
-
-        composable<Reminder> {
-            Text("REminder")
-        }
-
         profileGraph(navController = navController)
 
-        newTransactionGraph(navController = navController)
+        newTransactionGraph(
+            navController = navController,
+            onAddNewChannel = {
+                navController.navigate(ChannelGraphRoute)
+                navController.navigate(AddChannel)
+            }
+        )
+
+        reportGraph(
+            navController = navController,
+            onEditTransaction = { transactionId ->
+                navController.navigate(NewTransactionGraphRoute(transactionId))
+            }
+        )
 
         channelsGraph(navController = navController)
+
+        reminderGraph(navController = navController)
 
     }
 

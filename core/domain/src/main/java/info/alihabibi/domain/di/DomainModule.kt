@@ -1,5 +1,6 @@
 package info.alihabibi.domain.di
 
+import info.alihabibi.domain.local.coordinators.ReminderUndoManager
 import info.alihabibi.domain.local.coordinators.TransactionUndoManager
 import info.alihabibi.domain.local.usecases.database.category.DeleteCategoriesUseCase
 import info.alihabibi.domain.local.usecases.database.category.GetCategoriesUseCase
@@ -11,10 +12,29 @@ import info.alihabibi.domain.local.usecases.database.channel.GetChannelByIdUseCa
 import info.alihabibi.domain.local.usecases.database.channel.GetChannelsUseCase
 import info.alihabibi.domain.local.usecases.database.channel.GetTotalBalanceUseCase
 import info.alihabibi.domain.local.usecases.database.channel.SaveChannelUseCase
+import info.alihabibi.domain.local.usecases.database.channel.UpdateChannelBalanceUseCase
 import info.alihabibi.domain.local.usecases.database.channel.UpdateChannelUseCase
 import info.alihabibi.domain.local.usecases.database.channel.usecase.ChannelUseCases
+import info.alihabibi.domain.local.usecases.database.reminder.DeleteReminderUseCase
+import info.alihabibi.domain.local.usecases.database.reminder.GetAllRemindersUseCase
+import info.alihabibi.domain.local.usecases.database.reminder.GetReminderByIdUseCase
+import info.alihabibi.domain.local.usecases.database.reminder.SaveReminderUseCase
+import info.alihabibi.domain.local.usecases.database.reminder.UpdateReminderIsEnabledUseCase
+import info.alihabibi.domain.local.usecases.database.reminder.UpdateReminderUseCase
+import info.alihabibi.domain.local.usecases.database.reminder.usecase.ReminderUseCases
 import info.alihabibi.domain.local.usecases.database.transaction.DeleteTransactionUseCase
+import info.alihabibi.domain.local.usecases.database.transaction.GetAllTransactionsUseCase
+import info.alihabibi.domain.local.usecases.database.transaction.GetCategoryExpensesUseCase
+import info.alihabibi.domain.local.usecases.database.transaction.GetIncomeExpenseChartUseCase
+import info.alihabibi.domain.local.usecases.database.transaction.GetLastTransactions
+import info.alihabibi.domain.local.usecases.database.transaction.GetMonthExpensesByAllCategoriesUseCase
+import info.alihabibi.domain.local.usecases.database.transaction.GetMonthTotalExpensesUseCase
+import info.alihabibi.domain.local.usecases.database.transaction.GetMonthTotalIncomeUseCase
+import info.alihabibi.domain.local.usecases.database.transaction.GetTransactionByIdUseCase
+import info.alihabibi.domain.local.usecases.database.transaction.HasOutcomeTransactionUseCase
+import info.alihabibi.domain.local.usecases.database.transaction.HasTransactionUseCase
 import info.alihabibi.domain.local.usecases.database.transaction.SaveTransactionUseCase
+import info.alihabibi.domain.local.usecases.database.transaction.UpdateTransactionUseCase
 import info.alihabibi.domain.local.usecases.database.transaction.usecase.TransactionUseCases
 import info.alihabibi.domain.local.usecases.datastore.GetIsAppFirstLaunchUseCase
 import info.alihabibi.domain.local.usecases.datastore.GetIsSmsModalShownUseCase
@@ -25,6 +45,8 @@ import info.alihabibi.domain.local.usecases.datastore.SavePreferredCurrencyUseCa
 import info.alihabibi.domain.local.usecases.datastore.SaveSmsModalShownStateUseCase
 import info.alihabibi.domain.local.usecases.datastore.SaveUserAccountInfoUseCase
 import info.alihabibi.domain.local.usecases.datastore.usecase.DatastoreUseCases
+import info.alihabibi.domain.local.usecases.sms.GetSmsSendersSourceUseCase
+import info.alihabibi.domain.local.usecases.sms.usecase.SmsUseCases
 import org.koin.dsl.module
 
 val domainModule = module {
@@ -76,18 +98,22 @@ val domainModule = module {
     // region Channel
 
     factory { SaveChannelUseCase(get()) }
-    factory { DeleteChannelUseCase(get()) }
     factory { GetChannelsUseCase(get()) }
+    factory { DeleteChannelUseCase(get()) }
     factory { UpdateChannelUseCase(get()) }
+    factory { GetChannelByIdUseCase(get()) }
+    factory { GetTotalBalanceUseCase(get()) }
+    factory { UpdateChannelBalanceUseCase(get()) }
 
     factory {
         ChannelUseCases(
-            saveChannelUseCase = SaveChannelUseCase(get()),
-            getChannelsUseCase = GetChannelsUseCase(get()),
-            deleteChannelUseCase = DeleteChannelUseCase(get()),
-            updateChannelUseCase = UpdateChannelUseCase(get()),
-            getChannelByIdUseCase = GetChannelByIdUseCase(get()),
-            getTotalBalanceUseCase = GetTotalBalanceUseCase(get())
+            saveChannelUseCase = get(),
+            getChannelsUseCase = get(),
+            deleteChannelUseCase = get(),
+            updateChannelUseCase = get(),
+            getChannelByIdUseCase = get(),
+            getTotalBalanceUseCase = get(),
+            updateChannelBalanceUseCase = get()
         )
     }
 
@@ -96,12 +122,68 @@ val domainModule = module {
     // region Transaction
 
     factory { SaveTransactionUseCase(get()) }
+    factory { UpdateTransactionUseCase(get()) }
     factory { DeleteTransactionUseCase(get()) }
+    factory { GetMonthTotalIncomeUseCase(get()) }
+    factory { GetMonthTotalExpensesUseCase(get()) }
+    factory { HasTransactionUseCase(get()) }
+    factory { HasOutcomeTransactionUseCase(get()) }
+    factory { GetMonthExpensesByAllCategoriesUseCase(get()) }
+    factory { GetLastTransactions(get()) }
+    factory { GetAllTransactionsUseCase(get()) }
+    factory { GetTransactionByIdUseCase(get()) }
+    factory { GetIncomeExpenseChartUseCase(get()) }
+    factory { GetCategoryExpensesUseCase(get()) }
 
     factory {
         TransactionUseCases(
             saveTransactionUseCase = get(),
-            deleteTransactionUseCase = get()
+            updateTransactionUseCase = get(),
+            deleteTransactionUseCase = get(),
+            getMonthTotalIncomeUseCase = get(),
+            getMonthTotalExpensesUseCase = get(),
+            hasTransactionUseCases = get(),
+            hasOutcomeTransactionUseCase = get(),
+            getMonthExpensesByAllCategoriesUseCase = get(),
+            getLastTransactions = get(),
+            getAllTransactions = get(),
+            getTransactionByIdUseCase = get(),
+            getIncomeExpenseChartUseCase = get(),
+            getCategoryExpensesUseCase = get()
+        )
+    }
+
+    // endregion
+
+    // region Reminder
+
+    factory { SaveReminderUseCase(get()) }
+    factory { UpdateReminderUseCase(get()) }
+    factory { DeleteReminderUseCase(get()) }
+    factory { GetAllRemindersUseCase(get()) }
+    factory { UpdateReminderIsEnabledUseCase(get()) }
+    factory { GetReminderByIdUseCase(get()) }
+
+    factory {
+        ReminderUseCases(
+            saveReminderUseCases = get(),
+            updateReminderUseCase = get(),
+            deleteReminderUseCase = get(),
+            getAllRemindersUseCase = get(),
+            updateReminderIsEnabledUseCase = get(),
+            getReminderByIdUseCase = get()
+        )
+    }
+
+    // endregion
+
+    // region Sms
+
+    factory { GetSmsSendersSourceUseCase(get()) }
+
+    factory {
+        SmsUseCases(
+            getSmsSendersSourceUseCase = get()
         )
     }
 
@@ -110,7 +192,11 @@ val domainModule = module {
     // region coordinators
 
     single {
-        TransactionUndoManager(get(), get())
+        TransactionUndoManager(get(), get(), get())
+    }
+
+    single {
+        ReminderUndoManager(get(), get())
     }
 
     // endregion

@@ -19,3 +19,6 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Preserve annotations used by serializers and dependency injection
+-keepattributes *Annotation*,Signature,InnerClasses,EnclosingMethod

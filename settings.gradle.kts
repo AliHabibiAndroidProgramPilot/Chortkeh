@@ -8,7 +8,7 @@ pluginManagement {
             }
         }*/
 //        gradlePluginPortal()
-//        mavenCentral()
+        mavenCentral()
 //        maven(url = "https://jitpack.io")
         maven(url = "https://maven.myket.ir")
     }
@@ -18,11 +18,14 @@ pluginManagement {
     enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 }
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.10.0"
+}
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
 //        google()
-//        mavenCentral()
+        mavenCentral()
 //        maven(url = "https://jitpack.io")
         maven(url = "https://maven.myket.ir")
     }
@@ -44,3 +47,6 @@ include(":core:model")
 include(":features:profile")
 include(":core:database")
 include(":features:channels")
+include(":features:reminder")
+include(":features:report")
+include(":core:sms")

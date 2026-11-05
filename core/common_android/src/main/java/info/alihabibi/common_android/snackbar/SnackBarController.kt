@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 
 object SnackBarController {
-    private val _event = Channel<SnackBarEvent>()
+    private val _event = Channel<SnackBarEvent>(Channel.CONFLATED)
     val event: Flow<SnackBarEvent> = _event.receiveAsFlow()
 
     suspend fun sendEvent(event: SnackBarEvent) {

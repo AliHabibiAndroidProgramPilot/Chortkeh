@@ -3,7 +3,11 @@ package info.alihabibi.common
 import android.content.Context
 import android.util.Log
 import java.text.DecimalFormat
-import java.util.Calendar
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 object Utils {
 
@@ -27,11 +31,11 @@ object Utils {
      * - If future calendar requirements become more complex, consider replacing
      *   this implementation with a well-tested date/time library.
      */
-    private fun gregorianToPersianDate(year: Int, month: Int, day: Int): IntArray {
+    fun gregorianToPersianDate(date: LocalDate): DateTimeParts {
         val gDaysBeforeMonth = intArrayOf(0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334)
-        val gy2 = if (month > 2) year + 1 else year
-        var days = 355666 + (365 * year) + ((gy2 + 3) / 4) - ((gy2 + 99) / 100) +
-                ((gy2 + 399) / 400) + day + gDaysBeforeMonth[month - 1]
+        val gy2 = if (date.monthValue > 2) date.year + 1 else date.year
+        var days = 355666 + (365 * date.year) + ((gy2 + 3) / 4) - ((gy2 + 99) / 100) +
+                ((gy2 + 399) / 400) + date.dayOfMonth + gDaysBeforeMonth[date.monthValue - 1]
 
         var jy = -1595 + (33 * (days / 12053))
         days %= 12053
@@ -53,26 +57,71 @@ object Utils {
             jd = 1 + ((days - 186) % 30)
         }
 
-        return intArrayOf(jy, jm, jd)
+        return DateTimeParts(jy, jm, jd)
     }
 
-    fun getCurrentPersianMonth(): String {
-        val cal = Calendar.getInstance()
-        val (_, jm, _) = gregorianToPersianDate(
-            cal.get(Calendar.YEAR),
-            cal.get(Calendar.MONTH) + 1,
-            cal.get(Calendar.DAY_OF_MONTH)
+    fun epochMillisToPersianDate(epochMillis: Long): DateTimeParts {
+        val zoneDateTime = Instant
+            .ofEpochMilli(epochMillis)
+            .atZone(ZoneId.systemDefault())
+        val (year, month, dayOfMonth) = gregorianToPersianDate(zoneDateTime.toLocalDate())
+        val dayOfWeekName = try {
+            PersianDateFormatter.persianWeekDays[(zoneDateTime.dayOfWeek.value + 1) % 7]
+        } catch (_: IndexOutOfBoundsException) {
+            ""
+        }
+        return DateTimeParts(
+            year = year,
+            month = month,
+            dayOfMonth = dayOfMonth,
+            dayOfWeekName = dayOfWeekName,
+            hour = zoneDateTime.hour,
+            minute = zoneDateTime.minute
         )
-        val month = listOf(
-            "فروردین ماه", "اردیبهشت ماه", "خرداد ماه", "تیر ماه", "مرداد ماه", "شهریور ماه",
-            "مهر ماه", "آبان ماه", "آذر ماه", "دی ماه", "بهمن ماه", "اسفند ماه"
+    }
+
+    fun getCurrentPersianMonth(): Pair<String, Int> {
+        val date = Instant
+            .ofEpochMilli(System.currentTimeMillis())
+            .atZone(ZoneId.systemDefault())
+        val (_, month, _) = gregorianToPersianDate(date.toLocalDate())
+        return Pair(PersianDateFormatter.persianMonths[month - 1], month)
+    }
+
+    fun getCurrentPersianDate(): Triple<Int, Int, Int> {
+        val date = Instant
+            .ofEpochMilli(System.currentTimeMillis())
+            .atZone(ZoneId.systemDefault())
+        val (year, month, day) = gregorianToPersianDate(date.toLocalDate())
+        return Triple(year, month, day)
+    }
+
+    fun mergeTimeIntoEpochMillis(epochMillis: Long, time: String): Long {
+        val instant = Instant.ofEpochMilli(epochMillis)
+        val dateTime = instant
+            .atZone(ZoneId.systemDefault())
+            .toLocalDateTime()
+
+        val localTime = LocalTime.parse(
+            time.replace(" ", ""),
+            DateTimeFormatter.ofPattern("HH:mm")
         )
-        return month[jm - 1]
+
+        return dateTime
+            .with(localTime)
+            .atZone(ZoneId.systemDefault())
+            .toInstant()
+            .toEpochMilli()
     }
 
     fun getAppVersionName(context: Context): String =
         context.packageManager.getPackageInfo(context.packageName, 0).versionName.orEmpty()
 
     fun getStringResources(context: Context, id: Int): String = context.getString(id)
+
+    fun rialToToman(amountInRial: Long): Long? {
+        if (amountInRial < 10L) return null
+        return amountInRial / 10L
+    }
 
 }

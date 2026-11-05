@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -117,78 +118,88 @@ private fun UserAccountInfoScreen(
 
         Column(
             modifier = Modifier
-                .weight(weight = 1f)
-                .verticalScroll(state = rememberScrollState()),
+                .widthIn(max = 600.dp)
+                .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            AppHeader(
-                title = stringResource(id = R.string.user_account_info),
-                isActionAvailable = false,
-                onNavigationClicked = onBackPressed
-            )
-
-            Spacer(modifier = Modifier.height(height = 12.dp))
-
-            AppTitledTextField(
-                modifier = Modifier.padding(horizontal = 4.dp),
-                text = uiState.fullName,
-                onValueChange = onFullNameChanged,
-                title = stringResource(id = R.string.name_and_family_name),
-                placeHolderText = stringResource(id = R.string.sample_name)
-            )
-
-            Spacer(modifier = Modifier.height(height = 14.dp))
-
-            AppTitledPhoneTextField(
-                modifier = Modifier.padding(horizontal = 4.dp),
-                text = uiState.userPhone,
-                onValueChange = onPhoneChanged,
-                title = stringResource(id = R.string.phone_number),
-                placeHolderText = stringResource(id = R.string.sample_phone)
-            )
-
-            Spacer(modifier = Modifier.height(height = 16.dp))
-
-            Row(
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(height = 50.dp)
-                    .padding(horizontal = 16.dp)
-                    .border(width = 1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(12.dp))
-                    .clip(shape = RoundedCornerShape(12.dp))
-                    .clickable { showGenderSelectionModal = true },
-                verticalAlignment = Alignment.CenterVertically
+                    .weight(weight = 1f)
+                    .verticalScroll(state = rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                Icon(
-                    modifier = Modifier.padding(start = 18.dp),
-                    painter = painterResource(id = R.drawable.short_arrow_down),
-                    contentDescription = null,
-                    tint = Gray8
+                AppHeader(
+                    title = stringResource(id = R.string.user_account_info),
+                    isActionAvailable = false,
+                    onNavigationClicked = onBackPressed
                 )
 
-                Spacer(modifier = Modifier.weight(weight = 1f))
+                Spacer(modifier = Modifier.height(height = 12.dp))
 
-                Text(
-                    modifier = Modifier.padding(horizontal = 12.dp),
-                    text = stringResource(id = uiState.userGender.labelRes),
-                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp)
+                AppTitledTextField(
+                    modifier = Modifier.padding(horizontal = 4.dp),
+                    text = uiState.fullName,
+                    onValueChange = onFullNameChanged,
+                    title = stringResource(id = R.string.name_and_family_name),
+                    placeHolderText = stringResource(id = R.string.sample_name)
                 )
+
+                Spacer(modifier = Modifier.height(height = 14.dp))
+
+                AppTitledPhoneTextField(
+                    modifier = Modifier.padding(horizontal = 4.dp),
+                    text = uiState.userPhone,
+                    onValueChange = onPhoneChanged,
+                    title = stringResource(id = R.string.phone_number),
+                    placeHolderText = stringResource(id = R.string.sample_phone)
+                )
+
+                Spacer(modifier = Modifier.height(height = 16.dp))
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(height = 50.dp)
+                        .padding(horizontal = 16.dp)
+                        .border(width = 1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(12.dp))
+                        .clip(shape = RoundedCornerShape(12.dp))
+                        .clickable { showGenderSelectionModal = true },
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    Icon(
+                        modifier = Modifier.padding(start = 18.dp),
+                        painter = painterResource(id = R.drawable.short_arrow_down),
+                        contentDescription = null,
+                        tint = Gray8
+                    )
+
+                    Spacer(modifier = Modifier.weight(weight = 1f))
+
+                    Text(
+                        modifier = Modifier.padding(horizontal = 12.dp),
+                        text = stringResource(id = uiState.userGender.labelRes),
+                        style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp)
+                    )
+
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
 
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            AppButton(
+                modifier = Modifier
+                    .widthIn(max = 400.dp)
+                    .fillMaxWidth()
+                    .padding(end = 24.dp, start = 24.dp, bottom = 16.dp),
+                onClick = onSaveUserInfo,
+                text = stringResource(id = R.string.save_data)
+            )
 
         }
-
-        AppButton(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(end = 24.dp, start = 24.dp),
-            onClick = onSaveUserInfo,
-            text = stringResource(id = R.string.save_data)
-        )
 
     }
 

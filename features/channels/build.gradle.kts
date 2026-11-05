@@ -15,6 +15,9 @@ dependencies {
     // common
     implementation(projects.core.common)
 
+    // common android
+    implementation(projects.core.commonAndroid)
+
     // ui
     implementation(projects.core.ui)
 
@@ -23,5 +26,8 @@ dependencies {
 
     // model
     implementation(projects.core.model)
+
+    // accompanist
+    implementation(libs.accompanist.permissions)
 
 }

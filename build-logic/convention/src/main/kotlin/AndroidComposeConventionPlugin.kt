@@ -1,7 +1,9 @@
-import com.android.build.api.dsl.CommonExtension
+import com.android.build.api.dsl.ApplicationExtension
+import com.android.build.api.dsl.LibraryExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalogsExtension
+import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.getByType
 
@@ -12,9 +14,21 @@ class AndroidComposeConventionPlugin : Plugin<Project> {
             val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
 
             pluginManager.withPlugin("com.android.application") {
+                extensions.configure<ApplicationExtension> {
+                    buildFeatures {
+                        compose = true
+                        buildConfig = true
+                    }
+                }
                 configureCompose(libs)
             }
             pluginManager.withPlugin("com.android.library") {
+                extensions.configure<LibraryExtension> {
+                    buildFeatures {
+                        compose = true
+                        buildConfig = true
+                    }
+                }
                 configureCompose(libs)
             }
 
@@ -27,15 +41,6 @@ class AndroidComposeConventionPlugin : Plugin<Project> {
 
         pluginManager.apply("org.jetbrains.kotlin.plugin.serialization")
 
-        val androidExtension = extensions.getByName("android") as CommonExtension<*, *, *, *, *, *>
-
-        androidExtension.apply {
-            buildFeatures {
-                compose = true
-                buildConfig = true
-            }
-        }
-
         dependencies {
             val bom = libs.findLibrary("androidx-compose-bom").get()
             add("implementation", platform(bom))
@@ -47,6 +52,10 @@ class AndroidComposeConventionPlugin : Plugin<Project> {
             add("implementation", libs.findLibrary("androidx-compose-material3").get())
 
             add("implementation", libs.findLibrary("androidx-navigation-compose").get())
+
+            add("implementation", libs.findLibrary("compose-adaptive").get())
+            add("implementation", libs.findLibrary("compose-adaptive-layout").get())
+            add("implementation", libs.findLibrary("compose-adaptive-navigation").get())
 
             add("implementation", libs.findLibrary("androidx-activity-compose").get())
 

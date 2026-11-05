@@ -11,6 +11,9 @@ import info.alihabibi.home.di.homeModule
 import info.alihabibi.new_transaction.di.newTransactionModule
 import info.alihabibi.onboarding.di.onBoardingModule
 import info.alihabibi.profile.di.profileModule
+import info.alihabibi.reminder.di.reminderModule
+import info.alihabibi.report.di.reportModule
+import info.alihabibi.sms.di.smsModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
@@ -26,12 +29,15 @@ class ChortkehApp : Application() {
                     domainModule,
                     datastoreModule,
                     databaseModule,
+                    smsModule,
                     commonModule,
                     onBoardingModule,
                     homeModule,
                     newTransactionModule,
                     profileModule,
-                    channelsModule
+                    channelsModule,
+                    reminderModule,
+                    reportModule
                 )
             )
         }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     // Components
     <string name="undo">برگردون</string>
@@ -22,25 +22,36 @@
     <string name="reminder">یادآور</string>
     <string name="reports">گزارشات</string>
     <string name="home">خانه</string>
+    <string name="month">ماه</string>
     <string name="user_account_info">اطلاعات حساب کاربری</string>
     <string name="privacy_policy">امنیت و حریم خصوصی</string>
     <string name="currency">واحد پول</string>
     <string name="exit">خروج</string>
     <string name="confirm">تایید</string>
     <string name="cancel">لغو</string>
+    <string name="left_over_balance">مانده</string>
+    <string name="good_balance_state">اوضاع خوبه؛ هنوز تو منطقه سبزیم</string>
+    <string name="bad_balance_state">هشدار! بیشتر از دخلت خرج کردی</string>
+    <string name="empty_balance_state">هنوز دریافت و پرداختی ثبت نکردی</string>
 
     // Home
     <string name="bookkeeping">حساب کتاب</string>
+    <string name="last_actions">فعالیت‌های اخیر</string>
     <string name="all_accounts">همه حساب‌ها</string>
     <string name="input_channels">کانال‌های ورودی</string>
+    <string name="budgeting_subtitle">مدیریت مالی</string>
+    <string name="piggy_bank_subtitle">ذخیره پس‌انداز</string>
+    <string name="stairs_subtitle">هدف‌گذاری مالی</string>
+    <string name="all_transactions">همه تراکنش ها</string>
+    <string name="not_available">این بخش هنوز در دسترس نیست</string>
 
     // On Boarding
     <string name="piggy_bank">قلک</string>
-    <string name="piggy_bank_description">تا قلک پره نگران هیج اتفاق غیر قابل پیش بینی نباش</string>
+    <string name="piggy_bank_description">تا قلک پره نگران هیج اتفاق غیرقابل پیش بینی نباش</string>
     <string name="enter_app">ورود به اپلیکیشن</string>
     <string name="budgeting">بودجه بندی</string>
     <string name="budgeting_description">با کیف پول های جدا دیگه نگران دخل و خرجت نباش</string>
-    <string name="stairs">پله پله</string>
+    <string name="stairs" tools:ignore="Typos">پله پله</string>
     <string name="stairs_description">پله هات رو برای رسیدن به آرزو هات بچین</string>
 
     // Otp
@@ -79,7 +90,8 @@
     <string name="transaction_registered">تراکنش با موفقیت ثبت شد</string>
     <string name="register_transaction">ثبت تراکنش</string>
     <string name="register_category">ثبت دسته‌بندی</string>
-    <string name="update_category">ویرایش دسته‌بندی</string>
+    <string name="edit_category">ویرایش دسته‌بندی</string>
+    <string name="edit_transaction">ویرایش تراکنش</string>
     <string name="register_income_transaction">ثبت درآمد</string>
     <string name="register_outcome_transaction">ثبت هزینه</string>
     <string name="price">مبلغ</string>
@@ -87,6 +99,8 @@
     <string name="price_outcome">مبلغ هزینه</string>
     <string name="income">دریافت</string>
     <string name="outcome">پرداخت</string>
+    <string name="income2">دریافتی</string>
+    <string name="outcome2">پرداختی</string>
     <string name="withdraw_from">برداشت از</string>
     <string name="deposit_to">انتقال به</string>
     <string name="date">تاریخ</string>
@@ -101,6 +115,13 @@
     <string name="category_icon">آیکون دسته</string>
     <string name="category_icon2">آیکون دسته‌بندی</string>
     <string name="category_name_error">نام دسته‌بندی نمیتواند بیشتر از 30 کاراکتر باشد</string>
+    <string name="delete_transaction">حذف تراکنش؟</string>
+    <string name="delete_transaction_description">مطمعنی میخوای این تراکنش رو حذف کنی؟</string>
+    <string name="price_error_text">مبلغ نمیتونه خالی باشه</string>
+    <string name="channel_error_text">کانال تراکنشت رو مشخص کن</string>
+    <string name="category_error_text">دسته‌بندی تراکنشت رو مشخص کن</string>
+    <string name="date_error_text">تاریخ تراکنشت رو مشخص کن</string>
+    <string name="time_error_text">ساعت تراکنشت رو مشخص کن</string>
 
     // Channels
     <string name="channels">کانال‌ها</string>
@@ -117,6 +138,7 @@
     <string name="channel_icon">آیکون کانال</string>
     <string name="read_sms">خواندن پیامک ها</string>
     <string name="read_sms_description">دریافتی‌ها و پرداختی‌ها مسقیم از پیامک خونده میشه</string>
+    <string name="channel_name_error">نام کانال نمیتواند بیشتر از 30 کاراکتر باشد</string>
     <string name="edit_channel">ویرایش کانال</string>
     <string name="save_changes">ذخیره تغییرات</string>
     <string name="delete_channel">حذف کانال</string>
@@ -126,5 +148,41 @@
         در صورت حذف، تمام تراکنش‌های مربوط به کانال فاقد اطلاعات کانال خواهند بود.
     </string>
     <string name="delete">حذف کردن</string>
+    <string name="need_sms_permission">برای استفاده از این قابلیت چرتکه باید به پیامک های بانکی دسترسی داشته باشه</string>
+    <string name="choose_sms_number">شماره ای که از طریق اون برای این حسابت پیامک میاد رو انتخاب کن</string>
+    <string name="sms_remove_title">حذف دسترسی چرتکه به پیامک های این حساب؟</string>
+    <string name="sms_remove_description">در این صورت باید برای این حسابت تراکنش هات رو دستی اضافه کنی</string>
+
+    // Reminders
+    <string name="add_new_reminder">ثبت یادآور جدید</string>
+    <string name="register_reminder">ثبت یادآور</string>
+    <string name="chortkeh_reminder">یادآور چرتکه</string>
+    <string name="edit_reminder">ویرایش یادآور</string>
+    <string name="delete_reminder">حذف یادآور</string>
+    <string name="delete_reminder_description">مطمعنی میخوای این یادآور رو حذف کنی؟</string>
+    <string name="reminder_title">عنوان یادآور</string>
+    <string name="reminder_saved_successfully">یادآور با موفیت ذخیره شد</string>
+    <string name="register">ثبت</string>
+    <string name="reminder_name_error">نام یادآور نمیتواند بیشتر از 30 کاراکتر باشد</string>
+    <string name="empty_reminder_list_message">هنوز یادآوری ثبت نکردی</string>
+    <string name="exact_alarm_permission_title">اجازه تنظیم آلارم</string>
+    <string name="exact_alarm_permission_message">برای اینکه بتونی سر ساعت از یادآور هایی که تنظیم کردی مطلع بشی، لازمه دسترسی آلارم رو فعال کنی</string>
+    <string name="reminder_notification_channel_name">یادآورها</string>
+    <string name="reminder_notification_channel_description">یادآور هایی که ثبت کردی</string>
+
+    // Report
+    <string name="weekly">هفتگی</string>
+    <string name="monthly">ماهانه</string>
+    <string name="yearly">سالانه</string>
+    <string name="week_of_month">هفته %1$d</string>
+
+    // SMS Detection
+    <string name="sms_detection_notification_channel_name">پیامک‌های بانکی و مالی</string>
+    <string name="sms_detection_notification_channel_description">اطلاع‌رسانی پیامک‌های دریافتی از کانال‌های تعریف‌شده</string>
+    <string name="sms_detected_title">تراکنش جدید از حساب %1$s</string>
+    <string name="sms_detected_amount">مبلغ: %1$s</string>
+    <string name="sms_detected_date">تاریخ: %1$s</string>
+    <string name="sms_detected_channel">روی حساب: %1$s</string>
+    <string name="sms_detected_question">اضافه بشه به تراکنش های این ماه؟</string>
 
 </resources>

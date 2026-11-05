@@ -1,22 +1,34 @@
 package info.alihabibi.home
 
+import androidx.compose.runtime.Immutable
+import androidx.compose.ui.util.fastFilter
+import androidx.compose.ui.util.fastMap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import info.alihabibi.common.Utils
 import info.alihabibi.domain.local.usecases.database.channel.usecase.ChannelUseCases
+import info.alihabibi.domain.local.usecases.database.transaction.usecase.TransactionUseCases
 import info.alihabibi.domain.local.usecases.datastore.usecase.DatastoreUseCases
+import info.alihabibi.domain.models.transaction.CategoryTransactionExpenses
+import info.alihabibi.domain.models.transaction.Transaction
 import info.alihabibi.model.mapper.toUiModel
+import info.alihabibi.model.mapper.toUiOption
 import info.alihabibi.model.ui_model.channel.ChannelUiModel
+import info.alihabibi.model.ui_model.transaction.CategoryTransactionExpensesUiModel
+import info.alihabibi.model.ui_model.transaction.TransactionTypeOptionUiModel
+import info.alihabibi.model.ui_model.transaction.TransactionUiModel
+import info.alihabibi.ui.charts.gauge_chart.GaugeChartState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
     private val dataStoreUseCases: DatastoreUseCases,
+    transactionUseCases: TransactionUseCases,
     channelsUseCase: ChannelUseCases
 ) : ViewModel() {
 
@@ -27,21 +39,56 @@ class HomeViewModel(
         combine(
             dataStoreUseCases.getIsSmsModalShownUseCase.invoke(),
             channelsUseCase.getChannelsUseCase.invoke(),
-            channelsUseCase.getTotalBalanceUseCase.invoke()
-        ) { isSmsModalShown, channels, totalBalance ->
+            channelsUseCase.getTotalBalanceUseCase.invoke(),
+            transactionUseCases.getLastTransactions.invoke(5, TransactionTypeOptionUiModel.OUTCOME.name)
+        ) { isSmsModalShown, channels, totalBalance, lastTransactions ->
             val uiChannels = channels.map {
                 if (it.isAppDefaultChannel)
                     it.copy(channelBalance = totalBalance).toUiModel()
                 else
                     it.toUiModel()
             }
-            HomeUiState(
-                isSmsModalShown = isSmsModalShown,
-                channels = uiChannels
-            )
-        }
-            .onEach { state -> _uiState.update { state } }
-            .launchIn(viewModelScope)
+            val uiLastTransactions = lastTransactions.fastMap(Transaction::toUiModel)
+            _uiState.update {
+                it.copy(
+                    isSmsModalShown = isSmsModalShown,
+                    formattedTotalBalance = Utils.decimalFormatterPattern.format(totalBalance),
+                    lastTransactions = uiLastTransactions,
+                    channels = uiChannels
+                )
+            }
+        }.launchIn(viewModelScope)
+
+        val currentDate = Utils.getCurrentPersianDate()
+        val currentMonth = Utils.getCurrentPersianMonth()
+        combine(
+            transactionUseCases.getMonthTotalIncomeUseCase.invoke(currentDate.first, currentDate.second),
+            transactionUseCases.getMonthTotalExpensesUseCase.invoke(currentDate.first, currentDate.second),
+            transactionUseCases.hasOutcomeTransactionUseCase.invoke(),
+            transactionUseCases.getMonthExpensesByAllCategoriesUseCase.invoke(currentDate.first, currentDate.second)
+        ) { totalIncome, totalExpenses, hasOutcomeTransaction, categoryTransactionExpenses ->
+            val formattedIncome = Utils.decimalFormatterPattern.format(totalIncome)
+            val formattedExpenses = Utils.decimalFormatterPattern.format(totalExpenses)
+            val formattedRemainedBalance = Utils.decimalFormatterPattern.format(totalIncome - totalExpenses)
+            val categoryTransactionExpensesUiModel = categoryTransactionExpenses
+                // remove categories without transaction or unimportant expens values
+                .fastFilter { it.totalAmount > 10 }
+                .map(CategoryTransactionExpenses::toUiOption)
+            val gaugeChartProgress = calculateGaugeChartProgress(totalExpenses.toFloat(), totalIncome.toFloat())
+            val gaugeChartState = calculateGaugeChartState(totalExpenses.toFloat(), totalIncome.toFloat(), hasOutcomeTransaction)
+            _uiState.update {
+                it.copy(
+                    gaugeChartProgress = gaugeChartProgress,
+                    gaugeChartState = gaugeChartState,
+                    hasOutcomeTransaction = hasOutcomeTransaction,
+                    monthTotalIncome = formattedIncome,
+                    monthTotalExpenses = formattedExpenses,
+                    remainedBalance = formattedRemainedBalance,
+                    expensesByCategories = categoryTransactionExpensesUiModel,
+                    persianMonthName = currentMonth.first
+                )
+            }
+        }.launchIn(viewModelScope)
     }
 
     fun onEvent(event: HomeUiIntent) {
@@ -59,6 +106,22 @@ class HomeViewModel(
         }
     }
 
+    private fun calculateGaugeChartProgress(totalExpense: Float, totalIncome: Float): Float {
+        if (totalIncome == 0.0f && totalExpense == 0.0f) return 0f
+        val spendRatio = if (totalIncome > 0f) (totalExpense / totalIncome).coerceIn(0.0f, 2.0f) else 2.0f
+        val progress = (spendRatio * 90.0f).coerceIn(0.0f, 180.0f)
+        return progress
+    }
+
+    private fun calculateGaugeChartState(
+        totalExpense: Float,
+        totalIncome: Float,
+        hasTransaction: Boolean
+    ): GaugeChartState {
+        if (!hasTransaction) return GaugeChartState.EMPTY
+        return if (totalExpense >= totalIncome) GaugeChartState.RED else GaugeChartState.GREEN
+    }
+
 }
 
 sealed interface HomeUiIntent {
@@ -67,7 +130,18 @@ sealed interface HomeUiIntent {
 
 }
 
+@Immutable
 data class HomeUiState(
-    val isSmsModalShown: Boolean = false,
+    val monthTotalIncome: String = "",
+    val monthTotalExpenses: String = "",
+    val remainedBalance: String = "",
+    val persianMonthName: String = "",
+    val hasOutcomeTransaction: Boolean = false,
+    val formattedTotalBalance: String = "",
+    val isSmsModalShown: Boolean? = null,
+    val gaugeChartState: GaugeChartState = GaugeChartState.EMPTY,
+    val gaugeChartProgress: Float = 0f,
+    val lastTransactions: List<TransactionUiModel> = emptyList(),
+    val expensesByCategories: List<CategoryTransactionExpensesUiModel> = emptyList(),
     val channels: List<ChannelUiModel> = emptyList()
 )

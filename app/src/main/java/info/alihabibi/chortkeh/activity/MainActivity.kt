@@ -1,21 +1,28 @@
 package info.alihabibi.chortkeh.activity
 
+import android.content.ComponentName
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.core.content.IntentSanitizer
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -24,32 +31,29 @@ import info.alihabibi.chortkeh.navigation.DemoNavHost
 import info.alihabibi.chortkeh.navigation.Home
 import info.alihabibi.chortkeh.navigation.OnBoarding
 import info.alihabibi.chortkeh.navigation.topLevelDestinations
-import info.alihabibi.common_android.ObserveAsEvents
+import info.alihabibi.common_android.snackbar.ObserveAsEvents
 import info.alihabibi.common_android.snackbar.SnackBarController
 import info.alihabibi.designsystem.theme.ChortkehTheme
-import info.alihabibi.new_transaction.NewTransaction
+import info.alihabibi.domain.Keys
+import info.alihabibi.new_transaction.navigation.NewTransactionGraphRoute
 import info.alihabibi.ui.navigation.AppBottomNavigation
+import info.alihabibi.ui.navigation.AppNavigationRail
 import info.alihabibi.ui.scaffolds.BaseScaffold
 import info.alihabibi.ui.snackbars.AppSnackBar
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
 
     private val viewModel: MainActivityViewModel by viewModel()
+    private val deepLinkIntentState = MutableStateFlow<Intent?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.light(
-                scrim = android.graphics.Color.TRANSPARENT,
-                darkScrim = android.graphics.Color.TRANSPARENT
-            ),
-            navigationBarStyle = SystemBarStyle.light(
-                scrim = android.graphics.Color.TRANSPARENT,
-                darkScrim = android.graphics.Color.TRANSPARENT
-            )
-        )
+        enableEdgeToEdge()
+
+        deepLinkIntentState.value = sanitizeIntent(intent)
 
         splashScreen.setKeepOnScreenCondition { viewModel.uiState.value.shouldKeepSplashScreen() }
 
@@ -57,10 +61,21 @@ class MainActivity : ComponentActivity() {
             ChortkehTheme {
                 val navController = rememberNavController()
                 val uiState = viewModel.uiState.collectAsState()
-
+                val deepLinkIntent by deepLinkIntentState.collectAsStateWithLifecycle()
                 val currentDestination by navController.currentBackStackEntryAsState()
                 val shouldShowBottomBar = topLevelDestinations.any {
                     currentDestination?.destination?.hasRoute(it::class) == true
+                }
+
+                LaunchedEffect(deepLinkIntent, currentDestination) {
+                    val intent = deepLinkIntent ?: return@LaunchedEffect
+                    val isGraphReady = runCatching { navController.graph }.getOrNull() != null
+                    if (isGraphReady && intent.action == Intent.ACTION_VIEW &&
+                        (intent.data?.host == "new_transaction" || intent.data?.toString()?.contains("new_transaction") == true)
+                    ) {
+                        navController.handleDeepLink(intent)
+                        deepLinkIntentState.value = null
+                    }
                 }
 
                 val snackBarHostState = remember { SnackbarHostState() }
@@ -85,46 +100,97 @@ class MainActivity : ComponentActivity() {
                             false -> Home
                         }
 
-                        BaseScaffold(
-                            snackBarHost = {
-                                SnackbarHost(
-                                    modifier = Modifier.padding(bottom = 22.dp),
-                                    hostState = snackBarHostState
-                                ) { data ->
-                                    AppSnackBar(
-                                        description = data.visuals.message,
-                                        isUndoAvailable = data.visuals.actionLabel != null,
-                                        onUndo = { data.performAction() }
-                                    )
-                                }
-                            },
-                            bottomBar = {
-                                if (shouldShowBottomBar)
-                                    AppBottomNavigation(
-                                        currentDestination = currentDestination?.destination,
-                                        items = BottomNavItems.entries.map { it.toUiData() },
-                                        onFabClick = {
-                                            navController.navigate(NewTransaction)
-                                        },
-                                        onNavItemClicked = { navItem ->
-                                            navController.navigate(navItem.route) {
-                                                popUpTo(Home) { saveState = true }
-                                                launchSingleTop = true
-                                                restoreState = true
-                                            }
+                        val windowAdaptiveInfo = currentWindowAdaptiveInfoV2()
+                        val isCompact = !windowAdaptiveInfo.windowSizeClass.isWidthAtLeastBreakpoint(widthDpBreakpoint = 600)
+
+                        Row(modifier = Modifier.fillMaxSize()) {
+                            if (shouldShowBottomBar && !isCompact) {
+                                AppNavigationRail(
+                                    currentDestination = currentDestination?.destination,
+                                    items = BottomNavItems.entries.map { it.toUiData() },
+                                    onFabClick = {
+                                        navController.navigate(NewTransactionGraphRoute(null))
+                                    },
+                                    onNavItemClicked = { navItem ->
+                                        navController.navigate(navItem.route) {
+                                            popUpTo(Home) { saveState = true }
+                                            launchSingleTop = true
+                                            restoreState = true
                                         }
-                                    )
+                                    }
+                                )
                             }
-                        ) { innerPadding ->
-                            DemoNavHost(
-                                navController = navController,
-                                modifier = Modifier.padding(paddingValues = innerPadding),
-                                startDestination = startDestination
-                            )
+
+                            BaseScaffold(
+                                modifier = Modifier.weight(1f),
+                                snackBarHost = {
+                                    SnackbarHost(
+                                        modifier = Modifier.padding(bottom = 22.dp),
+                                        hostState = snackBarHostState
+                                    ) { data ->
+                                        AppSnackBar(
+                                            description = data.visuals.message,
+                                            isUndoAvailable = data.visuals.actionLabel != null,
+                                            onUndo = { data.performAction() }
+                                        )
+                                    }
+                                },
+                                bottomBar = {
+                                    if (shouldShowBottomBar && isCompact)
+                                        AppBottomNavigation(
+                                            currentDestination = currentDestination?.destination,
+                                            items = BottomNavItems.entries.map { it.toUiData() },
+                                            onFabClick = {
+                                                navController.navigate(NewTransactionGraphRoute(null))
+                                            },
+                                            onNavItemClicked = { navItem ->
+                                                navController.navigate(navItem.route) {
+                                                    popUpTo(Home) { saveState = true }
+                                                    launchSingleTop = true
+                                                    restoreState = true
+                                                }
+                                            }
+                                        )
+                                }
+                            ) { innerPadding ->
+                                DemoNavHost(
+                                    navController = navController,
+                                    modifier = Modifier.padding(paddingValues = innerPadding),
+                                    startDestination = startDestination
+                                )
+                            }
                         }
                     }
                 }
             }
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        deepLinkIntentState.value = sanitizeIntent(intent)
+    }
+
+    private fun sanitizeIntent(intent: Intent?): Intent? {
+        if (intent == null) return null
+        val sanitizer = IntentSanitizer.Builder()
+            .allowComponent(ComponentName(this, MainActivity::class.java))
+            .allowPackage(this.packageName)
+            .allowAction(Intent.ACTION_VIEW)
+            .allowAction(Intent.ACTION_MAIN)
+            .allowCategory(Intent.CATEGORY_LAUNCHER)
+            .allowCategory(Intent.CATEGORY_DEFAULT)
+            .allowCategory(Intent.CATEGORY_BROWSABLE)
+            .allowData { uri -> uri.scheme == "chortkeh" }
+            .allowExtra(Keys.EXTRA_NOTIFICATION_ID, Int::class.javaObjectType)
+            .allowExtra(Keys.EXTRA_ID_TRANSACTION_DATA) { true }
+            .build()
+
+        return try {
+            sanitizer.sanitizeByFiltering(intent)
+        } catch (_: Exception) {
+            intent
         }
     }
 

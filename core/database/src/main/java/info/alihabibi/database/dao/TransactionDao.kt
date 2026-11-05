@@ -1,12 +1,17 @@
 package info.alihabibi.database.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
+import androidx.room.Update
+import info.alihabibi.database.entities.CategoryTransactionExpensesData
+import info.alihabibi.database.entities.DetailedTransaction
+import info.alihabibi.database.entities.IncomeExpenseBucketData
 import info.alihabibi.database.entities.TransactionEntity
 import info.alihabibi.domain.Keys
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TransactionDao {
@@ -14,7 +19,146 @@ interface TransactionDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertTransaction(transaction: TransactionEntity): Long
 
+    @Update
+    suspend fun updateTransaction(transaction: TransactionEntity)
+
     @Query("DELETE FROM ${Keys.TRANSACTION_TABLE_NAME} WHERE id = :id")
     suspend fun deleteTransactionById(id: Long)
+
+    @Query("""
+    SELECT COALESCE(SUM(amount), 0)
+    FROM ${Keys.TRANSACTION_TABLE_NAME}
+    WHERE transactionType = 'INCOME'
+      AND year = :year
+      AND month = :month
+""")
+    fun getMonthTotalIncome(year: Int, month: Int): Flow<Long>
+
+    @Query("""
+    SELECT COALESCE(SUM(amount), 0)
+    FROM ${Keys.TRANSACTION_TABLE_NAME}
+    WHERE transactionType = 'OUTCOME'
+      AND year = :year
+      AND month = :month
+""")
+    fun getMonthTotalExpenses(year: Int, month: Int): Flow<Long>
+
+    @Query("SELECT EXISTS( SELECT 1 FROM ${Keys.TRANSACTION_TABLE_NAME} WHERE transactionType = 'OUTCOME')")
+    fun hasOutcomeTransaction(): Flow<Boolean>
+
+    @Query("SELECT EXISTS( SELECT 1 FROM ${Keys.TRANSACTION_TABLE_NAME})")
+    fun hasTransaction(): Flow<Boolean>
+
+    @Query("""
+    SELECT
+        c.id AS categoryId,
+        c.title AS categoryTitle,
+        COALESCE(SUM(t.amount), 0) AS totalAmount
+    FROM ${Keys.CATEGORY_TABLE_NAME} c
+    LEFT JOIN ${Keys.TRANSACTION_TABLE_NAME} t
+        ON t.transactionCategoryId = c.id
+        AND t.year = :year
+        AND t.month = :month
+        WHERE c.type = 'OUTCOME'
+    GROUP BY c.id
+""")
+    fun getMonthExpensesByAllCategories(year: Int, month: Int): Flow<List<CategoryTransactionExpensesData>>
+
+    @Query("""
+    SELECT
+        c.id AS categoryId,
+        c.title AS categoryTitle,
+        COALESCE(SUM(t.amount), 0) AS totalAmount
+    FROM ${Keys.CATEGORY_TABLE_NAME} c
+    LEFT JOIN ${Keys.TRANSACTION_TABLE_NAME} t
+        ON t.transactionCategoryId = c.id
+        AND t.transactionType = :type
+        AND t.year = :year
+    WHERE c.type = :type
+    GROUP BY c.id
+""")
+    fun getYearCategoryExpenses(year: Int, type: String): Flow<List<CategoryTransactionExpensesData>>
+
+    @Query("""
+    SELECT
+        c.id AS categoryId,
+        c.title AS categoryTitle,
+        COALESCE(SUM(t.amount), 0) AS totalAmount
+    FROM ${Keys.CATEGORY_TABLE_NAME} c
+    LEFT JOIN ${Keys.TRANSACTION_TABLE_NAME} t
+        ON t.transactionCategoryId = c.id
+        AND t.transactionType = :type
+        AND t.year = :year
+        AND t.month = :month
+    WHERE c.type = :type
+    GROUP BY c.id
+""")
+    fun getMonthCategoryExpenses(year: Int, month: Int, type: String): Flow<List<CategoryTransactionExpensesData>>
+
+    @Query("""
+    SELECT
+        c.id AS categoryId,
+        c.title AS categoryTitle,
+        COALESCE(SUM(t.amount), 0) AS totalAmount
+    FROM ${Keys.CATEGORY_TABLE_NAME} c
+    LEFT JOIN ${Keys.TRANSACTION_TABLE_NAME} t
+        ON t.transactionCategoryId = c.id
+        AND t.transactionType = :type
+        AND t.year BETWEEN :startYear AND :endYear
+        AND (t.year * 10000 + t.month * 100 + t.day) BETWEEN :startKey AND :endKey
+    WHERE c.type = :type
+    GROUP BY c.id
+""")
+    fun getWeeklyCategoryExpenses(startYear: Int, endYear: Int, startKey: Int, endKey: Int, type: String): Flow<List<CategoryTransactionExpensesData>>
+
+    @Transaction
+    @Query(
+        """
+    SELECT * FROM ${Keys.TRANSACTION_TABLE_NAME}
+    WHERE (:type IS NULL OR transactionType = :type)
+    ORDER BY id DESC
+    LIMIT :count
+    """
+    )
+    fun getLastTransactions(count: Int, type: String?): Flow<List<DetailedTransaction>>
+
+    @Transaction
+    @Query("SELECT * FROM ${Keys.TRANSACTION_TABLE_NAME} ORDER BY id DESC")
+    fun getAllTransactions(): Flow<List<DetailedTransaction>>
+
+    @Transaction
+    @Query("SELECT * FROM ${Keys.TRANSACTION_TABLE_NAME} WHERE id = :id")
+    suspend fun getTransactionById(id: Long): DetailedTransaction
+
+    @Query("""
+    SELECT month AS bucket,
+           COALESCE(SUM(CASE WHEN transactionType = 'INCOME'  THEN amount END), 0) AS incomeAmount,
+           COALESCE(SUM(CASE WHEN transactionType = 'OUTCOME' THEN amount END), 0) AS expenseAmount
+    FROM ${Keys.TRANSACTION_TABLE_NAME}
+    WHERE year = :year
+    GROUP BY month
+""")
+    fun getYearBuckets(year: Int): Flow<List<IncomeExpenseBucketData>>
+
+    @Query("""
+    SELECT (day - 1) / 7 AS bucket,
+           COALESCE(SUM(CASE WHEN transactionType = 'INCOME'  THEN amount END), 0) AS incomeAmount,
+           COALESCE(SUM(CASE WHEN transactionType = 'OUTCOME' THEN amount END), 0) AS expenseAmount
+    FROM ${Keys.TRANSACTION_TABLE_NAME}
+    WHERE year = :year AND month = :month
+    GROUP BY (day - 1) / 7
+""")
+    fun getMonthBuckets(year: Int, month: Int): Flow<List<IncomeExpenseBucketData>>
+
+    @Query("""
+    SELECT (year * 10000 + month * 100 + day) AS bucket,
+           COALESCE(SUM(CASE WHEN transactionType = 'INCOME'  THEN amount END), 0) AS incomeAmount,
+           COALESCE(SUM(CASE WHEN transactionType = 'OUTCOME' THEN amount END), 0) AS expenseAmount
+    FROM ${Keys.TRANSACTION_TABLE_NAME}
+    WHERE year BETWEEN :startYear AND :endYear
+      AND (year * 10000 + month * 100 + day) BETWEEN :startKey AND :endKey
+    GROUP BY year, month, day
+""")
+    fun getDayBuckets(startYear: Int, endYear: Int, startKey: Int, endKey: Int): Flow<List<IncomeExpenseBucketData>>
 
 }

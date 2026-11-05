@@ -54,8 +54,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import info.alihabibi.designsystem.R
-import info.alihabibi.designsystem.theme.ErrorExtraRedLight
-import info.alihabibi.designsystem.theme.ErrorRed
 import info.alihabibi.ui.buttons.AppButton
 import info.alihabibi.ui.buttons.AppOutlinedButton
 
@@ -333,15 +331,12 @@ private fun DialogContent(
                 ) {
 
                     Row(
+                        modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
 
-                        Box(
-                            modifier = Modifier.fillMaxWidth(),
-                            contentAlignment = Alignment.Center
-                        ) {
-
                             Text(
+                                modifier = Modifier.fillMaxWidth(),
                                 text = title,
                                 maxLines = 2,
                                 overflow = TextOverflow.Ellipsis,
@@ -351,22 +346,6 @@ private fun DialogContent(
                                     fontWeight = FontWeight.Bold
                                 )
                             )
-
-                            IconButton(
-                                onClick = onDismissIconClick,
-                                modifier = Modifier
-                                    .size(40.dp)
-                                    .align(Alignment.CenterStart)
-                            ) {
-
-                                Icon(
-                                    painter = painterResource(id = R.drawable.close_circle),
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    contentDescription = null
-                                )
-
-                            }
-                        }
 
                     }
 
@@ -398,8 +377,8 @@ private fun DialogContent(
                             modifier = Modifier.width(140.dp),
                             onClick = onCancelClicked,
                             text = cancelButtonText,
-                            color = ErrorExtraRedLight,
-                            borderColor = ErrorRed
+                            color = MaterialTheme.colorScheme.errorContainer,
+                            borderColor = MaterialTheme.colorScheme.error
                         )
 
                     }

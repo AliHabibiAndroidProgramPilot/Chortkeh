@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import info.alihabibi.common.banks.Bank
 import info.alihabibi.common.banks.BankCardIdentifier
 import info.alihabibi.domain.local.usecases.database.channel.usecase.ChannelUseCases
+import info.alihabibi.domain.local.usecases.sms.usecase.SmsUseCases
 import info.alihabibi.domain.models.channel.Channel
 import info.alihabibi.model.mapper.toDomain
 import info.alihabibi.model.mapper.toUiModel
@@ -14,14 +15,15 @@ import info.alihabibi.model.ui_model.channel.ChannelUiModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ChannelsViewModel(
-    private val channelsUseCases: ChannelUseCases
+    private val channelsUseCases: ChannelUseCases,
+    private val smsUseCases: SmsUseCases
 ) : ViewModel() {
 
     private val _channelUiState = MutableStateFlow(ChannelUiState())
@@ -55,11 +57,17 @@ class ChannelsViewModel(
 
             is ChannelsUiIntent.GetChannelById -> getChannelById(event.id)
 
+            is ChannelsUiIntent.SelectChannelSmsSource -> selectChannelSmsSource(event.smsSource)
+
             is ChannelsUiIntent.EditChannel -> editChannel(event.id)
 
             is ChannelsUiIntent.DeleteChannel -> deleteChannel(event.id)
 
+            is ChannelsUiIntent.RemoveChannelSmsSource -> removeChannelSmsSource()
+
             is ChannelsUiIntent.SaveChannel -> saveChannel()
+
+            is ChannelsUiIntent.FetchSmsSenders -> fetchSmsSenders()
 
             is ChannelsUiIntent.ResetChannelsDraft -> resetDraft()
 
@@ -93,12 +101,16 @@ class ChannelsViewModel(
     }
 
     private fun changeChannelName(name: String) {
-        if (name.length < 30)
+        if (name.length <= 30)
             _channelUiState.update { it.copy(channelName = name) }
     }
 
     private fun changeChannelIcon(icon: ChannelIconOptionUiModel) {
         _channelUiState.update { it.copy(channelIcon = icon) }
+    }
+
+    private fun selectChannelSmsSource(smsSource: String) {
+        _channelUiState.update { it.copy(selectedSmsSource = smsSource) }
     }
 
     private fun saveChannel() {
@@ -117,6 +129,7 @@ class ChannelsViewModel(
                 channelBalance = state.channelBalance,
                 isBankCardChannel = state.isBankAccountChannel,
                 cardNumber = state.cardNumber,
+                smsSource = state.selectedSmsSource,
                 icon = state.channelIcon ?: ChannelIconOptionUiModel.UNKNOWN,
                 bankName = if (bank == Bank.UNKNOWN) null else bank.name
             ).toDomain()
@@ -142,6 +155,7 @@ class ChannelsViewModel(
                 channelName = state.channelName,
                 channelBalance = state.channelBalance,
                 isBankCardChannel = state.isBankAccountChannel,
+                smsSource = state.selectedSmsSource,
                 cardNumber = state.cardNumber,
                 icon = state.channelIcon ?: ChannelIconOptionUiModel.UNKNOWN,
                 bankName = if (bank == Bank.UNKNOWN) null else bank.name
@@ -159,16 +173,37 @@ class ChannelsViewModel(
         }
     }
 
+    private fun removeChannelSmsSource() {
+        _channelUiState.update { it.copy(selectedSmsSource = null) }
+    }
+
     private fun getChannelById(id: Int) {
         viewModelScope.launch {
-            val channel = channelsUseCases.getChannelByIdUseCase.invoke(id).first().toUiModel(needsBalanceFormat = false)
+            val channel = channelsUseCases.getChannelByIdUseCase.invoke(id.toLong())
+                .firstOrNull()
+                ?.toUiModel(needsBalanceFormat = false)
+            if (channel != null) {
+                _channelUiState.update {
+                    ChannelUiState(
+                        isBankAccountChannel = channel.isBankCardChannel,
+                        channelName = channel.channelName,
+                        channelBalance = channel.channelBalance,
+                        selectedSmsSource = channel.smsSource?.takeIf { it.isNotBlank() },
+                        cardNumber = channel.cardNumber,
+                        channelIcon = channel.icon
+                    )
+                }
+            }
+        }
+    }
+
+    private fun fetchSmsSenders() {
+        viewModelScope.launch {
+            val smsInbox = smsUseCases.getSmsSendersSourceUseCase.invoke()
             _channelUiState.update {
-                ChannelUiState(
-                    isBankAccountChannel = channel.isBankCardChannel,
-                    channelName = channel.channelName,
-                    channelBalance = channel.channelBalance,
-                    cardNumber = channel.cardNumber,
-                    channelIcon = channel.icon
+                it.copy(
+                    smsSenders = smsInbox.keys.toList(),
+                    smsSendersLatestMessage = smsInbox.values.toList()
                 )
             }
         }
@@ -205,7 +240,13 @@ sealed interface ChannelsUiIntent {
 
     data class DeleteChannel(val id: Int) : ChannelsUiIntent
 
+    data class SelectChannelSmsSource(val smsSource: String) : ChannelsUiIntent
+
+    data object RemoveChannelSmsSource : ChannelsUiIntent
+
     data object SaveChannel : ChannelsUiIntent
+
+    data object FetchSmsSenders : ChannelsUiIntent
 
     data object ResetChannelsDraft : ChannelsUiIntent
 
@@ -217,7 +258,10 @@ data class ChannelUiState(
     val channelName: String = "",
     val channelBalance: String = "",
     val cardNumber: String = "",
-    val channelIcon: ChannelIconOptionUiModel? = null
+    val channelIcon: ChannelIconOptionUiModel? = null,
+    val smsSenders: List<String> = emptyList(),
+    val smsSendersLatestMessage: List<String> = emptyList(),
+    val selectedSmsSource: String? = null
 ) {
     val isChannelRegisterButtonEnabled: Boolean
         get() {

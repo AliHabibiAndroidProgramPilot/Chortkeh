@@ -1,5 +1,6 @@
 plugins {
     id("info.alihabibi.chortkeh.android.library")
+    id("kotlin-parcelize")
 }
 
 android {

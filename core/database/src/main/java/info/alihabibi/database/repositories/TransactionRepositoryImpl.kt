@@ -1,10 +1,19 @@
 package info.alihabibi.database.repositories
 
 import info.alihabibi.database.dao.TransactionDao
+import info.alihabibi.database.entities.CategoryTransactionExpensesData
+import info.alihabibi.database.entities.DetailedTransaction
+import info.alihabibi.database.entities.IncomeExpenseBucketData
 import info.alihabibi.database.mappers.asEntity
+import info.alihabibi.database.mappers.asExternalModel
 import info.alihabibi.domain.local.repositories.TransactionRepository
+import info.alihabibi.domain.models.transaction.CategoryTransactionExpenses
 import info.alihabibi.domain.models.transaction.Transaction
+import info.alihabibi.domain.models.transaction.chart_data.IncomeExpenseBucket
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 class TransactionRepositoryImpl(private val dao: TransactionDao) : TransactionRepository {
@@ -15,10 +24,105 @@ class TransactionRepositoryImpl(private val dao: TransactionDao) : TransactionRe
         }
     }
 
+    override suspend fun updateTransaction(transaction: Transaction) {
+        dao.updateTransaction(transaction.asEntity())
+    }
+
     override suspend fun deleteTransaction(transactionId: Long) {
         return withContext(Dispatchers.IO) {
             dao.deleteTransactionById(transactionId)
         }
+    }
+
+    override fun getMonthTotalIncome(year: Int, month: Int): Flow<Long> {
+        return dao.getMonthTotalIncome(year, month).flowOn(Dispatchers.IO)
+    }
+
+    override fun getMonthTotalExpenses(year: Int, month: Int): Flow<Long> {
+        return dao.getMonthTotalExpenses(year, month).flowOn(Dispatchers.IO)
+    }
+
+    override fun hasTransaction(): Flow<Boolean> {
+        return dao.hasTransaction().flowOn(Dispatchers.IO)
+    }
+
+    override fun hasOutcomeTransaction(): Flow<Boolean> {
+        return dao.hasOutcomeTransaction().flowOn(Dispatchers.IO)
+    }
+
+    override fun getMonthExpensesByAllCategories(year: Int, month: Int): Flow<List<CategoryTransactionExpenses>> {
+        return dao.getMonthExpensesByAllCategories(year, month)
+            .map { categoryExpensesData ->
+                categoryExpensesData.map(CategoryTransactionExpensesData::asExternalModel)
+            }
+            .flowOn(Dispatchers.IO)
+    }
+
+    override fun getYearCategoryExpenses(year: Int, type: String): Flow<List<CategoryTransactionExpenses>> {
+        return dao.getYearCategoryExpenses(year, type)
+            .map { list -> list.map(CategoryTransactionExpensesData::asExternalModel) }
+            .flowOn(Dispatchers.IO)
+    }
+
+    override fun getMonthCategoryExpenses(year: Int, month: Int, type: String): Flow<List<CategoryTransactionExpenses>> {
+        return dao.getMonthCategoryExpenses(year, month, type)
+            .map { list -> list.map(CategoryTransactionExpensesData::asExternalModel) }
+            .flowOn(Dispatchers.IO)
+    }
+
+    override fun getWeeklyCategoryExpenses(startKey: Int, endKey: Int, type: String): Flow<List<CategoryTransactionExpenses>> {
+        return dao.getWeeklyCategoryExpenses(
+            startYear = startKey / 10_000,
+            endYear = endKey / 10_000,
+            startKey = startKey,
+            endKey = endKey,
+            type = type
+        )
+            .map { list -> list.map(CategoryTransactionExpensesData::asExternalModel) }
+            .flowOn(Dispatchers.IO)
+    }
+
+    override fun getLastTransactions(count: Int, type: String?): Flow<List<Transaction>> {
+        return dao.getLastTransactions(count, type).map { transactionDataList ->
+            transactionDataList.map(DetailedTransaction::asExternalModel)
+        }
+            .flowOn(Dispatchers.IO)
+    }
+
+    override fun getAllTransactions(): Flow<List<Transaction>> {
+        return dao.getAllTransactions().map { transactions ->
+            transactions.map(DetailedTransaction::asExternalModel)
+        }
+            .flowOn(Dispatchers.IO)
+    }
+
+    override suspend fun getTransactionById(id: Long): Transaction {
+        return dao.getTransactionById(id).asExternalModel()
+    }
+
+    override fun getYearBuckets(year: Int): Flow<List<IncomeExpenseBucket>> {
+        return dao.getYearBuckets(year).map { bucketData ->
+            bucketData.map(IncomeExpenseBucketData::asExternalModel)
+        }
+            .flowOn(Dispatchers.IO)
+    }
+
+    override fun getMonthBuckets(year: Int, month: Int): Flow<List<IncomeExpenseBucket>> {
+        return dao.getMonthBuckets(year, month).map { bucketData ->
+            bucketData.map(IncomeExpenseBucketData::asExternalModel)
+        }
+            .flowOn(Dispatchers.IO)
+    }
+
+    override fun getDayBuckets(startKey: Int, endKey: Int): Flow<List<IncomeExpenseBucket>> {
+        return dao.getDayBuckets(
+            startYear = startKey / 10_000,
+            endYear = endKey / 10_000,
+            startKey = startKey,
+            endKey = endKey
+        )
+            .map { bucketData -> bucketData.map(IncomeExpenseBucketData::asExternalModel) }
+            .flowOn(Dispatchers.IO)
     }
 
 }

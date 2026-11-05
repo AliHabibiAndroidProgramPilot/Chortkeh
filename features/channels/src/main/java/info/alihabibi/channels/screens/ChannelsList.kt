@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Icon
@@ -71,34 +72,44 @@ private fun ChannelsListScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        AppHeader(
-            title = stringResource(id = R.string.input_channels),
-            isActionAvailable = false,
-            onNavigationClicked = onBackPressed
-        )
-
-        if (channels.isEmpty())
-            EmptyChannelState(
-                modifier = Modifier
-                    .weight(weight = 1f)
-                    .fillMaxWidth()
-            )
-        else
-            ChannelsListContent(
-                modifier = Modifier
-                    .weight(weight = 1f)
-                    .fillMaxWidth(),
-                channels = channels,
-                onChannelItemClicked = onEditChannel
-            )
-
-        AppButton(
+        Column(
             modifier = Modifier
-                .fillMaxWidth(fraction = 0.9f)
-                .padding(bottom = 16.dp),
-            onClick = onAddNewChannel,
-            text = stringResource(id = R.string.add_new_channel)
-        )
+                .widthIn(max = 700.dp)
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            AppHeader(
+                title = stringResource(id = R.string.input_channels),
+                isActionAvailable = false,
+                onNavigationClicked = onBackPressed
+            )
+
+            if (channels.isEmpty())
+                EmptyChannelState(
+                    modifier = Modifier
+                        .weight(weight = 1f)
+                        .fillMaxWidth()
+                )
+            else
+                ChannelsListContent(
+                    modifier = Modifier
+                        .weight(weight = 1f)
+                        .fillMaxWidth(),
+                    channels = channels,
+                    onChannelItemClicked = onEditChannel
+                )
+
+            AppButton(
+                modifier = Modifier
+                    .widthIn(max = 400.dp)
+                    .fillMaxWidth(fraction = 0.9f)
+                    .padding(bottom = 16.dp),
+                onClick = onAddNewChannel,
+                text = stringResource(id = R.string.add_new_channel)
+            )
+
+        }
 
     }
 
@@ -155,33 +166,32 @@ private fun EmptyChannelState(modifier: Modifier = Modifier) {
     ) {
 
         Column(
+            modifier = modifier.align(Alignment.Center),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.spacedBy(space = 12.dp)
         ) {
 
             Image(
-                modifier = Modifier
-                    .align(alignment = Alignment.CenterHorizontally)
-                    .padding(top = 128.dp),
                 painter = painterResource(id = R.drawable.empty_wallet),
                 contentDescription = null,
                 contentScale = ContentScale.Fit
             )
 
             Text(
-                modifier = Modifier.padding(top = 16.dp, bottom = 128.dp),
                 text = stringResource(id = R.string.empty_channels_list_message),
                 style = MaterialTheme.typography.labelLarge.copy(color = Gray7)
             )
 
-            Image(
-                modifier = Modifier.padding(end = 128.dp),
-                painter = painterResource(id = R.drawable.arrow_shape_down),
-                contentDescription = null,
-                contentScale = ContentScale.Fit
-            )
-
         }
+
+        Image(
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(start = 48.dp),
+            painter = painterResource(id = R.drawable.arrow_shape_down),
+            contentDescription = null,
+            contentScale = ContentScale.Fit
+        )
 
     }
 

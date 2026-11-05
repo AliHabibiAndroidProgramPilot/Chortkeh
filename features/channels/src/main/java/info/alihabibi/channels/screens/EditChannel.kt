@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -26,6 +27,7 @@ import info.alihabibi.designsystem.R
 import info.alihabibi.model.ui_model.channel.ChannelIconOptionUiModel
 import info.alihabibi.ui.buttons.AppButton
 import info.alihabibi.ui.dialogs.AppDialog
+import info.alihabibi.ui.dialogs.SmsInboxSelectionBottomSheet
 import info.alihabibi.ui.headrs.AppHeader
 import org.koin.androidx.compose.koinViewModel
 
@@ -63,6 +65,15 @@ fun EditChannelDestination(
         onChannelNameChanged = { name ->
             viewModel.onEvent(ChannelsUiIntent.ChannelNameChanged(name))
         },
+        onRemoveSmsSource = {
+            viewModel.onEvent(ChannelsUiIntent.RemoveChannelSmsSource)
+        },
+        onSmsSourceSelected = { smsSource ->
+            viewModel.onEvent(ChannelsUiIntent.SelectChannelSmsSource(smsSource))
+        },
+        onFetchSmsSenders = {
+            viewModel.onEvent(ChannelsUiIntent.FetchSmsSenders)
+        },
         onChannelIconChanged = { icon ->
             viewModel.onEvent(ChannelsUiIntent.ChannelIconChanged(icon))
         },
@@ -80,8 +91,26 @@ private fun EditChannelScreen(
     onCardNumberChange: (cardNumber: String) -> Unit = {},
     onBalanceChanged: (balance: String) -> Unit = {},
     onChannelIconChanged: (icon: ChannelIconOptionUiModel) -> Unit = {},
+    onRemoveSmsSource: () -> Unit = {},
+    onSmsSourceSelected: (smsSource: String) -> Unit = {},
+    onFetchSmsSenders: () -> Unit = {},
     onBackPressed: () -> Unit
 ) {
+
+    var showSmsInboxSelectionModal by remember { mutableStateOf(false) }
+    if (uiState.smsSenders.isNotEmpty() && showSmsInboxSelectionModal)
+        SmsInboxSelectionBottomSheet(
+            smsSenders = uiState.smsSenders,
+            smsSendersContent = uiState.smsSendersLatestMessage,
+            bottomSheetTitle = stringResource(id = R.string.choose_sms_number),
+            onSelectItem = { smsSource ->
+                onSmsSourceSelected(smsSource)
+                showSmsInboxSelectionModal = false
+            },
+            onDismissRequest = {
+                showSmsInboxSelectionModal = false
+            }
+        )
 
     var showDeleteWarning by remember { mutableStateOf(false) }
     if (showDeleteWarning)
@@ -106,9 +135,11 @@ private fun EditChannelScreen(
     ) {
 
         Column(
-            modifier = Modifier.weight(weight = 1f),
+            modifier = Modifier
+                .widthIn(max = 600.dp)
+                .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
-        ){
+        ) {
 
             AppHeader(
                 title = stringResource(id = R.string.edit_channel),
@@ -125,13 +156,20 @@ private fun EditChannelScreen(
                         .padding(vertical = 12.dp)
                         .imePadding()
                         .verticalScroll(state = rememberScrollState()),
+                    isEditing = true,
                     channelName = uiState.channelName,
                     cardNumber = uiState.cardNumber,
+                    selectedSmsSource = uiState.selectedSmsSource,
                     balance = uiState.channelBalance,
                     iconResId = uiState.channelIcon?.iconResId ?: R.drawable.channel_ic_default,
                     onChannelNameChange = onChannelNameChanged,
                     onCardNumberChange = onCardNumberChange,
-                    onInitialBalanceChange = onBalanceChanged
+                    onInitialBalanceChange = onBalanceChanged,
+                    onFetchSmsSenders = {
+                        onFetchSmsSenders()
+                        showSmsInboxSelectionModal = true
+                    },
+                    onRemoveSmsSource = onRemoveSmsSource
                 )
             else
                 OtherChannelContent(
@@ -151,6 +189,7 @@ private fun EditChannelScreen(
 
             AppButton(
                 modifier = Modifier
+                    .widthIn(max = 400.dp)
                     .fillMaxWidth(fraction = 0.9f)
                     .padding(bottom = 12.dp),
                 onClick = onEditChannel,

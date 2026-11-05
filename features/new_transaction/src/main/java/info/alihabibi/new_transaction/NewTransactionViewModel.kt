@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import info.alihabibi.common.PersianDateFormatter
+import info.alihabibi.common_android.NotificationCanceler
 import info.alihabibi.domain.local.usecases.database.category.usecase.CategoryUseCases
 import info.alihabibi.domain.local.usecases.database.channel.usecase.ChannelUseCases
 import info.alihabibi.domain.local.usecases.database.transaction.usecase.TransactionUseCases
@@ -14,39 +15,53 @@ import info.alihabibi.model.ui_model.category.CategoryIconOptionUiModel
 import info.alihabibi.model.ui_model.category.CategoryTypeOptionUiModel
 import info.alihabibi.model.ui_model.category.CategoryUiModel
 import info.alihabibi.model.ui_model.channel.ChannelUiModel
+import info.alihabibi.model.ui_model.transaction.NewTransactionPrefill
 import info.alihabibi.model.ui_model.transaction.TransactionTypeOptionUiModel
 import info.alihabibi.model.ui_model.transaction.TransactionUiModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 class NewTransactionViewModel(
     private val categoryUseCases: CategoryUseCases,
     private val channelsUseCase: ChannelUseCases,
-    private val transactionUseCases: TransactionUseCases
+    private val transactionUseCases: TransactionUseCases,
+    private val notificationCanceler: NotificationCanceler
 ) : ViewModel() {
 
     private val _newTransactionUiState = MutableStateFlow(NewTransactionUiState())
-    val newTransactionUiState: StateFlow<NewTransactionUiState> =
-        _newTransactionUiState.asStateFlow()
+    val newTransactionUiState: StateFlow<NewTransactionUiState> = _newTransactionUiState.asStateFlow()
 
     private val _categoryUiState = MutableStateFlow(CategoryUiState())
     val categoryUiState: StateFlow<CategoryUiState> = _categoryUiState.asStateFlow()
 
+    private val _fieldsError = MutableStateFlow(NewTransactionFieldsError())
+    val fieldsError: StateFlow<NewTransactionFieldsError> = _fieldsError.asStateFlow()
+
+    private val _newTransactionEvents = MutableSharedFlow<NewTransactionUiEvents>()
+    val newTransactionEvents: SharedFlow<NewTransactionUiEvents> = _newTransactionEvents.asSharedFlow()
+
+    private var lastAppliedPrefill: NewTransactionPrefill? = null
+
     val formattedTransactionDate: StateFlow<String> = combine(
         newTransactionUiState.map { it.transactionYear },
         newTransactionUiState.map { it.transactionMonth },
-        newTransactionUiState.map { it.transactionDay }
+        newTransactionUiState.map { it.transactionDay.first }
     ) { year, month, day ->
-        if (year != null && month != null && day != null)
+        if (year > 0 && month > 0 && day > 0)
             PersianDateFormatter.format(year, month, day)
         else ""
     }.stateIn(
@@ -55,45 +70,7 @@ class NewTransactionViewModel(
         started = SharingStarted.WhileSubscribed(5_000, 10_000)
     )
 
-    fun onEvent(event: NewTransactionUiIntent) {
-        when (event) {
-
-            is NewTransactionUiIntent.Init -> init()
-
-            is NewTransactionUiIntent.SaveTransaction -> saveTransaction()
-
-            is NewTransactionUiIntent.SaveCategory -> saveCategory()
-
-            is NewTransactionUiIntent.EditCategory -> editCategory(event.id)
-
-            is NewTransactionUiIntent.PriceChanged -> changePrice(event.price)
-
-            is NewTransactionUiIntent.DateChanged -> changeDate(event.year, event.month, event.day)
-
-            is NewTransactionUiIntent.TimeChanged -> changeTime(event.hour, event.minute)
-
-            is NewTransactionUiIntent.CategoryChanged -> changeCategory(event.category)
-
-            is NewTransactionUiIntent.ChannelChanged -> changeChannel(event.channel)
-
-            is NewTransactionUiIntent.CategoryNameChanged -> changeCategoryName(event.categoryName)
-
-            is NewTransactionUiIntent.CategoryTypeChanged -> changeCategoryType(event.categoryType)
-
-            is NewTransactionUiIntent.CategoryIconChanged -> changeCategoryIcon(event.categoryIcon)
-
-            is NewTransactionUiIntent.CategoriesDeleted -> deleteCategories(event.categoriesToDelete)
-
-            is NewTransactionUiIntent.FetchEditingCategory -> fetchEditingCategory(event.categoryId)
-
-            is NewTransactionUiIntent.ResetCategoryDrafts -> resetCategoryDrafts()
-
-            is NewTransactionUiIntent.TransactionTypeChanged -> changeTransactionType(event.type)
-
-        }
-    }
-
-    private fun init() {
+    init {
         combine(
             categoryUseCases.getCategoriesUseCase.invoke(),
             channelsUseCase.getChannelsUseCase.invoke().distinctUntilChanged(),
@@ -119,22 +96,131 @@ class NewTransactionViewModel(
         }.launchIn(viewModelScope)
     }
 
+    fun onEvent(event: NewTransactionUiIntent) {
+        when (event) {
+
+            is NewTransactionUiIntent.SaveTransaction -> saveTransaction()
+
+            is NewTransactionUiIntent.SaveCategory -> saveCategory()
+
+            is NewTransactionUiIntent.ApplyPrefill -> applyPrefill(event.prefill, event.notificationId)
+
+            is NewTransactionUiIntent.EditCategory -> editCategory(event.id)
+
+            is NewTransactionUiIntent.EditTransaction -> editTransaction(event.id)
+
+            is NewTransactionUiIntent.DeleteTransaction -> deleteTransaction(event.id)
+
+            is NewTransactionUiIntent.PriceChanged -> changePrice(event.price)
+
+            is NewTransactionUiIntent.DateChanged -> changeDate(event.year, event.month, event.day)
+
+            is NewTransactionUiIntent.TimeChanged -> changeTime(event.hour, event.minute)
+
+            is NewTransactionUiIntent.CategoryChanged -> changeCategory(event.category)
+
+            is NewTransactionUiIntent.ChannelChanged -> changeChannel(event.channel)
+
+            is NewTransactionUiIntent.CategoryNameChanged -> changeCategoryName(event.categoryName)
+
+            is NewTransactionUiIntent.CategoryTypeChanged -> changeCategoryType(event.categoryType)
+
+            is NewTransactionUiIntent.CategoryIconChanged -> changeCategoryIcon(event.categoryIcon)
+
+            is NewTransactionUiIntent.CategoriesDeleted -> deleteCategories(event.categoriesToDelete)
+
+            is NewTransactionUiIntent.FetchEditingCategory -> fetchEditingCategory(event.categoryId)
+
+            is NewTransactionUiIntent.FetchEditingTransaction -> fetchEditingTransaction(event.transactionId)
+
+            is NewTransactionUiIntent.ResetCategoryDrafts -> resetCategoryDrafts()
+
+            is NewTransactionUiIntent.TransactionTypeChanged -> changeTransactionType(event.type)
+
+        }
+    }
+
+    private fun applyPrefill(prefill: NewTransactionPrefill, notificationId: Int) {
+        notificationCanceler.cancel(notificationId)
+        if (lastAppliedPrefill == prefill) return
+        viewModelScope.launch {
+            val channel = channelsUseCase.getChannelByIdUseCase.invoke(prefill.channelId)
+                .firstOrNull()
+                ?.toUiModel()
+            _newTransactionUiState.update {
+                it.copy(
+                    transactionType = prefill.transactionType,
+                    transactionPrice = if (prefill.amount != null) prefill.amount.toString() else "",
+                    formattedTransactionTime = String.format(Locale.US, "%02d : %02d", prefill.hour, prefill.minute),
+                    transactionHour = prefill.hour,
+                    transactionMinute = prefill.minute,
+                    transactionYear = prefill.year ?: 0,
+                    transactionMonth = prefill.month ?: 0,
+                    transactionDay = Pair(prefill.dayOfMonth ?: 0, prefill.dayOfWeekName ?: ""),
+                    transactionChannel = channel
+                )
+            }
+            lastAppliedPrefill = prefill
+        }
+    }
+
     private fun saveTransaction() {
         viewModelScope.launch {
             val state = _newTransactionUiState.value
-            if (state.transactionChannel == null || state.transactionCategory == null)
+
+            if (state.transactionPrice.isBlank()) {
+                _fieldsError.update { it.copy(priceFiledError = true) }
                 return@launch
+            }
+
+            if (state.transactionChannel == null) {
+                _fieldsError.update { it.copy(channelFiledError = true) }
+                return@launch
+            }
+
+            if (state.transactionCategory == null) {
+                _fieldsError.update { it.copy(categoryFiledError = true) }
+                return@launch
+            }
+
+            if (state.transactionYear <= 0 || state.transactionMonth <= 0 || state.transactionDay.first <= 0) {
+                _fieldsError.update { it.copy(dateFieldError = true) }
+                return@launch
+            }
+
+            if (state.transactionHour == null || state.transactionMinute == null) {
+                _fieldsError.update { it.copy(timeFieldError = true) }
+                return@launch
+            }
 
             val transaction = TransactionUiModel(
-                transactionTypeOptionUiModel = state.transactionType,
-                amount = state.transactionPrice.toLong(),
+                type = state.transactionType,
+                amount = state.transactionPrice,
                 channel = state.transactionChannel,
                 category = state.transactionCategory,
-                date = "${state.transactionYear}-${state.transactionMonth}-${state.transactionDay}",
-                time = "${state.transactionHour}:${state.transactionMinute}"
+                year = state.transactionYear,
+                month = state.transactionMonth,
+                day = state.transactionDay.first,
+                dayOfWeekName = state.transactionDay.second,
+                time = String.format(Locale.US, "%02d:%02d", state.transactionHour, state.transactionMinute)
             ).toDomain()
             val id = transactionUseCases.saveTransactionUseCase.invoke(transaction)
-            _newTransactionUiState.update { it.copy(savedTransactionId = id) }
+            updateChannelBalanceAfterTransaction(
+                null,
+                false,
+                state.transactionChannel.id,
+                state.transactionPrice.toLong(),
+                state.transactionType == TransactionTypeOptionUiModel.INCOME
+            )
+
+            _newTransactionEvents.emit(
+                NewTransactionUiEvents.ShowSuccessSnackBarAndNavigateUp(
+                    id,
+                    state.transactionChannel.id,
+                    state.transactionPrice,
+                    state.transactionType == TransactionTypeOptionUiModel.INCOME
+                )
+            )
         }
     }
 
@@ -189,11 +275,68 @@ class NewTransactionViewModel(
         }
     }
 
+    private fun editTransaction(transactionId: Long) {
+        viewModelScope.launch {
+            val state = _newTransactionUiState.value
+
+            if (state.transactionPrice.isBlank()) {
+                _fieldsError.update { it.copy(priceFiledError = true) }
+                return@launch
+            }
+
+            if (state.transactionCategory == null) {
+                _fieldsError.update { it.copy(categoryFiledError = true) }
+                return@launch
+            }
+
+            if (state.transactionChannel == null)
+                return@launch
+
+            val transaction = TransactionUiModel(
+                id = transactionId,
+                type = state.transactionType,
+                amount = state.transactionPrice,
+                channel = state.transactionChannel,
+                category = state.transactionCategory,
+                year = state.transactionYear,
+                month = state.transactionMonth,
+                day = state.transactionDay.first,
+                dayOfWeekName = state.transactionDay.second,
+                time = String.format(Locale.US, "%02d:%02d", state.transactionHour, state.transactionMinute)
+            ).toDomain()
+            updateChannelBalanceAfterTransaction(
+                transactionId,
+                true,
+                state.transactionChannel.id,
+                state.transactionPrice.toLong(),
+                state.transactionType == TransactionTypeOptionUiModel.INCOME
+            )
+            transactionUseCases.updateTransactionUseCase.invoke(transaction)
+
+            _newTransactionEvents.emit(NewTransactionUiEvents.NavigateUp)
+        }
+    }
+
+    private fun deleteTransaction(transactionId: Long) {
+        viewModelScope.launch {
+            val transactionSnapshot =
+                transactionUseCases.getTransactionByIdUseCase.invoke(transactionId).toUiModel(false)
+            transactionSnapshot.channel?.let { channel ->
+                val oldAmount = transactionSnapshot.amount.toLongOrNull() ?: 0L
+                val oldIsIncome = transactionSnapshot.type == TransactionTypeOptionUiModel.INCOME
+                channelsUseCase.updateChannelBalanceUseCase.invoke(channel.id, oldAmount,!oldIsIncome)
+            }
+            transactionUseCases.deleteTransactionUseCase.invoke(transactionId)
+        }
+    }
+
     private fun changePrice(price: String) {
         val digits = price
             .filter(Char::isDigit)
             .take(17)
             .trimStart('0')
+        if (_fieldsError.value.priceFiledError != null)
+            _fieldsError.update { it.copy(priceFiledError = digits.isBlank()) }
         _newTransactionUiState.update {
             it.copy(transactionPrice = digits)
         }
@@ -201,7 +344,7 @@ class NewTransactionViewModel(
 
     private fun changeTime(hour: Int?, minute: Int?) {
         val formattedTime =
-            if (hour != null && minute != null) "$hour : $minute" else ""
+            if (hour != null && minute != null) String.format(Locale.US, "%02d : %02d", hour, minute) else ""
         _newTransactionUiState.update {
             it.copy(
                 formattedTransactionTime = formattedTime,
@@ -209,9 +352,10 @@ class NewTransactionViewModel(
                 transactionMinute = minute
             )
         }
+        _fieldsError.update { it.copy(timeFieldError = false) }
     }
 
-    private fun changeDate(year: Int, month: Int, day: Int) {
+    private fun changeDate(year: Int, month: Int, day: Pair<Int, String>) {
         _newTransactionUiState.update {
             it.copy(
                 transactionYear = year,
@@ -219,6 +363,7 @@ class NewTransactionViewModel(
                 transactionDay = day
             )
         }
+        _fieldsError.update { it.copy(dateFieldError = false) }
     }
 
     private fun changeTransactionType(type: TransactionTypeOptionUiModel) {
@@ -229,10 +374,12 @@ class NewTransactionViewModel(
 
     private fun changeCategory(category: CategoryUiModel) {
         _newTransactionUiState.update { it.copy(transactionCategory = category) }
+        _fieldsError.update { it.copy(categoryFiledError = false) }
     }
 
     private fun changeChannel(channel: ChannelUiModel) {
         _newTransactionUiState.update { it.copy(transactionChannel = channel) }
+        _fieldsError.update { it.copy(channelFiledError = false) }
     }
 
     private fun changeCategoryName(categoryName: String) {
@@ -249,15 +396,36 @@ class NewTransactionViewModel(
     }
 
     private fun fetchEditingCategory(categoryId: Int) {
-        val category =
-            _newTransactionUiState.value.categories.firstOrNull { it.id.toInt() == categoryId }
-                ?: return
+        val category = _newTransactionUiState.value.categories.firstOrNull { it.id.toInt() == categoryId } ?: return
         _categoryUiState.update { _ ->
             CategoryUiState(
                 categoryName = category.title,
                 categoryType = category.type,
                 categoryIcon = category.icon
             )
+        }
+    }
+
+    private fun fetchEditingTransaction(transactionId: Long) {
+        viewModelScope.launch {
+            val transaction =
+                transactionUseCases.getTransactionByIdUseCase.invoke(transactionId).toUiModel(false)
+            val hour = transaction.time.substringBefore(':').toIntOrNull() ?: 0
+            val minute = transaction.time.substringAfter(':').toIntOrNull() ?: 0
+            _newTransactionUiState.update {
+                it.copy(
+                    transactionType = transaction.type,
+                    transactionPrice = transaction.amount,
+                    transactionHour = hour,
+                    transactionMinute = minute,
+                    formattedTransactionTime = "$hour : $minute",
+                    transactionYear = transaction.year,
+                    transactionMonth = transaction.month,
+                    transactionDay = transaction.day to transaction.dayOfWeekName,
+                    transactionChannel = transaction.channel,
+                    transactionCategory = transaction.category
+                )
+            }
         }
     }
 
@@ -277,21 +445,46 @@ class NewTransactionViewModel(
         }
     }
 
+    private suspend fun updateChannelBalanceAfterTransaction(
+        transactionId: Long?,
+        isEditedTransaction: Boolean,
+        channelId: Long,
+        balance: Long,
+        isIncome: Boolean
+    ) {
+        if (isEditedTransaction && transactionId != null) {
+            val transactionSnapshot =
+                transactionUseCases.getTransactionByIdUseCase.invoke(transactionId).toUiModel(false)
+            transactionSnapshot.channel?.let { oldChannel ->
+                val oldAmount = transactionSnapshot.amount.toLongOrNull() ?: 0L
+                val oldIsIncome = transactionSnapshot.type == TransactionTypeOptionUiModel.INCOME
+                // Revert the old transaction effect on the old channel
+                channelsUseCase.updateChannelBalanceUseCase.invoke(oldChannel.id, oldAmount,!oldIsIncome)
+            }
+        }
+        // Apply the new transaction effect on the target channel
+        channelsUseCase.updateChannelBalanceUseCase.invoke(channelId, balance, isIncome)
+    }
+
 }
 
 sealed interface NewTransactionUiIntent {
-
-    data object Init : NewTransactionUiIntent
 
     data object SaveTransaction : NewTransactionUiIntent
 
     data object SaveCategory : NewTransactionUiIntent
 
+    data class ApplyPrefill(val prefill: NewTransactionPrefill, val notificationId: Int) : NewTransactionUiIntent
+
     data class EditCategory(val id: Int) : NewTransactionUiIntent
+
+    data class EditTransaction(val id: Long) : NewTransactionUiIntent
+
+    data class DeleteTransaction(val id: Long) : NewTransactionUiIntent
 
     data class PriceChanged(val price: String) : NewTransactionUiIntent
 
-    data class DateChanged(val year: Int, val month: Int, val day: Int) : NewTransactionUiIntent
+    data class DateChanged(val year: Int, val month: Int, val day: Pair<Int, String>) : NewTransactionUiIntent
 
     data class TimeChanged(val hour: Int?, val minute: Int?) : NewTransactionUiIntent
 
@@ -309,6 +502,8 @@ sealed interface NewTransactionUiIntent {
 
     data class FetchEditingCategory(val categoryId: Int) : NewTransactionUiIntent
 
+    data class FetchEditingTransaction(val transactionId: Long) : NewTransactionUiIntent
+
     data object ResetCategoryDrafts : NewTransactionUiIntent
 
     data class TransactionTypeChanged(val type: TransactionTypeOptionUiModel) : NewTransactionUiIntent
@@ -322,23 +517,23 @@ data class NewTransactionUiState(
     val formattedTransactionTime: String = "",
     val transactionHour: Int? = null,
     val transactionMinute: Int? = null,
-    val transactionYear: Int? = null,
-    val transactionMonth: Int? = null,
-    val transactionDay: Int? = null,
+    val transactionYear: Int = 0,
+    val transactionMonth: Int = 0,
+    val transactionDay: Pair<Int, String> = Pair(0, ""),
     val transactionCategory: CategoryUiModel? = null,
     val transactionChannel: ChannelUiModel? = null,
     val categories: List<CategoryUiModel> = emptyList(),
-    val channels: List<ChannelUiModel> = emptyList(),
-    val savedTransactionId: Long? = null
-) {
-    val isRegisterTransactionButtonEnabled: Boolean
-        get() {
-            return transactionPrice.isNotEmpty() &&
-                    formattedTransactionTime.isNotEmpty() &&
-                    transactionCategory != null &&
-                    transactionChannel != null
-        }
-}
+    val channels: List<ChannelUiModel> = emptyList()
+)
+
+@Immutable
+data class NewTransactionFieldsError(
+    val priceFiledError: Boolean? = null,
+    val channelFiledError: Boolean = false,
+    val categoryFiledError: Boolean = false,
+    val dateFieldError: Boolean = false,
+    val timeFieldError: Boolean = false
+)
 
 @Immutable
 data class CategoryUiState(
@@ -348,4 +543,17 @@ data class CategoryUiState(
 ) {
     val isCategoryRegisterButtonEnabled: Boolean
         get() = categoryName.isNotEmpty() && categoryType != null && categoryIcon != null
+}
+
+sealed interface NewTransactionUiEvents {
+
+    data object NavigateUp : NewTransactionUiEvents
+
+    data class ShowSuccessSnackBarAndNavigateUp(
+        val id: Long,
+        val channelId: Long,
+        val price: String,
+        val isIncome: Boolean
+    ) : NewTransactionUiEvents
+
 }

@@ -1,17 +1,18 @@
 package info.alihabibi.new_transaction.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,10 +22,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -43,10 +45,7 @@ import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.repeatOnLifecycle
 import info.alihabibi.common.Utils
 import info.alihabibi.common_android.snackbar.SnackBarController
 import info.alihabibi.common_android.snackbar.SnackBarEvent
@@ -57,11 +56,14 @@ import info.alihabibi.domain.local.coordinators.TransactionUndoManager
 import info.alihabibi.model.ui_model.category.CategoryUiModel
 import info.alihabibi.model.ui_model.channel.ChannelUiModel
 import info.alihabibi.model.ui_model.transaction.TransactionTypeOptionUiModel
+import info.alihabibi.new_transaction.NewTransactionFieldsError
+import info.alihabibi.new_transaction.NewTransactionUiEvents
 import info.alihabibi.new_transaction.NewTransactionUiIntent
 import info.alihabibi.new_transaction.NewTransactionUiState
 import info.alihabibi.new_transaction.NewTransactionViewModel
 import info.alihabibi.ui.buttons.AppButton
 import info.alihabibi.ui.buttons.AppToggle
+import info.alihabibi.ui.dialogs.AppDialog
 import info.alihabibi.ui.dialogs.ChannelListedBottomSheet
 import info.alihabibi.ui.dialogs.ListedBottomSheet
 import info.alihabibi.ui.dialogs.TimePickerBottomSheetContent
@@ -79,44 +81,59 @@ import java.time.LocalTime
 @Composable
 fun NewTransactionDestination(
     viewModel: NewTransactionViewModel = koinViewModel(),
+    editingTransactionId: Long?,
     onAddNewCategory: () -> Unit = {},
+    onAddNewChannel: () -> Unit = {},
     onEditCategory: (categoryId: Int) -> Unit = {},
     onBackPressed: () -> Unit
 ) {
 
-    val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
-
-    val uiState by viewModel.newTransactionUiState.collectAsStateWithLifecycle()
-    val formattedTransactionDate by viewModel.formattedTransactionDate.collectAsStateWithLifecycle()
-
-    LaunchedEffect(lifecycleOwner) {
-        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            viewModel.onEvent(NewTransactionUiIntent.Init)
-        }
+    SideEffect(editingTransactionId) {
+        if (editingTransactionId != null)
+            viewModel.onEvent(NewTransactionUiIntent.FetchEditingTransaction(editingTransactionId))
     }
+
+    val context = LocalContext.current
 
     val currentOnBackPressed by rememberUpdatedState(onBackPressed)
     val transactionUndoManager: TransactionUndoManager = koinInject()
-    uiState.savedTransactionId?.let { id ->
-        LaunchedEffect(id) {
-            SnackBarController.sendEvent(
-                SnackBarEvent(
-                    message = Utils.getStringResources(context, R.string.transaction_registered),
-                    actionTitle = Utils.getStringResources(context, R.string.undo),
-                    action = {
-                        transactionUndoManager.executeUndo(id)
-                    }
-                )
-            )
-            currentOnBackPressed()
+
+    val uiState by viewModel.newTransactionUiState.collectAsStateWithLifecycle()
+    val fieldsError by viewModel.fieldsError.collectAsStateWithLifecycle()
+    val formattedTransactionDate by viewModel.formattedTransactionDate.collectAsStateWithLifecycle()
+
+    LaunchedEffect(viewModel) {
+        viewModel.newTransactionEvents.collect { event ->
+            when(event) {
+                is NewTransactionUiEvents.NavigateUp -> currentOnBackPressed()
+                is NewTransactionUiEvents.ShowSuccessSnackBarAndNavigateUp -> {
+                    SnackBarController.sendEvent(
+                        SnackBarEvent(
+                            message = Utils.getStringResources(context, R.string.transaction_registered),
+                            actionTitle = Utils.getStringResources(context, R.string.undo),
+                            action = {
+                                transactionUndoManager.executeUndo(
+                                    event.id,
+                                    event.channelId,
+                                    event.price,
+                                    event.isIncome
+                                )
+                            }
+                        )
+                    )
+                    currentOnBackPressed()
+                }
+            }
         }
     }
 
     NewTransactionScreen(
         uiState = uiState,
+        isEditingTransaction = editingTransactionId != null,
+        fieldsError = fieldsError,
         formattedTransactionDate = formattedTransactionDate,
         onAddNewCategory = onAddNewCategory,
+        onAddNewChannel = onAddNewChannel,
         onEditCategory = onEditCategory,
         onPriceChanged = { price ->
             viewModel.onEvent(NewTransactionUiIntent.PriceChanged(price))
@@ -136,8 +153,17 @@ fun NewTransactionDestination(
         onCategoriesDelete = { categoriesToDelete ->
             viewModel.onEvent(NewTransactionUiIntent.CategoriesDeleted(categoriesToDelete))
         },
-        onSaveTransaction = {
-            viewModel.onEvent(NewTransactionUiIntent.SaveTransaction)
+        onSaveOrEditTransaction = {
+            if (editingTransactionId != null)
+                viewModel.onEvent(NewTransactionUiIntent.EditTransaction(editingTransactionId))
+            else
+                viewModel.onEvent(NewTransactionUiIntent.SaveTransaction)
+        },
+        onDeleteTransaction = {
+            if (editingTransactionId != null) {
+                viewModel.onEvent(NewTransactionUiIntent.DeleteTransaction(editingTransactionId))
+                onBackPressed()
+            }
         },
         onTransactionTypeChanged = { type ->
             viewModel.onEvent(NewTransactionUiIntent.TransactionTypeChanged(type))
@@ -151,16 +177,20 @@ fun NewTransactionDestination(
 @Composable
 private fun NewTransactionScreen(
     uiState: NewTransactionUiState,
+    isEditingTransaction: Boolean,
+    fieldsError: NewTransactionFieldsError,
     formattedTransactionDate: String = "",
     onPriceChanged: (price: String) -> Unit = {},
-    onDateChanged: (year: Int, month: Int, day: Int) -> Unit = { _, _, _ -> },
+    onDateChanged: (year: Int, month: Int, day: Pair<Int, String>) -> Unit = { _, _, _ -> },
     onTimeChange: (hour: Int?, minute: Int?) -> Unit = { _, _ -> },
     onCategoryChanged: (category: CategoryUiModel) -> Unit = {},
     onChannelChanged: (channel: ChannelUiModel) -> Unit = {},
     onCategoriesDelete: (categoriesIdsToDelete: List<Long>) -> Unit = {},
     onEditCategory: (categoryId: Int) -> Unit = {},
-    onSaveTransaction: () -> Unit = {},
+    onSaveOrEditTransaction: () -> Unit = {},
+    onDeleteTransaction: () -> Unit = {},
     onAddNewCategory: () -> Unit = {},
+    onAddNewChannel: () -> Unit = {},
     onTransactionTypeChanged: (type: TransactionTypeOptionUiModel) -> Unit = {},
     onBackPressed: () -> Unit
 ) {
@@ -179,6 +209,12 @@ private fun NewTransactionScreen(
                 .wrapContentHeight(),
             controller = datePickerController,
             sheetState = dateBottomSheetState,
+            useInitialDate = isEditingTransaction, // Use Initial Date Only For Transactions That Has A Date, So Dialog Can Open That Date
+            initialDate = Triple(
+                uiState.transactionYear,
+                uiState.transactionMonth,
+                uiState.transactionDay.first
+            ),
             minYear = MinYear.On(1404),
             maxYear = MaxYear.On(1406),
             titleBottomSheet = stringResource(id = R.string.date),
@@ -208,14 +244,12 @@ private fun NewTransactionScreen(
             onDismissRequest = {
                 scope.launch { dateBottomSheetState.hide() }
             },
-            onDateChanged = { year, month, day ->
-                onDateChanged(year, month, day)
-            },
             onSubmitClick = {
                 val year = datePickerController.getPersianYear()
                 val month = datePickerController.getPersianMonth()
                 val day = datePickerController.getPersianDay()
-                onDateChanged(year, month, day)
+                val dayName = datePickerController.getPersianDayOfWeekName()
+                onDateChanged(year, month, Pair(day, dayName))
             }
         )
 
@@ -284,10 +318,20 @@ private fun NewTransactionScreen(
                 onChannelChanged(channel)
                 showChannelsBottomSheet = false
             },
-            onAddNewItem = {
-
-            },
+            onAddNewItem = onAddNewChannel,
             onDismissRequest = { showChannelsBottomSheet = false },
+        )
+
+    var showTransactionDeleteDialog by remember { mutableStateOf(false) }
+    if (showTransactionDeleteDialog)
+        AppDialog(
+            title = stringResource(id = R.string.delete_transaction),
+            message = stringResource(id = R.string.delete_transaction_description),
+            confirmButtonText = stringResource(id = R.string.delete),
+            cancelButtonText = stringResource(id = R.string.cancel),
+            onConfirmClicked = onDeleteTransaction,
+            onCancelClicked = { showTransactionDeleteDialog = false },
+            onDismissRequest = { showTransactionDeleteDialog = false }
         )
 
     Column(
@@ -299,194 +343,328 @@ private fun NewTransactionScreen(
 
         Column(
             modifier = Modifier
-                .weight(weight = 1f)
-                .verticalScroll(state = rememberScrollState()),
+                .widthIn(max = 600.dp)
+                .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            AppHeader(
-                title = stringResource(id = R.string.register_transaction),
-                windowInsets = TopAppBarDefaults.windowInsets.only(sides = WindowInsetsSides.Top),
-                isActionAvailable = false,
-                onNavigationClicked = onBackPressed
-            )
-
-            Spacer(Modifier.height(height = 8.dp))
-
-            AppToggle(
-                toggleItems = TransactionTypeOptionUiModel.entries.toList(),
-                itemTitle = { transactionType -> stringResource(id = transactionType.labelRes) },
-                selectedOption = uiState.transactionType,
-                onToggleSelectionChanged = { selected ->
-                    onTransactionTypeChanged(selected)
-                }
-            )
-
-            Spacer(Modifier.height(height = 8.dp))
-
-            AppTitledPriceTextField(
-                modifier = Modifier.padding(horizontal = 4.dp),
-                text = uiState.transactionPrice,
-                onValueChange = { newValue ->
-                    onPriceChanged(newValue)
-                },
-                title = stringResource(id = R.string.price),
-                placeHolderText = when (uiState.transactionType) {
-                    TransactionTypeOptionUiModel.OUTCOME -> stringResource(id = R.string.price_outcome)
-                    TransactionTypeOptionUiModel.INCOME -> stringResource(id = R.string.price_income)
-                }
-            )
-
-            Spacer(modifier = Modifier.height(height = 16.dp))
-
-            Row(
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(height = 50.dp)
-                    .padding(horizontal = 16.dp)
-                    .border(width = 1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(12.dp))
-                    .clip(shape = RoundedCornerShape(12.dp))
-                    .clickable { showChannelsBottomSheet = true },
-                verticalAlignment = Alignment.CenterVertically
+                    .weight(weight = 1f)
+                    .verticalScroll(state = rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                Icon(
-                    modifier = Modifier.padding(start = 18.dp),
-                    painter = painterResource(id = R.drawable.short_arrow_down),
-                    contentDescription = null,
-                    tint = Gray8
+                AppHeader(
+                    title = if (isEditingTransaction)
+                        stringResource(id = R.string.edit_transaction)
+                    else
+                        stringResource(id = R.string.register_transaction),
+                    actionIcon = painterResource(id = R.drawable.trash),
+                    isActionAvailable = isEditingTransaction,
+                    onNavigationClicked = onBackPressed,
+                    onActionClicked = { showTransactionDeleteDialog = true }
                 )
 
-                Spacer(modifier = Modifier.weight(weight = 1f))
+                Spacer(Modifier.height(height = 8.dp))
 
-                Text(
-                    modifier = Modifier.padding(horizontal = 12.dp),
-                    text = if (uiState.transactionChannel != null)
-                        uiState.transactionChannel.channelName
-                    else {
-                        when(uiState.transactionType) {
-                            TransactionTypeOptionUiModel.OUTCOME -> stringResource(id = R.string.withdraw_from)
-                            TransactionTypeOptionUiModel.INCOME -> stringResource(id = R.string.deposit_to)
-                        }
+                AppToggle(
+                    toggleItems = TransactionTypeOptionUiModel.entries.toList(),
+                    itemTitle = { transactionType -> stringResource(id = transactionType.labelRes) },
+                    selectedOption = uiState.transactionType,
+                    onToggleSelectionChanged = { selected ->
+                        onTransactionTypeChanged(selected)
+                    }
+                )
+
+                Spacer(Modifier.height(height = 8.dp))
+
+                AppTitledPriceTextField(
+                    modifier = Modifier.padding(horizontal = 4.dp),
+                    text = uiState.transactionPrice,
+                    onValueChange = { newValue ->
+                        onPriceChanged(newValue)
                     },
-                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp)
-                )
-
-            }
-
-            Spacer(modifier = Modifier.height(height = 16.dp))
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(height = 50.dp)
-                    .padding(horizontal = 16.dp)
-                    .border(width = 1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(12.dp))
-                    .clip(shape = RoundedCornerShape(size = 12.dp))
-                    .clickable { showCategoryBottomSheet = true },
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-
-                Icon(
-                    modifier = Modifier.padding(start = 18.dp),
-                    painter = painterResource(id = R.drawable.short_arrow_down),
-                    contentDescription = null,
-                    tint = Gray8
-                )
-
-                Spacer(modifier = Modifier.weight(weight = 1f))
-
-                Text(
-                    modifier = Modifier.padding(horizontal = 12.dp),
-                    text = when {
-                        uiState.transactionCategory != null -> uiState.transactionCategory.title
-                        else -> stringResource(id = R.string.category)
+                    title = stringResource(id = R.string.price),
+                    placeHolderText = when (uiState.transactionType) {
+                        TransactionTypeOptionUiModel.OUTCOME -> stringResource(id = R.string.price_outcome)
+                        TransactionTypeOptionUiModel.INCOME -> stringResource(id = R.string.price_income)
                     },
-                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp)
+                    error = fieldsError.priceFiledError == true,
+                    errorText = stringResource(id = R.string.price_error_text)
                 )
 
-            }
+                Spacer(modifier = Modifier.height(height = 16.dp))
 
-            Spacer(modifier = Modifier.height(height = 16.dp))
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(height = 50.dp)
-                    .padding(horizontal = 16.dp)
-                    .border(width = 1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(size = 12.dp))
-                    .clip(shape = RoundedCornerShape(size = 12.dp))
-                    .clickable {
-                        scope.launch { dateBottomSheetState.show() }
-                    },
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-
-                Icon(
-                    modifier = Modifier.padding(start = 18.dp),
-                    painter = painterResource(id = R.drawable.calendar),
-                    contentDescription = null,
-                    tint = Gray8
-                )
-
-                Spacer(modifier = Modifier.weight(weight = 1f))
-
-                Text(
-                    modifier = Modifier.padding(horizontal = 12.dp),
-                    text = formattedTransactionDate.ifEmpty { stringResource(id = R.string.date) },
-                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp)
-                )
-
-            }
-
-            Spacer(modifier = Modifier.height(height = 16.dp))
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(height = 50.dp)
-                    .padding(horizontal = 16.dp)
-                    .border(width = 1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(size = 12.dp))
-                    .clip(shape = RoundedCornerShape(size = 12.dp))
-                    .clickable {
-                        scope.launch { timeBottomSheetState.show() }
-                    },
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-
-                Icon(
-                    modifier = Modifier.padding(start = 18.dp),
-                    painter = painterResource(id = R.drawable.clock),
-                    contentDescription = null,
-                    tint = Gray8
-                )
-
-                Text(
+                Row(
                     modifier = Modifier
-                        .padding(horizontal = 12.dp)
-                        .weight(weight = 1f),
-                    text = uiState.formattedTransactionTime.ifEmpty { stringResource(id = R.string.clock) },
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        fontSize = 16.sp,
-                        textDirection = if (uiState.formattedTransactionTime.isEmpty()) TextDirection.Rtl else TextDirection.Ltr,
-                        textAlign = if (uiState.formattedTransactionTime.isEmpty()) TextAlign.Right else TextAlign.Left
+                        .fillMaxWidth()
+                        .height(height = 50.dp)
+                        .padding(horizontal = 16.dp)
+                        .border(
+                            width = 1.dp,
+                            color = if (fieldsError.channelFiledError)
+                                MaterialTheme.colorScheme.error
+                            else
+                                MaterialTheme.colorScheme.outline,
+                            shape = RoundedCornerShape(size = 12.dp)
+                        )
+                        .clip(shape = RoundedCornerShape(size = 12.dp))
+                        .background(
+                            color = if (fieldsError.channelFiledError)
+                                MaterialTheme.colorScheme.errorContainer
+                            else
+                                Color.Transparent
+                        )
+                        .clickable { showChannelsBottomSheet = true },
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    Icon(
+                        modifier = Modifier.padding(start = 18.dp),
+                        painter = painterResource(id = R.drawable.short_arrow_down),
+                        contentDescription = null,
+                        tint = Gray8
                     )
-                )
 
+                    Spacer(modifier = Modifier.weight(weight = 1f))
+
+                    Text(
+                        modifier = Modifier.padding(horizontal = 12.dp),
+                        text = if (uiState.transactionChannel != null)
+                            uiState.transactionChannel.channelName
+                        else {
+                            when (uiState.transactionType) {
+                                TransactionTypeOptionUiModel.OUTCOME -> stringResource(id = R.string.withdraw_from)
+                                TransactionTypeOptionUiModel.INCOME -> stringResource(id = R.string.deposit_to)
+                            }
+                        },
+                        style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp)
+                    )
+
+                }
+
+                AnimatedVisibility(visible = fieldsError.channelFiledError) {
+
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 3.dp),
+                        text = stringResource(id = R.string.channel_error_text),
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            fontSize = 12.sp,
+                            textAlign = TextAlign.End,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    )
+
+                }
+
+                Spacer(modifier = Modifier.height(height = 16.dp))
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(height = 50.dp)
+                        .padding(horizontal = 16.dp)
+                        .border(
+                            width = 1.dp,
+                            color = if (fieldsError.categoryFiledError)
+                                MaterialTheme.colorScheme.error
+                            else
+                                MaterialTheme.colorScheme.outline,
+                            shape = RoundedCornerShape(size = 12.dp)
+                        )
+                        .clip(shape = RoundedCornerShape(size = 12.dp))
+                        .background(
+                            color = if (fieldsError.categoryFiledError)
+                                MaterialTheme.colorScheme.errorContainer
+                            else
+                                Color.Transparent
+                        )
+                        .clickable { showCategoryBottomSheet = true },
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    Icon(
+                        modifier = Modifier.padding(start = 18.dp),
+                        painter = painterResource(id = R.drawable.short_arrow_down),
+                        contentDescription = null,
+                        tint = Gray8
+                    )
+
+                    Spacer(modifier = Modifier.weight(weight = 1f))
+
+                    Text(
+                        modifier = Modifier.padding(horizontal = 12.dp),
+                        text = when {
+                            uiState.transactionCategory != null -> uiState.transactionCategory.title
+                            else -> stringResource(id = R.string.category)
+                        },
+                        style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp)
+                    )
+
+                }
+
+                AnimatedVisibility(visible = fieldsError.categoryFiledError) {
+
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 3.dp),
+                        text = stringResource(id = R.string.category_error_text),
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            fontSize = 12.sp,
+                            textAlign = TextAlign.End,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    )
+
+                }
+
+                Spacer(modifier = Modifier.height(height = 16.dp))
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(height = 50.dp)
+                        .padding(horizontal = 16.dp)
+                        .border(
+                            width = 1.dp,
+                            color = if (fieldsError.dateFieldError)
+                                MaterialTheme.colorScheme.error
+                            else
+                                MaterialTheme.colorScheme.outline,
+                            shape = RoundedCornerShape(size = 12.dp)
+                        )
+                        .clip(shape = RoundedCornerShape(size = 12.dp))
+                        .background(
+                            color = if (fieldsError.dateFieldError)
+                                MaterialTheme.colorScheme.errorContainer
+                            else
+                                Color.Transparent
+                        )
+                        .clickable {
+                            scope.launch { dateBottomSheetState.show() }
+                        },
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    Icon(
+                        modifier = Modifier.padding(start = 18.dp),
+                        painter = painterResource(id = R.drawable.calendar),
+                        contentDescription = null,
+                        tint = Gray8
+                    )
+
+                    Spacer(modifier = Modifier.weight(weight = 1f))
+
+                    Text(
+                        modifier = Modifier.padding(horizontal = 12.dp),
+                        text = formattedTransactionDate.ifEmpty { stringResource(id = R.string.date) },
+                        style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp)
+                    )
+
+                }
+
+                AnimatedVisibility(visible = fieldsError.dateFieldError) {
+
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 3.dp),
+                        text = stringResource(id = R.string.date_error_text),
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            fontSize = 12.sp,
+                            textAlign = TextAlign.End,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    )
+
+                }
+
+                Spacer(modifier = Modifier.height(height = 16.dp))
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(height = 50.dp)
+                        .padding(horizontal = 16.dp)
+                        .border(
+                            width = 1.dp,
+                            color = if (fieldsError.timeFieldError)
+                                MaterialTheme.colorScheme.error
+                            else
+                                MaterialTheme.colorScheme.outline,
+                            shape = RoundedCornerShape(size = 12.dp)
+                        )
+                        .clip(shape = RoundedCornerShape(size = 12.dp))
+                        .background(
+                            color = if (fieldsError.timeFieldError)
+                                MaterialTheme.colorScheme.errorContainer
+                            else
+                                Color.Transparent
+                        )
+                        .clickable {
+                            scope.launch { timeBottomSheetState.show() }
+                        },
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    Icon(
+                        modifier = Modifier.padding(start = 18.dp),
+                        painter = painterResource(id = R.drawable.clock),
+                        contentDescription = null,
+                        tint = Gray8
+                    )
+
+                    Text(
+                        modifier = Modifier
+                            .padding(horizontal = 12.dp)
+                            .weight(weight = 1f),
+                        text = uiState.formattedTransactionTime.ifEmpty { stringResource(id = R.string.clock) },
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontSize = 16.sp,
+                            textDirection = if (uiState.formattedTransactionTime.isEmpty()) TextDirection.Rtl else TextDirection.Ltr,
+                            textAlign = if (uiState.formattedTransactionTime.isEmpty()) TextAlign.Right else TextAlign.Left
+                        )
+                    )
+
+                }
+
+                AnimatedVisibility(visible = fieldsError.timeFieldError) {
+
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 3.dp),
+                        text = stringResource(id = R.string.time_error_text),
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            fontSize = 12.sp,
+                            textAlign = TextAlign.End,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    )
+
+                }
             }
-        }
 
-        AppButton(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(end = 24.dp, start = 24.dp),
-            onClick = onSaveTransaction,
-            text = when (uiState.transactionType) {
-                TransactionTypeOptionUiModel.OUTCOME -> stringResource(id = R.string.register_outcome_transaction)
-                TransactionTypeOptionUiModel.INCOME -> stringResource(id = R.string.register_income_transaction)
-            },
-            enabled = uiState.isRegisterTransactionButtonEnabled
-        )
+            AppButton(
+                modifier = Modifier
+                    .widthIn(max = 400.dp)
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+                    .padding(bottom = 16.dp),
+                onClick = onSaveOrEditTransaction,
+                text = if (isEditingTransaction) stringResource(id = R.string.edit_transaction) else {
+                    when (uiState.transactionType) {
+                        TransactionTypeOptionUiModel.OUTCOME -> stringResource(id = R.string.register_outcome_transaction)
+                        TransactionTypeOptionUiModel.INCOME -> stringResource(id = R.string.register_income_transaction)
+                    }
+                }
+            )
+
+        }
 
     }
 
@@ -498,6 +676,8 @@ private fun NewTransactionPreview() {
 
     NewTransactionScreen(
         uiState = NewTransactionUiState(),
+        fieldsError = NewTransactionFieldsError(),
+        isEditingTransaction = false,
         onBackPressed = {}
     )
 

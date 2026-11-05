@@ -1,6 +1,7 @@
 package info.alihabibi.profile.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,18 +10,21 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -34,7 +38,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import info.alihabibi.common.Utils
 import info.alihabibi.designsystem.R
-import info.alihabibi.designsystem.theme.Gray7
 import info.alihabibi.model.ui_model.CurrenciesOptionUiModel
 import info.alihabibi.profile.ProfileUiIntent
 import info.alihabibi.profile.ProfileUiState
@@ -53,7 +56,7 @@ fun ProfileDestination(
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    LaunchedEffect(Unit) {
+    SideEffect(Unit) {
         viewModel.onEvent(ProfileUiIntent.Init)
     }
 
@@ -78,6 +81,20 @@ private fun ProfileScreen(
     onPreferredCurrencySelection: (currency: CurrenciesOptionUiModel) -> Unit = {}
 ) {
 
+    val invertAsMatrix = remember {
+        val contrast = 0.9f
+        val scale = -contrast
+        val offset = 127f * contrast + 128f
+        ColorMatrix(
+            floatArrayOf(
+                scale, 0f, 0f, 0f, offset,
+                0f, scale, 0f, 0f, offset,
+                0f, 0f, scale, 0f, offset,
+                0f, 0f, 0f, 1f, 0f
+            )
+        )
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -85,161 +102,173 @@ private fun ProfileScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        Box(
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(height = 230.dp),
-            contentAlignment = Alignment.TopCenter
+                .widthIn(max = 650.dp)
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            Image(
-                modifier = Modifier.fillMaxWidth(),
-                painter = painterResource(id = R.drawable.profile_header_background),
-                contentDescription = null,
-                contentScale = ContentScale.FillBounds
-            )
-
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(height = 230.dp),
+                contentAlignment = Alignment.TopCenter
             ) {
 
-                Spacer(modifier = Modifier.padding(top = 10.dp))
-
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 32.dp),
-                    text = stringResource(id = R.string.profile),
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        textAlign = TextAlign.Center,
-                        fontSize = 16.sp
-                    )
-                )
-
-                Spacer(modifier = Modifier.height(26.dp))
-
                 Image(
-                    painter = painterResource(id = uiState.userAccountInfo.profileImageRes),
-                    contentDescription = null
+                    modifier = Modifier.fillMaxWidth(),
+                    painter = painterResource(id = R.drawable.profile_header_background),
+                    contentDescription = null,
+                    contentScale = ContentScale.FillBounds,
+                    colorFilter = if (isSystemInDarkTheme())
+                        ColorFilter.colorMatrix(invertAsMatrix) else null
                 )
 
-                Text(
-                    modifier = Modifier.padding(
-                        top = 8.dp,
-                        bottom = 4.dp,
-                        start = 4.dp,
-                        end = 4.dp
-                    ),
-                    text = uiState.userAccountInfo.fullName.ifEmpty { stringResource(id = R.string.chortkeh_user) },
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.labelLarge.copy(
-                        fontSize = 16.sp,
-                        textAlign = TextAlign.Center,
-                        textDirection = TextDirection.ContentOrRtl
-                    )
-                )
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
 
-                if (uiState.userAccountInfo.phone.isNotEmpty())
+                    Spacer(modifier = Modifier.padding(top = 10.dp))
+
                     Text(
-                        modifier = Modifier.padding(bottom = 4.dp),
-                        text = uiState.userAccountInfo.phone,
-                        style = MaterialTheme.typography.labelMedium.copy(color = Gray7)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 32.dp),
+                        text = stringResource(id = R.string.profile),
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            textAlign = TextAlign.Center,
+                            fontSize = 16.sp,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
                     )
+
+                    Spacer(modifier = Modifier.height(26.dp))
+
+                    Image(
+                        painter = painterResource(id = uiState.userAccountInfo.profileImageRes),
+                        contentDescription = null
+                    )
+
+                    Text(
+                        modifier = Modifier.padding(
+                            top = 8.dp,
+                            bottom = 4.dp,
+                            start = 4.dp,
+                            end = 4.dp
+                        ),
+                        text = uiState.userAccountInfo.fullName.ifEmpty { stringResource(id = R.string.chortkeh_user) },
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            fontSize = 16.sp,
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            textDirection = TextDirection.ContentOrRtl
+                        )
+                    )
+
+                    if (uiState.userAccountInfo.phone.isNotEmpty())
+                        Text(
+                            modifier = Modifier.padding(bottom = 4.dp),
+                            text = uiState.userAccountInfo.phone,
+                            style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        )
+
+                }
 
             }
 
-        }
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
 
-        Column(
-            modifier = Modifier.fillMaxWidth()
-        ) {
+                var showExitDialog by remember { mutableStateOf(false) }
+                if (showExitDialog)
+                    AppDialog(
+                        title = stringResource(id = R.string.exit_from_account),
+                        message = stringResource(id = R.string.exit_from_account_description),
+                        confirmButtonText = stringResource(id = R.string.dismiss),
+                        cancelButtonText = stringResource(id = R.string.exit),
+                        onDismissRequest = { showExitDialog = false },
+                        onCancelClicked = {
+                            showExitDialog = false
+                            onExitOfAccount()
+                        },
+                        onConfirmClicked = { showExitDialog = false }
+                    )
 
-            var showExitDialog by remember { mutableStateOf(false) }
-            if (showExitDialog)
-                AppDialog(
-                    title = stringResource(id = R.string.exit_from_account),
-                    message = stringResource(id = R.string.exit_from_account_description),
-                    confirmButtonText = stringResource(id = R.string.dismiss),
-                    cancelButtonText = stringResource(id = R.string.exit),
-                    onDismissRequest = { showExitDialog = false },
-                    onCancelClicked = {
-                        showExitDialog = false
-                        onExitOfAccount()
-                    },
-                    onConfirmClicked = { showExitDialog = false }
+                var showCurrencySelectionModal by remember { mutableStateOf(false) }
+                if (showCurrencySelectionModal)
+                    AppRadioSelectionBottomSheet(
+                        title = stringResource(id = R.string.currency),
+                        radioOptions = CurrenciesOptionUiModel.entries.toList(),
+                        selectedOption = uiState.currency,
+                        disabledIndex = 1,
+                        optionLabel = { currency -> stringResource(id = currency.labelRes) },
+                        onRadioOptionSelected = { userSelectedCurrency ->
+                            onPreferredCurrencySelection(userSelectedCurrency)
+                        },
+                        onConfirmClicked = {
+                            showCurrencySelectionModal = false
+                        },
+                        onDismissRequest = { showCurrencySelectionModal = false }
+                    )
+
+                AppSimpleListItem(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                    onClick = onUserAccountInfo,
+                    title = stringResource(id = R.string.user_account_info),
+                    startIcon = painterResource(id = R.drawable.profile)
                 )
 
-            var showCurrencySelectionModal by remember { mutableStateOf(false) }
+                AppSimpleListItem(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                    onClick = onPrivacyAndPolicy,
+                    title = stringResource(id = R.string.privacy_policy),
+                    startIcon = painterResource(id = R.drawable.lock)
+                )
 
-            if (showCurrencySelectionModal)
-                AppRadioSelectionBottomSheet(
+                AppSimpleListItem(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                    onClick = { showCurrencySelectionModal = true },
                     title = stringResource(id = R.string.currency),
-                    radioOptions = CurrenciesOptionUiModel.entries.toList(),
-                    selectedOption = uiState.currency,
-                    disabledIndex = 1,
-                    optionLabel = { currency -> stringResource(id = currency.labelRes) },
-                    onRadioOptionSelected = { userSelectedCurrency ->
-                        onPreferredCurrencySelection(userSelectedCurrency)
-                    },
-                    onConfirmClicked = {
-                        showCurrencySelectionModal = false
-                    },
-                    onDismissRequest = { showCurrencySelectionModal = false }
+                    startIcon = painterResource(id = R.drawable.money_currency)
                 )
 
-            AppSimpleListItem(
-                modifier = Modifier.padding(vertical = 8.dp),
-                onClick = onUserAccountInfo,
-                title = stringResource(id = R.string.user_account_info),
-                startIcon = painterResource(id = R.drawable.profile)
-            )
+                AppDangerousListItem(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                    onClick = { showExitDialog = true },
+                    title = stringResource(id = R.string.exit),
+                    startIcon = painterResource(id = R.drawable.logout_red),
+                    isEnabled = false
+                )
 
-            AppSimpleListItem(
-                modifier = Modifier.padding(vertical = 8.dp),
-                onClick = onPrivacyAndPolicy,
-                title = stringResource(id = R.string.privacy_policy),
-                startIcon = painterResource(id = R.drawable.lock)
-            )
+            }
 
-            AppSimpleListItem(
-                modifier = Modifier.padding(vertical = 8.dp),
-                onClick = { showCurrencySelectionModal = true },
-                title = stringResource(id = R.string.currency),
-                startIcon = painterResource(id = R.drawable.money_currency)
-            )
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(bottom = 50.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
 
-            AppDangerousListItem(
-                modifier = Modifier.padding(vertical = 8.dp),
-                onClick = { showExitDialog = true },
-                title = stringResource(id = R.string.exit),
-                startIcon = painterResource(id = R.drawable.logout_red),
-                isEnabled = false
-            )
+                val context = LocalContext.current
+                val version = remember { Utils.getAppVersionName(context) }
 
-        }
+                Text(
+                    text = "Version $version",
+                    style = MaterialTheme.typography.bodyMedium
+                )
 
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .padding(bottom = 50.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
+                Text(
+                    text = stringResource(id = R.string.made_with_love),
+                    style = MaterialTheme.typography.bodySmall.copy(textDirection = TextDirection.Ltr)
+                )
 
-            val context = LocalContext.current
-            val version = remember { Utils.getAppVersionName(context) }
-
-            Text(
-                text = "Version $version",
-                style = MaterialTheme.typography.bodyMedium
-            )
-
-            Text(
-                text = stringResource(id = R.string.made_with_love),
-                style = MaterialTheme.typography.bodySmall.copy(textDirection = TextDirection.Ltr)
-            )
+            }
 
         }
 

@@ -9,11 +9,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -55,41 +60,52 @@ private fun AnnouncementsScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        AppHeader(
-            title = stringResource(id = R.string.announcements),
-            isActionAvailable = false,
-            onNavigationClicked = onBackPressed
-        )
-
-        Spacer(Modifier.height(height = 8.dp))
-
-        AppToggle(
-            toggleItems = toggleItems,
-            itemTitle = { it },
-            selectedOption = toggleItems.first(),
-            onToggleSelectionChanged = {}
-        )
-
-        Spacer(Modifier.height(height = 8.dp))
-
-        LazyColumn(
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
+                .widthIn(max = 600.dp)
+                .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            if (announcements.isEmpty()) {
-                item {
-                    EmptyAnnouncementsPlaceholder()
+            AppHeader(
+                title = stringResource(id = R.string.announcements),
+                isActionAvailable = false,
+                onNavigationClicked = onBackPressed
+            )
+
+            Spacer(Modifier.height(height = 8.dp))
+
+            var selectedOption by remember(toggleItems) { mutableStateOf(toggleItems.firstOrNull() ?: "") }
+
+            AppToggle(
+                toggleItems = toggleItems,
+                itemTitle = { it },
+                selectedOption = selectedOption,
+                onToggleSelectionChanged = { selectedOption = it }
+            )
+
+            Spacer(Modifier.height(height = 8.dp))
+
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+                if (announcements.isEmpty()) {
+                    item {
+                        EmptyAnnouncementsPlaceholder()
+                    }
+                } else {
+                    items(
+                        items = announcements,
+                        key = { it }
+                    ) { announcement ->
+                        // AnnouncementItem(announcement)
+                    }
                 }
-            } else {
-                items(
-                    items = announcements,
-                    key = { it }
-                ) { announcement ->
-                    // AnnouncementItem(announcement)
-                }
+
             }
 
         }
