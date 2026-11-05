@@ -21,16 +21,20 @@ object SmsNormalizer {
 
     internal fun normalizer(rawSms: String): String {
         val sb = StringBuilder(rawSms.length)
-        rawSms.forEach { character ->
-            val mapped = when (character) {
-                in '۰'..'۹' -> '0' + (character - '۰')
-                in '٠'..'٩' -> '0' + (character - '٠')
-                'ي', 'ئ' -> 'ی'
-                'ك' -> 'ک'
-                '٬', '،' -> ','
-                else -> character
+        for (ch in rawSms) {
+            when (ch) {
+                in '\u06F0'..'\u06F9' -> sb.append('0' + (ch - '\u06F0')) // Persian digits
+                in '\u0660'..'\u0669' -> sb.append('0' + (ch - '\u0660')) // Arabic-Indic digits
+                '\u064A', '\u0649' -> sb.append('\u06CC')                 // ي, ى -> ی
+                '\u0643' -> sb.append('\u06A9')                           // ك -> ک
+                '\u0629' -> sb.append('\u0647')                           // ة -> ه
+                '\u066C', '\u060C' -> sb.append(',')                      // ٬ ، -> ,
+                '\u00A0' -> sb.append(' ')                                // NBSP -> space
+                '\u200C', '\u200D', '\u200E', '\u200F',                   // ZWNJ, ZWJ, LRM, RLM
+                in '\u202A'..'\u202E', in '\u2066'..'\u2069',             // bidi embeddings/isolates
+                '\u0640', '\uFEFF' -> Unit                                // tatweel, BOM: drop
+                else -> sb.append(ch)
             }
-            sb.append(mapped)
         }
         return sb.toString().trim()
     }

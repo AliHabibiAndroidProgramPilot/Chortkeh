@@ -45,7 +45,7 @@ object SmsMatcher {
         val normalizedSmsText = SmsNormalizer.normalizer(rawSmsBody)
         if (!SmsNormalizer.isLikelyTransactionSms(normalizedSmsText)) return null
 
-        val parsedTransactionData = BankSmsParserFactory.parsSmsByFactory(rawSmsBody, channelBankName)
+        val parsedTransactionData = BankSmsParserFactory.parsSmsByFactory(normalizedSmsText, channelBankName)
         val amountInToman = if (parsedTransactionData.amountInRial != null)
             Utils.rialToToman(parsedTransactionData.amountInRial)
         else null
