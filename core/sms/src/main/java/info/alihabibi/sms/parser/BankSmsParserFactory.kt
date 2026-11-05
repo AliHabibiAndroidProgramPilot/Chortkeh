@@ -8,7 +8,10 @@ internal object BankSmsParserFactory {
         val bank = resolveBankEnum(bankName)
         val primaryParser = getParserForBank(bank)
         val parsResult = primaryParser.parse(normalizedText)
-        return if (parsResult.isEmpty()) UniversalBankFallBackParser.parse(normalizedText) else parsResult
+        return if (parsResult.isEmpty() && primaryParser !is UniversalBankFallBackParser)
+            UniversalBankFallBackParser.parse(normalizedText)
+        else
+            parsResult
     }
 
     private fun getParserForBank(bank: Bank): BaseBankSmsParser {
