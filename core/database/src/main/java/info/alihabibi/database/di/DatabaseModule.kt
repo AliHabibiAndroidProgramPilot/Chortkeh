@@ -8,6 +8,7 @@ import info.alihabibi.database.repositories.CategoryRepositoryImpl
 import info.alihabibi.database.repositories.ChannelRepositoryImpl
 import info.alihabibi.database.repositories.ReminderRepositoryImpl
 import info.alihabibi.database.repositories.TransactionRepositoryImpl
+import info.alihabibi.database.repositories.AnnouncementRepositoryImpl
 import info.alihabibi.database.seeding.CategorySeedCallback
 import info.alihabibi.database.seeding.ChannelSeedCallback
 import info.alihabibi.domain.Keys
@@ -15,6 +16,7 @@ import info.alihabibi.domain.local.repositories.CategoryRepository
 import info.alihabibi.domain.local.repositories.ChannelRepository
 import info.alihabibi.domain.local.repositories.ReminderRepository
 import info.alihabibi.domain.local.repositories.TransactionRepository
+import info.alihabibi.domain.local.repositories.AnnouncementRepository
 import kotlinx.coroutines.Dispatchers
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
@@ -50,11 +52,13 @@ val databaseModule = module {
     single { get<AppDatabase>().channelDao() }
     single { get<AppDatabase>().transactionDao() }
     single { get<AppDatabase>().reminderDao() }
+    single { get<AppDatabase>().announcementDao() }
 
     // Repositories
     single<CategoryRepository> { CategoryRepositoryImpl(get()) }
     single<ChannelRepository> { ChannelRepositoryImpl(get()) }
     single<TransactionRepository> { TransactionRepositoryImpl(get()) }
     single<ReminderRepository> { ReminderRepositoryImpl(get()) }
+    single<AnnouncementRepository> { AnnouncementRepositoryImpl(get()) }
 
 }

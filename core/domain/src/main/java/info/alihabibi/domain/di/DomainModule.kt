@@ -3,6 +3,9 @@ package info.alihabibi.domain.di
 import info.alihabibi.domain.local.coordinators.ReminderUndoManager
 import info.alihabibi.domain.local.coordinators.TransactionUndoManager
 import info.alihabibi.domain.local.usecases.database.category.DeleteCategoriesUseCase
+import info.alihabibi.domain.local.usecases.database.announcement.GetAnnouncementByIdUseCase
+import info.alihabibi.domain.local.usecases.database.announcement.SaveAnnouncementUseCase
+import info.alihabibi.domain.local.usecases.database.announcement.usecase.AnnouncementUseCases
 import info.alihabibi.domain.local.usecases.database.category.GetCategoriesUseCase
 import info.alihabibi.domain.local.usecases.database.category.SaveCategoryUseCase
 import info.alihabibi.domain.local.usecases.database.category.UpdateCategoryUseCase
@@ -172,6 +175,20 @@ val domainModule = module {
             getAllRemindersUseCase = get(),
             updateReminderIsEnabledUseCase = get(),
             getReminderByIdUseCase = get()
+        )
+    }
+
+    // endregion
+
+    // region Announcement
+
+    factory { SaveAnnouncementUseCase(get()) }
+    factory { GetAnnouncementByIdUseCase(get()) }
+
+    factory {
+        AnnouncementUseCases(
+            saveAnnouncementUseCase = get(),
+            getAnnouncementByIdUseCase = get()
         )
     }
 

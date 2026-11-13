@@ -12,6 +12,7 @@ import info.alihabibi.database.dao.CategoryDao
 import info.alihabibi.database.dao.ChannelDao
 import info.alihabibi.database.dao.ReminderDao
 import info.alihabibi.database.dao.TransactionDao
+import info.alihabibi.database.dao.AnnouncementDao
 import info.alihabibi.database.entities.AnnouncementEntity
 import info.alihabibi.database.entities.CategoryEntity
 import info.alihabibi.database.entities.ChannelEntity
@@ -42,5 +43,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun channelDao(): ChannelDao
     abstract fun transactionDao(): TransactionDao
     abstract fun reminderDao(): ReminderDao
+    abstract fun announcementDao(): AnnouncementDao
 
 }
