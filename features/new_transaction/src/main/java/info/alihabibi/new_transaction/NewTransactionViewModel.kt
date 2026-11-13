@@ -9,6 +9,7 @@ import info.alihabibi.domain.local.usecases.database.announcement.usecase.Announ
 import info.alihabibi.domain.local.usecases.database.category.usecase.CategoryUseCases
 import info.alihabibi.domain.local.usecases.database.channel.usecase.ChannelUseCases
 import info.alihabibi.domain.local.usecases.database.transaction.usecase.TransactionUseCases
+import info.alihabibi.domain.local.usecases.datastore.usecase.DatastoreUseCases
 import info.alihabibi.domain.models.channel.Channel
 import info.alihabibi.model.mapper.toDomain
 import info.alihabibi.model.mapper.toUiModel
@@ -34,6 +35,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import java.util.Locale
 
 class NewTransactionViewModel(
@@ -41,6 +43,7 @@ class NewTransactionViewModel(
     private val channelsUseCase: ChannelUseCases,
     private val transactionUseCases: TransactionUseCases,
     private val announcementUseCases: AnnouncementUseCases,
+    private val datastoreUseCases: DatastoreUseCases,
     private val notificationCanceler: NotificationCanceler
 ) : ViewModel() {
 
@@ -145,24 +148,34 @@ class NewTransactionViewModel(
     private fun applyPrefill(prefill: NewTransactionPrefill, notificationId: Int, announcementId: Long) {
         notificationCanceler.cancel(notificationId)
         if (lastAppliedPrefill == prefill) return
+        lastAppliedPrefill = prefill
         viewModelScope.launch {
-            val channel = channelsUseCase.getChannelByIdUseCase.invoke(prefill.channelId)
-                .firstOrNull()
-                ?.toUiModel()
-            _newTransactionUiState.update {
-                it.copy(
-                    transactionType = prefill.transactionType,
-                    transactionPrice = if (prefill.amount != null) prefill.amount.toString() else "",
-                    formattedTransactionTime = String.format(Locale.US, "%02d : %02d", prefill.hour, prefill.minute),
-                    transactionHour = prefill.hour,
-                    transactionMinute = prefill.minute,
-                    transactionYear = prefill.year ?: 0,
-                    transactionMonth = prefill.month ?: 0,
-                    transactionDay = Pair(prefill.dayOfMonth ?: 0, prefill.dayOfWeekName ?: ""),
-                    transactionChannel = channel
-                )
+            supervisorScope {
+                launch {
+                    val channel = channelsUseCase.getChannelByIdUseCase.invoke(prefill.channelId)
+                        .firstOrNull()
+                        ?.toUiModel()
+                    _newTransactionUiState.update {
+                        it.copy(
+                            transactionType = prefill.transactionType,
+                            transactionPrice = if (prefill.amount != null) prefill.amount.toString() else "",
+                            formattedTransactionTime = String.format(Locale.US, "%02d : %02d", prefill.hour, prefill.minute),
+                            transactionHour = prefill.hour,
+                            transactionMinute = prefill.minute,
+                            transactionYear = prefill.year ?: 0,
+                            transactionMonth = prefill.month ?: 0,
+                            transactionDay = Pair(prefill.dayOfMonth ?: 0, prefill.dayOfWeekName ?: ""),
+                            transactionChannel = channel
+                        )
+                    }
+                }
+                launch {
+                    announcementUseCases.deleteAnnouncementByIdUseCase.invoke(announcementId)
+                }
+                launch {
+                    datastoreUseCases.saveHomeAnnouncementRedBadge.invoke(false)
+                }
             }
-            lastAppliedPrefill = prefill
         }
     }
 
