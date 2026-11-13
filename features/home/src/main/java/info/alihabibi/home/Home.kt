@@ -168,7 +168,7 @@ private fun HomeScreen(
         ) {
 
             HomePageHeader(
-                isBadgeAvailable = false,
+                isBadgeAvailable = uiState.isAnnouncementRedBadgeEnabled,
                 onNavigationClick = onAnnouncements
             )
 
