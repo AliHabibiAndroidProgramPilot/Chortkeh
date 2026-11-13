@@ -12,9 +12,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,7 +46,8 @@ fun AnnouncementsDestination(
     }
 
     AnnouncementsScreen(
-        announcements = emptyList(),
+        inAppAnnouncements = emptyList(),
+        bankSMSAnnouncements = emptyList(),
         selectedOption = selectedOption,
         onOptionChanged = { selectedOption = it },
         onBackPressed = onBackPressed
@@ -53,11 +57,23 @@ fun AnnouncementsDestination(
 
 @Composable
 private fun AnnouncementsScreen(
-    announcements: List<AnnouncementUiModel>,
+    inAppAnnouncements: List<AnnouncementUiModel>,
+    bankSMSAnnouncements: List<AnnouncementUiModel>,
     selectedOption: AnnouncementTypeOptionUiModel,
     onOptionChanged: (AnnouncementTypeOptionUiModel) -> Unit,
     onBackPressed: () -> Unit
 ) {
+
+    val pagerState = rememberPagerState(
+        initialPage = selectedOption.ordinal,
+        pageCount = { AnnouncementTypeOptionUiModel.entries.size }
+    )
+
+    LaunchedEffect(selectedOption) {
+        if (pagerState.currentPage != selectedOption.ordinal) {
+            pagerState.animateScrollToPage(selectedOption.ordinal)
+        }
+    }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -88,30 +104,50 @@ private fun AnnouncementsScreen(
 
             Spacer(Modifier.height(height = 8.dp))
 
-            if (announcements.isEmpty())
-                EmptyAnnouncementState(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
+            HorizontalPager(
+                modifier = Modifier
+                    .weight(weight = 1f)
+                    .fillMaxWidth(),
+                state = pagerState,
+                userScrollEnabled = false,
+                key = { it }
+            ) { page ->
+
+                AnnouncementsPage(
+                    announcements = if (page == AnnouncementTypeOptionUiModel.IN_APP.ordinal)
+                        inAppAnnouncements
+                    else
+                        bankSMSAnnouncements
                 )
-            else
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    items(
-                        items = announcements,
-                        key = { it.id }
-                    ) { announcement ->
-                        // AnnouncementItem(announcement)
-                    }
-                }
+
+            }
 
         }
 
     }
+
+}
+
+@Composable
+private fun AnnouncementsPage(
+    modifier: Modifier = Modifier,
+    announcements: List<AnnouncementUiModel>
+) {
+
+    if (announcements.isEmpty())
+        EmptyAnnouncementState(modifier = modifier.fillMaxSize())
+    else
+        LazyColumn(
+            modifier = modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            items(
+                items = announcements,
+                key = { it.id }
+            ) { announcement ->
+                // AnnouncementItem(announcement)
+            }
+        }
 
 }
 
@@ -124,7 +160,7 @@ private fun EmptyAnnouncementState(modifier: Modifier = Modifier) {
     ) {
 
         Column(
-            modifier = modifier.align(Alignment.Center),
+            modifier = Modifier.align(Alignment.Center),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(space = 12.dp)
         ) {
@@ -152,7 +188,8 @@ private fun EmptyAnnouncementState(modifier: Modifier = Modifier) {
 private fun AnnouncementsPreview() {
 
     AnnouncementsScreen(
-        announcements = emptyList(),
+        inAppAnnouncements = emptyList(),
+        bankSMSAnnouncements = emptyList(),
         selectedOption = AnnouncementTypeOptionUiModel.IN_APP,
         onOptionChanged = {},
         onBackPressed = {}
