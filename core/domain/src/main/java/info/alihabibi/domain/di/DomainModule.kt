@@ -2,6 +2,7 @@ package info.alihabibi.domain.di
 
 import info.alihabibi.domain.local.coordinators.ReminderUndoManager
 import info.alihabibi.domain.local.coordinators.TransactionUndoManager
+import info.alihabibi.domain.local.usecases.database.announcement.DeleteAnnouncementByIdUseCase
 import info.alihabibi.domain.local.usecases.database.category.DeleteCategoriesUseCase
 import info.alihabibi.domain.local.usecases.database.announcement.GetAnnouncementByIdUseCase
 import info.alihabibi.domain.local.usecases.database.announcement.SaveAnnouncementUseCase
@@ -64,6 +65,8 @@ val domainModule = module {
     factory { GetPreferredCurrencyUseCase(get()) }
     factory { SaveUserAccountInfoUseCase(get()) }
     factory { GetUserAccountInfoUseCase(get()) }
+    factory { SaveAnnouncementUseCase(get()) }
+    factory { GetAnnouncementByIdUseCase(get()) }
 
     factory {
         DatastoreUseCases(
@@ -74,7 +77,9 @@ val domainModule = module {
             savePreferredCurrencyUseCase = get(),
             getPreferredCurrencyUseCase = get(),
             saveUserAccountInfoUseCase = get(),
-            getUserAccountInfoUseCase = get()
+            getUserAccountInfoUseCase = get(),
+            saveHomeAnnouncementRedBadge = get(),
+            getAnnouncementRedBadge = get()
         )
     }
 
@@ -184,11 +189,13 @@ val domainModule = module {
 
     factory { SaveAnnouncementUseCase(get()) }
     factory { GetAnnouncementByIdUseCase(get()) }
+    factory { DeleteAnnouncementByIdUseCase(get()) }
 
     factory {
         AnnouncementUseCases(
             saveAnnouncementUseCase = get(),
-            getAnnouncementByIdUseCase = get()
+            getAnnouncementByIdUseCase = get(),
+            deleteAnnouncementByIdUseCase = get()
         )
     }
 

@@ -25,4 +25,8 @@ class AnnouncementRepositoryImpl(private val dao: AnnouncementDao) : Announcemen
             .flowOn(Dispatchers.IO)
     }
 
+    override suspend fun deleteAnnouncementById(id: Long) {
+        dao.deleteAnnouncementById(id)
+    }
+
 }

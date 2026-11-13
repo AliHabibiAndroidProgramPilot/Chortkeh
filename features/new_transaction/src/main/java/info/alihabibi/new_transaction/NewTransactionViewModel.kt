@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import info.alihabibi.common.PersianDateFormatter
 import info.alihabibi.common_android.NotificationCanceler
+import info.alihabibi.domain.local.usecases.database.announcement.usecase.AnnouncementUseCases
 import info.alihabibi.domain.local.usecases.database.category.usecase.CategoryUseCases
 import info.alihabibi.domain.local.usecases.database.channel.usecase.ChannelUseCases
 import info.alihabibi.domain.local.usecases.database.transaction.usecase.TransactionUseCases
@@ -39,6 +40,7 @@ class NewTransactionViewModel(
     private val categoryUseCases: CategoryUseCases,
     private val channelsUseCase: ChannelUseCases,
     private val transactionUseCases: TransactionUseCases,
+    private val announcementUseCases: AnnouncementUseCases,
     private val notificationCanceler: NotificationCanceler
 ) : ViewModel() {
 
@@ -103,7 +105,7 @@ class NewTransactionViewModel(
 
             is NewTransactionUiIntent.SaveCategory -> saveCategory()
 
-            is NewTransactionUiIntent.ApplyPrefill -> applyPrefill(event.prefill, event.notificationId)
+            is NewTransactionUiIntent.ApplyPrefill -> applyPrefill(event.prefill, event.notificationId, event.announcementId)
 
             is NewTransactionUiIntent.EditCategory -> editCategory(event.id)
 
@@ -140,7 +142,7 @@ class NewTransactionViewModel(
         }
     }
 
-    private fun applyPrefill(prefill: NewTransactionPrefill, notificationId: Int) {
+    private fun applyPrefill(prefill: NewTransactionPrefill, notificationId: Int, announcementId: Long) {
         notificationCanceler.cancel(notificationId)
         if (lastAppliedPrefill == prefill) return
         viewModelScope.launch {
@@ -474,7 +476,7 @@ sealed interface NewTransactionUiIntent {
 
     data object SaveCategory : NewTransactionUiIntent
 
-    data class ApplyPrefill(val prefill: NewTransactionPrefill, val notificationId: Int) : NewTransactionUiIntent
+    data class ApplyPrefill(val prefill: NewTransactionPrefill, val notificationId: Int, val announcementId: Long) : NewTransactionUiIntent
 
     data class EditCategory(val id: Int) : NewTransactionUiIntent
 

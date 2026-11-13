@@ -20,4 +20,7 @@ interface AnnouncementDao {
     @Query("SELECT * FROM ${Keys.ANNOUNCEMENT_TABLE_NAME} WHERE id = :id LIMIT 1")
     fun getAnnouncementById(id: Long): Flow<DetailedAnnouncement?>
 
+    @Query("DELETE FROM ${Keys.ANNOUNCEMENT_TABLE_NAME} WHERE id = :id")
+    suspend fun deleteAnnouncementById(id: Long)
+
 }

@@ -1,10 +1,12 @@
 package info.alihabibi.domain.local.usecases.datastore.usecase
 
+import info.alihabibi.domain.local.usecases.datastore.GetAnnouncementBadgeEnabled
 import info.alihabibi.domain.local.usecases.datastore.GetIsAppFirstLaunchUseCase
 import info.alihabibi.domain.local.usecases.datastore.GetIsSmsModalShownUseCase
 import info.alihabibi.domain.local.usecases.datastore.GetPreferredCurrencyUseCase
 import info.alihabibi.domain.local.usecases.datastore.GetUserAccountInfoUseCase
 import info.alihabibi.domain.local.usecases.datastore.SaveFirstLaunchUseCase
+import info.alihabibi.domain.local.usecases.datastore.SaveHomeAnnouncementRedBadge
 import info.alihabibi.domain.local.usecases.datastore.SavePreferredCurrencyUseCase
 import info.alihabibi.domain.local.usecases.datastore.SaveSmsModalShownStateUseCase
 import info.alihabibi.domain.local.usecases.datastore.SaveUserAccountInfoUseCase
@@ -17,5 +19,7 @@ data class DatastoreUseCases(
     val savePreferredCurrencyUseCase: SavePreferredCurrencyUseCase,
     val getPreferredCurrencyUseCase: GetPreferredCurrencyUseCase,
     val saveUserAccountInfoUseCase: SaveUserAccountInfoUseCase,
-    val getUserAccountInfoUseCase: GetUserAccountInfoUseCase
+    val getUserAccountInfoUseCase: GetUserAccountInfoUseCase,
+    val saveHomeAnnouncementRedBadge: SaveHomeAnnouncementRedBadge,
+    val getAnnouncementRedBadge: GetAnnouncementBadgeEnabled
 )

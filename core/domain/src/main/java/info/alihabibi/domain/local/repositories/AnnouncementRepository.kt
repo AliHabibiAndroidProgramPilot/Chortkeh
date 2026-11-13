@@ -8,4 +8,7 @@ interface AnnouncementRepository {
     suspend fun saveAnnouncement(announcement: Announcement): Long
 
     fun getAnnouncementById(id: Long): Flow<Announcement?>
+
+    suspend fun deleteAnnouncementById(id: Long)
+
 }

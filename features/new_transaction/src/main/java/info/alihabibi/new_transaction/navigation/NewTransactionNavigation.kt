@@ -71,7 +71,8 @@ fun NavGraphBuilder.newTransactionGraph(
                     viewModel.onEvent(
                         NewTransactionUiIntent.ApplyPrefill(
                             prefill,
-                            intentExtra?.getIntExtra(Keys.EXTRA_NOTIFICATION_ID, -1) ?: -1
+                            intentExtra?.getIntExtra(Keys.EXTRA_NOTIFICATION_ID, -1) ?: -1,
+                            intentExtra?.getLongExtra(Keys.EXTRA_ANNOUNCEMENT_ID, -1) ?: -1
                         )
                     )
             }

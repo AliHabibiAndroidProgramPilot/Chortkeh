@@ -10,6 +10,7 @@ object Keys {
     const val USER_FULL_NAME = "USER_FULL_NAME"
     const val USER_PHONE = "USER_PHONE"
     const val USER_GENDER = "USER_GENDER"
+    const val HOME_ANNOUNCEMENT_RED_BADGE = "HOME_ANNOUNCEMENT_RED_BADGE"
 
     // Database
     const val DATABASE_NAME = "Chortkeh.db"
@@ -22,5 +23,6 @@ object Keys {
     // Intent Extra Ids
     const val EXTRA_ID_TRANSACTION_DATA = "EXTRA_ID_TRANSACTION_DATA"
     const val EXTRA_NOTIFICATION_ID = "notification_id"
+    const val EXTRA_ANNOUNCEMENT_ID = "announcement_id"
 
 }

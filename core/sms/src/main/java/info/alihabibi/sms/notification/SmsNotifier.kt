@@ -32,7 +32,8 @@ internal class SmsNotifier(private val context: Context) : NotificationCanceler 
     internal fun pushNotification(
         notificationId: Int = System.currentTimeMillis().toInt(),
         channelName: String,
-        transactionData: TransactionData
+        transactionData: TransactionData,
+        announcementId: Long
     ) {
         if (!notificationManager.areNotificationsEnabled()) return
 
@@ -53,9 +54,9 @@ internal class SmsNotifier(private val context: Context) : NotificationCanceler 
             .setContentText(text)
             .setStyle(Notification.BigTextStyle().bigText(text))
             .setCategory(Notification.CATEGORY_MESSAGE)
-            .setContentIntent(buildContentIntent(notificationId, transactionData))
+            .setContentIntent(buildContentIntent(notificationId, transactionData, announcementId))
             .setAutoCancel(true)
-            .addAction(buildAcceptAction(notificationId, transactionData))
+            .addAction(buildAcceptAction(notificationId, transactionData, announcementId))
             .addAction(buildDenyAction(notificationId))
             .build()
 
@@ -85,10 +86,11 @@ internal class SmsNotifier(private val context: Context) : NotificationCanceler 
         notificationManager.createNotificationChannel(channel)
     }
 
-    private fun buildContentIntent(notificationId: Int, transactionData: TransactionData): PendingIntent? {
+    private fun buildContentIntent(notificationId: Int, transactionData: TransactionData, announcementId: Long): PendingIntent? {
         val intent = Intent(Intent.ACTION_VIEW, NEW_TRANSACTION_URI.toUri()).apply {
             setClassName(context.packageName, MAIN_ACTIVITY_DESTINATION)
             setPackage(context.packageName)
+            putExtra(Keys.EXTRA_ANNOUNCEMENT_ID, announcementId)
             putExtra(Keys.EXTRA_ID_TRANSACTION_DATA, transactionData)
         }
          return PendingIntent.getActivity(
@@ -115,11 +117,12 @@ internal class SmsNotifier(private val context: Context) : NotificationCanceler 
         return Notification.Action.Builder(null, context.getString(R.string.dismiss), pendingIntent).build()
     }
 
-    private fun buildAcceptAction(notificationId: Int, transactionData: TransactionData): Notification.Action {
+    private fun buildAcceptAction(notificationId: Int, transactionData: TransactionData, announcementId: Long): Notification.Action {
         val intent = Intent(Intent.ACTION_VIEW, NEW_TRANSACTION_URI.toUri()).apply {
             setClassName(context.packageName, MAIN_ACTIVITY_DESTINATION)
             setPackage(context.packageName)
             putExtra(Keys.EXTRA_NOTIFICATION_ID, notificationId)
+            putExtra(Keys.EXTRA_ANNOUNCEMENT_ID, announcementId)
             putExtra(Keys.EXTRA_ID_TRANSACTION_DATA, transactionData)
         }
         val pendingIntent = PendingIntent.getActivity(

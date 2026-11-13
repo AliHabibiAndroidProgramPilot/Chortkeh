@@ -31,6 +31,20 @@ object PersianDateFormatter {
             .toString()
     }
 
+    fun format(year: Int, month: Int, dayOfWeekName: String, dayOfMonth: Int, hour: Int, minute: Int): String {
+        require(month in 1..12) { return "" }
+        require(dayOfMonth in 1..31) { return "" }
+        return StringBuilder()
+            .append(dayOfWeekName)
+            .append("، ")
+            .append("$dayOfMonth ")
+            .append("${persianMonths[month -1]} ")
+            .append(year)
+            .append("، ")
+            .append("\u202A$hour : $minute\u202C")
+            .toString()
+    }
+
     fun format(dayOfWeekName: String, hour: Int, minute: Int): String {
         return StringBuilder()
             .append(dayOfWeekName)
