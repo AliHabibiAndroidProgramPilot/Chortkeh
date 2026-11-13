@@ -11,6 +11,8 @@ val newTransactionModule = module {
             get(),
             get(),
             get(),
+            get(),
+            get(),
             get()
         )
     }
