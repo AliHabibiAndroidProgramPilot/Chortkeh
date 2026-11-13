@@ -41,10 +41,10 @@ fun AnnouncementsDestination(
         stringResource(id = R.string.bank)
     )
 
-        AnnouncementsScreen(
-            toggleItems = toggleItems,
-            onBackPressed = onBackPressed
-        )
+    AnnouncementsScreen(
+        toggleItems = toggleItems,
+        onBackPressed = onBackPressed
+    )
 
 }
 
@@ -75,7 +75,9 @@ private fun AnnouncementsScreen(
 
             Spacer(Modifier.height(height = 8.dp))
 
-            var selectedOption by remember(toggleItems) { mutableStateOf(toggleItems.firstOrNull() ?: "") }
+            var selectedOption by remember(toggleItems) {
+                mutableStateOf(toggleItems.firstOrNull() ?: "")
+            }
 
             AppToggle(
                 toggleItems = toggleItems,

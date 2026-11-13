@@ -3,6 +3,7 @@ package info.alihabibi.database
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import info.alihabibi.database.converters.AnnouncementTypeConverter
 import info.alihabibi.database.converters.CategoryIconConverter
 import info.alihabibi.database.converters.CategoryTypeConverter
 import info.alihabibi.database.converters.ChannelIconConverter
@@ -17,7 +18,13 @@ import info.alihabibi.database.entities.ReminderEntity
 import info.alihabibi.database.entities.TransactionEntity
 
 @Database(
-    entities = [CategoryEntity::class, ChannelEntity::class, TransactionEntity::class, ReminderEntity::class],
+    entities = [
+        CategoryEntity::class,
+        ChannelEntity::class,
+        TransactionEntity::class,
+        ReminderEntity::class,
+        AnnouncementTypeConverter::class
+    ],
     version = 1,
     exportSchema = false
 )
@@ -25,7 +32,8 @@ import info.alihabibi.database.entities.TransactionEntity
     CategoryIconConverter::class,
     CategoryTypeConverter::class,
     ChannelIconConverter::class,
-    TransactionTypeConverter::class
+    TransactionTypeConverter::class,
+    AnnouncementTypeConverter::class
 )
 abstract class AppDatabase : RoomDatabase() {
 

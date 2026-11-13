@@ -17,6 +17,7 @@ object Keys {
     const val CHANNELS_TABLE_NAME = "channels"
     const val TRANSACTION_TABLE_NAME = "transactions"
     const val REMINDER_TABLE_NAME = "reminders"
+    const val ANNOUNCEMENT_TABLE_NAME = "announcement"
 
     // Intent Extra Ids
     const val EXTRA_ID_TRANSACTION_DATA = "EXTRA_ID_TRANSACTION_DATA"
