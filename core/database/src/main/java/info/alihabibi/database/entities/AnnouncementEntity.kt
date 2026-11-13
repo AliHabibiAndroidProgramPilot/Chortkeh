@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import androidx.room.Relation
 import info.alihabibi.domain.Keys
 import info.alihabibi.domain.models.AnnouncementType
 
@@ -29,4 +30,9 @@ data class AnnouncementEntity(
     val description: String,
     val announcementType: AnnouncementType,  // @TypeConverter -> AnnouncementTypeConverter
     @Embedded(prefix = "tx_") val transaction: TransactionEntity? = null
+)
+
+data class DetailedAnnouncement(
+    @Embedded val announcement: AnnouncementEntity,
+    @Relation(parentColumn = "tx_transactionChannelId", entityColumn = "id") val channel: ChannelEntity?
 )

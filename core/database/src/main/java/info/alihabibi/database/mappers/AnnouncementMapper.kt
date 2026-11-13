@@ -1,21 +1,21 @@
 package info.alihabibi.database.mappers
 
 import info.alihabibi.database.entities.AnnouncementEntity
+import info.alihabibi.database.entities.DetailedAnnouncement
 import info.alihabibi.domain.models.announcement.Announcement
-import info.alihabibi.database.entities.TransactionEntity
 import info.alihabibi.domain.models.transaction.Transaction
 
-fun AnnouncementEntity.asExternalModel(): Announcement = Announcement(
-    id = id,
-    title = title,
-    description = description,
-    announcementType = announcementType,
-    transaction = transaction?.let {
+fun DetailedAnnouncement.asExternalModel(): Announcement = Announcement(
+    id = announcement.id,
+    title = announcement.title,
+    description = announcement.description,
+    announcementType = announcement.announcementType,
+    transaction = announcement.transaction?.let {
         Transaction(
             id = it.id,
             transactionType = it.transactionType,
             amount = it.amount,
-            channel = null,
+            channel = channel?.asExternalModel(),
             category = null,
             year = it.year,
             month = it.month,

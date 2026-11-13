@@ -1,7 +1,6 @@
 package info.alihabibi.database.repositories
 
 import info.alihabibi.database.dao.AnnouncementDao
-import info.alihabibi.database.entities.AnnouncementEntity
 import info.alihabibi.database.mappers.asEntity
 import info.alihabibi.database.mappers.asExternalModel
 import info.alihabibi.domain.local.repositories.AnnouncementRepository
