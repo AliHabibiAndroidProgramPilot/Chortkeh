@@ -12,6 +12,7 @@ import info.alihabibi.database.dao.CategoryDao
 import info.alihabibi.database.dao.ChannelDao
 import info.alihabibi.database.dao.ReminderDao
 import info.alihabibi.database.dao.TransactionDao
+import info.alihabibi.database.entities.AnnouncementEntity
 import info.alihabibi.database.entities.CategoryEntity
 import info.alihabibi.database.entities.ChannelEntity
 import info.alihabibi.database.entities.ReminderEntity
@@ -23,7 +24,7 @@ import info.alihabibi.database.entities.TransactionEntity
         ChannelEntity::class,
         TransactionEntity::class,
         ReminderEntity::class,
-        AnnouncementTypeConverter::class
+        AnnouncementEntity::class
     ],
     version = 1,
     exportSchema = false
