@@ -3,7 +3,7 @@ package info.alihabibi.domain.local.usecases.datastore
 import info.alihabibi.domain.local.repositories.DatastoreRepository
 import kotlinx.coroutines.flow.Flow
 
-class GetAnnouncementBadgeEnabled(
+class GetIsAnnouncementBadgeEnabled(
     private val repository: DatastoreRepository
 ) {
 
