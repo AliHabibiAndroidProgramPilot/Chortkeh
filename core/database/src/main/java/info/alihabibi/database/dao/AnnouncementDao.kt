@@ -21,7 +21,7 @@ interface AnnouncementDao {
     fun getAnnouncementById(id: Long): Flow<DetailedAnnouncement?>
 
     @Transaction
-    @Query("SELECT * FROM ${Keys.ANNOUNCEMENT_TABLE_NAME} LIMIT 200")
+    @Query("SELECT * FROM ${Keys.ANNOUNCEMENT_TABLE_NAME} ORDER BY id DESC LIMIT 200")
     fun getAllSmsAnnouncements(): Flow<List<DetailedAnnouncement>>
 
     @Query("DELETE FROM ${Keys.ANNOUNCEMENT_TABLE_NAME} WHERE id = :id")
