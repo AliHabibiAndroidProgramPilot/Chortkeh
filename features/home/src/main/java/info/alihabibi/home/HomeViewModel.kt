@@ -38,10 +38,11 @@ class HomeViewModel(
     init {
         combine(
             dataStoreUseCases.getIsSmsModalShownUseCase.invoke(),
+            dataStoreUseCases.getAnnouncementRedBadgeEnabled.invoke(),
             channelsUseCase.getChannelsUseCase.invoke(),
             channelsUseCase.getTotalBalanceUseCase.invoke(),
             transactionUseCases.getLastTransactions.invoke(5, TransactionTypeOptionUiModel.OUTCOME.name)
-        ) { isSmsModalShown, channels, totalBalance, lastTransactions ->
+        ) { isSmsModalShown, isRedBadgeEnabled, channels, totalBalance, lastTransactions ->
             val uiChannels = channels.map {
                 if (it.isAppDefaultChannel)
                     it.copy(channelBalance = totalBalance).toUiModel()
@@ -52,6 +53,7 @@ class HomeViewModel(
             _uiState.update {
                 it.copy(
                     isSmsModalShown = isSmsModalShown,
+                    isAnnouncementRedBadgeEnabled = isRedBadgeEnabled,
                     formattedTotalBalance = Utils.decimalFormatterPattern.format(totalBalance),
                     lastTransactions = uiLastTransactions,
                     channels = uiChannels
@@ -139,6 +141,7 @@ data class HomeUiState(
     val hasOutcomeTransaction: Boolean = false,
     val formattedTotalBalance: String = "",
     val isSmsModalShown: Boolean? = null,
+    val isAnnouncementRedBadgeEnabled: Boolean = false,
     val gaugeChartState: GaugeChartState = GaugeChartState.EMPTY,
     val gaugeChartProgress: Float = 0f,
     val lastTransactions: List<TransactionUiModel> = emptyList(),

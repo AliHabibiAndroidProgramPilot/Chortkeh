@@ -3,6 +3,7 @@ package info.alihabibi.database
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import info.alihabibi.database.converters.AnnouncementTypeConverter
 import info.alihabibi.database.converters.CategoryIconConverter
 import info.alihabibi.database.converters.CategoryTypeConverter
 import info.alihabibi.database.converters.ChannelIconConverter
@@ -11,13 +12,21 @@ import info.alihabibi.database.dao.CategoryDao
 import info.alihabibi.database.dao.ChannelDao
 import info.alihabibi.database.dao.ReminderDao
 import info.alihabibi.database.dao.TransactionDao
+import info.alihabibi.database.dao.AnnouncementDao
+import info.alihabibi.database.entities.AnnouncementEntity
 import info.alihabibi.database.entities.CategoryEntity
 import info.alihabibi.database.entities.ChannelEntity
 import info.alihabibi.database.entities.ReminderEntity
 import info.alihabibi.database.entities.TransactionEntity
 
 @Database(
-    entities = [CategoryEntity::class, ChannelEntity::class, TransactionEntity::class, ReminderEntity::class],
+    entities = [
+        CategoryEntity::class,
+        ChannelEntity::class,
+        TransactionEntity::class,
+        ReminderEntity::class,
+        AnnouncementEntity::class
+    ],
     version = 1,
     exportSchema = false
 )
@@ -25,7 +34,8 @@ import info.alihabibi.database.entities.TransactionEntity
     CategoryIconConverter::class,
     CategoryTypeConverter::class,
     ChannelIconConverter::class,
-    TransactionTypeConverter::class
+    TransactionTypeConverter::class,
+    AnnouncementTypeConverter::class
 )
 abstract class AppDatabase : RoomDatabase() {
 
@@ -33,5 +43,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun channelDao(): ChannelDao
     abstract fun transactionDao(): TransactionDao
     abstract fun reminderDao(): ReminderDao
+    abstract fun announcementDao(): AnnouncementDao
 
 }

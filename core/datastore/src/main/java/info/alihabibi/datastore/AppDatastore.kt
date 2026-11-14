@@ -28,6 +28,7 @@ class DatastoreManager(private val context: Context) {
     private val userFullName = stringPreferencesKey(Keys.USER_FULL_NAME)
     private val userPhone = stringPreferencesKey(Keys.USER_PHONE)
     private val userGender = stringPreferencesKey(Keys.USER_GENDER)
+    private val homeAnnouncementRedBadge = booleanPreferencesKey(Keys.HOME_ANNOUNCEMENT_RED_BADGE)
 
     suspend fun saveFirstLaunch(value: Boolean) = withContext(Dispatchers.IO) {
         context.datastore.edit { prefs ->
@@ -94,6 +95,21 @@ class DatastoreManager(private val context: Context) {
                         phone = pref[userPhone].orEmpty(),
                         gender = pref[userGender]?.let { enumValueOf<Genders>(it) } ?: Genders.UNKNOWN
                     )
+                }
+                .flowOn(Dispatchers.IO)
+
+    suspend fun saveHomeAnnouncementRedBadge(value: Boolean) {
+        context.datastore.edit { pref ->
+            pref[homeAnnouncementRedBadge] = value
+        }
+    }
+
+    val isAnnouncementBadgeEnabled: Flow<Boolean>
+        get() =
+            context.datastore.data
+                .catch { emit(emptyPreferences()) }
+                .map { pref ->
+                    pref[homeAnnouncementRedBadge] ?: false
                 }
                 .flowOn(Dispatchers.IO)
 

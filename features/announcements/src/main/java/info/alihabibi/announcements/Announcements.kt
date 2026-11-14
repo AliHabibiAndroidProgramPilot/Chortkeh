@@ -2,19 +2,23 @@ package info.alihabibi.announcements
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,34 +30,60 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray8
+import info.alihabibi.model.ui_model.announcement.AnnouncementTypeOptionUiModel
+import info.alihabibi.model.ui_model.announcement.AnnouncementUiModel
 import info.alihabibi.ui.buttons.AppToggle
 import info.alihabibi.ui.headrs.AppHeader
+import info.alihabibi.ui.items.ListedAnnouncementItem
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun AnnouncementsDestination(
+    viewModel: AnnouncementViewModel = koinViewModel(),
     onBackPressed: () -> Unit
 ) {
 
-    val toggleItems: List<String> = listOf(
-        stringResource(id = R.string.inApp),
-        stringResource(id = R.string.bank)
-    )
+    val bankSMSAnnouncements by viewModel.bankSMSAnnouncements.collectAsStateWithLifecycle()
+    SideEffect(Unit) {
+        viewModel.onEvent(AnnouncementUiIntent.ClearRedBadge)
+    }
 
-        AnnouncementsScreen(
-            toggleItems = toggleItems,
-            onBackPressed = onBackPressed
-        )
+    var selectedOption by remember {
+        mutableStateOf(AnnouncementTypeOptionUiModel.BANK_SMS)
+    }
+
+    AnnouncementsScreen(
+        inAppAnnouncements = emptyList(),
+        bankSMSAnnouncements = bankSMSAnnouncements,
+        selectedOption = selectedOption,
+        onOptionChanged = { selectedOption = it },
+        onBackPressed = onBackPressed
+    )
 
 }
 
 @Composable
 private fun AnnouncementsScreen(
-    announcements: List<String> = emptyList(),
-    toggleItems: List<String>,
+    inAppAnnouncements: List<AnnouncementUiModel>,
+    bankSMSAnnouncements: List<AnnouncementUiModel>,
+    selectedOption: AnnouncementTypeOptionUiModel,
+    onOptionChanged: (AnnouncementTypeOptionUiModel) -> Unit,
     onBackPressed: () -> Unit
 ) {
+
+    val pagerState = rememberPagerState(
+        initialPage = selectedOption.ordinal,
+        pageCount = { AnnouncementTypeOptionUiModel.entries.size }
+    )
+
+    LaunchedEffect(selectedOption) {
+        if (pagerState.currentPage != selectedOption.ordinal) {
+            pagerState.animateScrollToPage(selectedOption.ordinal)
+        }
+    }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -75,36 +105,30 @@ private fun AnnouncementsScreen(
 
             Spacer(Modifier.height(height = 8.dp))
 
-            var selectedOption by remember(toggleItems) { mutableStateOf(toggleItems.firstOrNull() ?: "") }
-
             AppToggle(
-                toggleItems = toggleItems,
-                itemTitle = { it },
+                toggleItems = AnnouncementTypeOptionUiModel.entries.toList(),
+                itemTitle = { stringResource(id = it.labelRes) },
                 selectedOption = selectedOption,
-                onToggleSelectionChanged = { selectedOption = it }
+                onToggleSelectionChanged = onOptionChanged
             )
 
             Spacer(Modifier.height(height = 8.dp))
 
-            LazyColumn(
+            HorizontalPager(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+                    .weight(weight = 1f)
+                    .fillMaxWidth(),
+                state = pagerState,
+                userScrollEnabled = false,
+                key = { it }
+            ) { page ->
 
-                if (announcements.isEmpty()) {
-                    item {
-                        EmptyAnnouncementsPlaceholder()
-                    }
-                } else {
-                    items(
-                        items = announcements,
-                        key = { it }
-                    ) { announcement ->
-                        // AnnouncementItem(announcement)
-                    }
-                }
+                AnnouncementsPage(
+                    announcements = if (page == AnnouncementTypeOptionUiModel.IN_APP.ordinal)
+                        inAppAnnouncements
+                    else
+                        bankSMSAnnouncements
+                )
 
             }
 
@@ -115,29 +139,62 @@ private fun AnnouncementsScreen(
 }
 
 @Composable
-private fun EmptyAnnouncementsPlaceholder() {
+private fun AnnouncementsPage(
+    modifier: Modifier = Modifier,
+    announcements: List<AnnouncementUiModel>
+) {
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 80.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+    if (announcements.isEmpty())
+        EmptyAnnouncementState(modifier = modifier.fillMaxSize())
+    else
+        LazyColumn(
+            modifier = modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            items(
+                items = announcements,
+                key = { it.id }
+            ) { announcement ->
+
+                ListedAnnouncementItem(
+                    title = announcement.title,
+                    subTitle = announcement.description,
+                    iconResId = announcement.transaction?.channel?.icon?.iconResId ?: R.drawable.channel_ic_default,
+                    onClick = {}
+                )
+
+            }
+        }
+
+}
+
+@Composable
+private fun EmptyAnnouncementState(modifier: Modifier = Modifier) {
+
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center
     ) {
 
-        Image(
-            modifier = Modifier.size(180.dp),
-            painter = painterResource(id = R.drawable.empty_mailbox),
-            contentDescription = null,
-            contentScale = ContentScale.Fit
-        )
+        Column(
+            modifier = Modifier.align(Alignment.Center),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(space = 12.dp)
+        ) {
 
-        Spacer(Modifier.height(12.dp))
+            Image(
+                modifier = Modifier.size(180.dp),
+                painter = painterResource(id = R.drawable.empty_mailbox),
+                contentDescription = null,
+                contentScale = ContentScale.Fit
+            )
 
-        Text(
-            text = stringResource(id = R.string.empty_mail_box_message),
-            style = MaterialTheme.typography.labelLarge.copy(color = Gray8)
-        )
+            Text(
+                text = stringResource(id = R.string.empty_mail_box_message),
+                style = MaterialTheme.typography.labelLarge.copy(color = Gray8)
+            )
+
+        }
 
     }
 
@@ -148,7 +205,10 @@ private fun EmptyAnnouncementsPlaceholder() {
 private fun AnnouncementsPreview() {
 
     AnnouncementsScreen(
-        toggleItems = listOf("درون برنامه", "بانک"),
+        inAppAnnouncements = emptyList(),
+        bankSMSAnnouncements = emptyList(),
+        selectedOption = AnnouncementTypeOptionUiModel.IN_APP,
+        onOptionChanged = {},
         onBackPressed = {}
     )
 

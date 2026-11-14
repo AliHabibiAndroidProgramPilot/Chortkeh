@@ -174,7 +174,11 @@ fun ListedChannelItem(
                 .height(height = 65.dp)
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 4.dp)
-                .border(width = 1.dp, color = MaterialTheme.colorScheme.outlineVariant, shape = shape)
+                .border(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.outlineVariant,
+                    shape = shape
+                )
                 .clip(shape = shape)
                 .clickable(onClick = onClick),
             verticalAlignment = Alignment.CenterVertically,
@@ -218,6 +222,70 @@ fun ListedChannelItem(
 }
 
 @Composable
+fun ListedAnnouncementItem(
+    title: String,
+    subTitle: String = "",
+    @DrawableRes iconResId: Int,
+    onClick: () -> Unit
+) {
+
+    val shape = RoundedCornerShape(size = 10.dp)
+
+    Row(
+        modifier = Modifier
+            .height(height = 65.dp)
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp)
+            .border(width = 1.dp, color = MaterialTheme.colorScheme.outlineVariant, shape = shape)
+            .clip(shape = shape)
+            .clickable(onClick = onClick),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.End
+    ) {
+
+        Icon(
+            modifier = Modifier.padding(start = 16.dp),
+            painter = painterResource(id = R.drawable.short_arrow_left),
+            contentDescription = null,
+            tint = Color.Unspecified
+        )
+
+        Column(
+            modifier = Modifier.weight(weight = 1f),
+            horizontalAlignment = Alignment.End
+        ) {
+
+            Text(
+                modifier = Modifier.padding(end = 10.dp, bottom = 8.dp),
+                text = title,
+                style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.End)
+            )
+
+            Text(
+                modifier = Modifier.padding(end = 10.dp),
+                text = subTitle,
+                style = MaterialTheme.typography.bodySmall.copy(
+                    textAlign = TextAlign.End,
+                    color = Gray8
+                )
+            )
+
+        }
+
+        Icon(
+            modifier = Modifier
+                .padding(end = 12.dp)
+                .size(size = 28.dp),
+            painter = painterResource(iconResId),
+            contentDescription = null,
+            tint = Color.Unspecified
+        )
+
+    }
+
+}
+
+@Composable
 fun ListedReminderItem(
     title: String,
     subTitle: String = "",
@@ -236,7 +304,11 @@ fun ListedReminderItem(
                 .height(height = 65.dp)
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 4.dp)
-                .border(width = 1.dp, color = MaterialTheme.colorScheme.outlineVariant, shape = shape)
+                .border(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.outlineVariant,
+                    shape = shape
+                )
                 .clip(shape = shape)
                 .clickable(onClick = onClick),
             verticalAlignment = Alignment.CenterVertically,
@@ -245,7 +317,7 @@ fun ListedReminderItem(
 
             Switch(
                 modifier = Modifier.padding(horizontal = 16.dp),
-                checked = when(isPassed) {
+                checked = when (isPassed) {
                     true -> false
                     else -> isEnabled
                 },

@@ -58,8 +58,8 @@ object SmsMatcher {
             month = parsedTransactionDateTime.month,
             dayOfMonth = parsedTransactionDateTime.dayOfMonth,
             dayOfWeekName = parsedTransactionDateTime.dayOfWeekName,
-            hour = parsedTransactionDateTime.hour,
-            minute = parsedTransactionDateTime.minute
+            hour = parsedTransactionDateTime.hour ?: 0,
+            minute = parsedTransactionDateTime.minute ?: 0
         )
     }
 

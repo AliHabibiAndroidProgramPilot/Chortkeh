@@ -5,9 +5,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import info.alihabibi.common.PersianDateFormatter
 import info.alihabibi.common_android.NotificationCanceler
+import info.alihabibi.domain.local.usecases.database.announcement.usecase.AnnouncementUseCases
 import info.alihabibi.domain.local.usecases.database.category.usecase.CategoryUseCases
 import info.alihabibi.domain.local.usecases.database.channel.usecase.ChannelUseCases
 import info.alihabibi.domain.local.usecases.database.transaction.usecase.TransactionUseCases
+import info.alihabibi.domain.local.usecases.datastore.usecase.DatastoreUseCases
 import info.alihabibi.domain.models.channel.Channel
 import info.alihabibi.model.mapper.toDomain
 import info.alihabibi.model.mapper.toUiModel
@@ -39,6 +41,8 @@ class NewTransactionViewModel(
     private val categoryUseCases: CategoryUseCases,
     private val channelsUseCase: ChannelUseCases,
     private val transactionUseCases: TransactionUseCases,
+    private val announcementUseCases: AnnouncementUseCases,
+    private val datastoreUseCases: DatastoreUseCases,
     private val notificationCanceler: NotificationCanceler
 ) : ViewModel() {
 
@@ -103,7 +107,7 @@ class NewTransactionViewModel(
 
             is NewTransactionUiIntent.SaveCategory -> saveCategory()
 
-            is NewTransactionUiIntent.ApplyPrefill -> applyPrefill(event.prefill, event.notificationId)
+            is NewTransactionUiIntent.ApplyPrefill -> applyPrefill(event.prefill, event.notificationId, event.announcementId)
 
             is NewTransactionUiIntent.EditCategory -> editCategory(event.id)
 
@@ -140,27 +144,40 @@ class NewTransactionViewModel(
         }
     }
 
-    private fun applyPrefill(prefill: NewTransactionPrefill, notificationId: Int) {
+    private fun applyPrefill(prefill: NewTransactionPrefill, notificationId: Int, announcementId: Long) {
         notificationCanceler.cancel(notificationId)
         if (lastAppliedPrefill == prefill) return
+        lastAppliedPrefill = prefill
         viewModelScope.launch {
-            val channel = channelsUseCase.getChannelByIdUseCase.invoke(prefill.channelId)
-                .firstOrNull()
-                ?.toUiModel()
-            _newTransactionUiState.update {
-                it.copy(
-                    transactionType = prefill.transactionType,
-                    transactionPrice = if (prefill.amount != null) prefill.amount.toString() else "",
-                    formattedTransactionTime = String.format(Locale.US, "%02d : %02d", prefill.hour, prefill.minute),
-                    transactionHour = prefill.hour,
-                    transactionMinute = prefill.minute,
-                    transactionYear = prefill.year ?: 0,
-                    transactionMonth = prefill.month ?: 0,
-                    transactionDay = Pair(prefill.dayOfMonth ?: 0, prefill.dayOfWeekName ?: ""),
-                    transactionChannel = channel
-                )
+            launch {
+                val channel = channelsUseCase.getChannelByIdUseCase.invoke(prefill.channelId)
+                    .firstOrNull()
+                    ?.toUiModel()
+                _newTransactionUiState.update {
+                    it.copy(
+                        transactionType = prefill.transactionType,
+                        transactionPrice = if (prefill.amount != null) prefill.amount.toString() else "",
+                        formattedTransactionTime = String.format(
+                            Locale.US,
+                            "%02d : %02d",
+                            prefill.hour,
+                            prefill.minute
+                        ),
+                        transactionHour = prefill.hour,
+                        transactionMinute = prefill.minute,
+                        transactionYear = prefill.year ?: 0,
+                        transactionMonth = prefill.month ?: 0,
+                        transactionDay = Pair(prefill.dayOfMonth ?: 0, prefill.dayOfWeekName ?: ""),
+                        transactionChannel = channel
+                    )
+                }
             }
-            lastAppliedPrefill = prefill
+            launch {
+                announcementUseCases.deleteAnnouncementByIdUseCase.invoke(announcementId)
+                val hasSmsAnnouncements = announcementUseCases.hasSmsAnnouncementsUseCase.invoke()
+                if (!hasSmsAnnouncements)
+                    datastoreUseCases.saveHomeAnnouncementRedBadge.invoke(false)
+            }
         }
     }
 
@@ -474,7 +491,7 @@ sealed interface NewTransactionUiIntent {
 
     data object SaveCategory : NewTransactionUiIntent
 
-    data class ApplyPrefill(val prefill: NewTransactionPrefill, val notificationId: Int) : NewTransactionUiIntent
+    data class ApplyPrefill(val prefill: NewTransactionPrefill, val notificationId: Int, val announcementId: Long) : NewTransactionUiIntent
 
     data class EditCategory(val id: Int) : NewTransactionUiIntent
 

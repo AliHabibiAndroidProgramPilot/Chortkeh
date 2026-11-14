@@ -18,4 +18,7 @@ interface DatastoreRepository {
     suspend fun saveUserInfo(userAccountInfo: UserAccountInfo)
     val userAccountInfo: Flow<UserAccountInfo>
 
+    suspend fun saveHomeAnnouncementRedBadge(value: Boolean)
+    val isAnnouncementBadgeEnabled: Flow<Boolean>
+
 }

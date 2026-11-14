@@ -5,9 +5,7 @@ import info.alihabibi.domain.models.Currencies
 import info.alihabibi.domain.models.UserAccountInfo
 import kotlinx.coroutines.flow.Flow
 
-class DatastoreRepositoryImpl(
-    private val datastore: DatastoreManager
-) : DatastoreRepository {
+class DatastoreRepositoryImpl(private val datastore: DatastoreManager) : DatastoreRepository {
 
     override suspend fun saveFirstLaunch(value: Boolean) {
         datastore.saveFirstLaunch(value = value)
@@ -36,5 +34,12 @@ class DatastoreRepositoryImpl(
 
     override val userAccountInfo: Flow<UserAccountInfo>
         get() = datastore.userAccountInfo
+
+    override suspend fun saveHomeAnnouncementRedBadge(value: Boolean) {
+        datastore.saveHomeAnnouncementRedBadge(value)
+    }
+
+    override val isAnnouncementBadgeEnabled: Flow<Boolean>
+        get() = datastore.isAnnouncementBadgeEnabled
 
 }

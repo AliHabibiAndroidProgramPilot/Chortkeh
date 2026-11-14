@@ -2,7 +2,13 @@ package info.alihabibi.domain.di
 
 import info.alihabibi.domain.local.coordinators.ReminderUndoManager
 import info.alihabibi.domain.local.coordinators.TransactionUndoManager
+import info.alihabibi.domain.local.usecases.database.announcement.DeleteAnnouncementByIdUseCase
+import info.alihabibi.domain.local.usecases.database.announcement.GetAllSmsAnnouncements
 import info.alihabibi.domain.local.usecases.database.category.DeleteCategoriesUseCase
+import info.alihabibi.domain.local.usecases.database.announcement.GetAnnouncementByIdUseCase
+import info.alihabibi.domain.local.usecases.database.announcement.HasSmsAnnouncementsUseCase
+import info.alihabibi.domain.local.usecases.database.announcement.SaveAnnouncementUseCase
+import info.alihabibi.domain.local.usecases.database.announcement.usecase.AnnouncementUseCases
 import info.alihabibi.domain.local.usecases.database.category.GetCategoriesUseCase
 import info.alihabibi.domain.local.usecases.database.category.SaveCategoryUseCase
 import info.alihabibi.domain.local.usecases.database.category.UpdateCategoryUseCase
@@ -36,11 +42,13 @@ import info.alihabibi.domain.local.usecases.database.transaction.HasTransactionU
 import info.alihabibi.domain.local.usecases.database.transaction.SaveTransactionUseCase
 import info.alihabibi.domain.local.usecases.database.transaction.UpdateTransactionUseCase
 import info.alihabibi.domain.local.usecases.database.transaction.usecase.TransactionUseCases
+import info.alihabibi.domain.local.usecases.datastore.GetIsAnnouncementBadgeEnabled
 import info.alihabibi.domain.local.usecases.datastore.GetIsAppFirstLaunchUseCase
 import info.alihabibi.domain.local.usecases.datastore.GetIsSmsModalShownUseCase
 import info.alihabibi.domain.local.usecases.datastore.GetPreferredCurrencyUseCase
 import info.alihabibi.domain.local.usecases.datastore.GetUserAccountInfoUseCase
 import info.alihabibi.domain.local.usecases.datastore.SaveFirstLaunchUseCase
+import info.alihabibi.domain.local.usecases.datastore.SaveHomeAnnouncementRedBadge
 import info.alihabibi.domain.local.usecases.datastore.SavePreferredCurrencyUseCase
 import info.alihabibi.domain.local.usecases.datastore.SaveSmsModalShownStateUseCase
 import info.alihabibi.domain.local.usecases.datastore.SaveUserAccountInfoUseCase
@@ -61,6 +69,8 @@ val domainModule = module {
     factory { GetPreferredCurrencyUseCase(get()) }
     factory { SaveUserAccountInfoUseCase(get()) }
     factory { GetUserAccountInfoUseCase(get()) }
+    factory { SaveHomeAnnouncementRedBadge(get()) }
+    factory { GetIsAnnouncementBadgeEnabled(get()) }
 
     factory {
         DatastoreUseCases(
@@ -71,7 +81,9 @@ val domainModule = module {
             savePreferredCurrencyUseCase = get(),
             getPreferredCurrencyUseCase = get(),
             saveUserAccountInfoUseCase = get(),
-            getUserAccountInfoUseCase = get()
+            getUserAccountInfoUseCase = get(),
+            saveHomeAnnouncementRedBadge = get(),
+            getAnnouncementRedBadgeEnabled = get()
         )
     }
 
@@ -172,6 +184,26 @@ val domainModule = module {
             getAllRemindersUseCase = get(),
             updateReminderIsEnabledUseCase = get(),
             getReminderByIdUseCase = get()
+        )
+    }
+
+    // endregion
+
+    // region Announcement
+
+    factory { SaveAnnouncementUseCase(get()) }
+    factory { GetAnnouncementByIdUseCase(get()) }
+    factory { GetAllSmsAnnouncements(get()) }
+    factory { HasSmsAnnouncementsUseCase(get()) }
+    factory { DeleteAnnouncementByIdUseCase(get()) }
+
+    factory {
+        AnnouncementUseCases(
+            saveAnnouncementUseCase = get(),
+            getAnnouncementByIdUseCase = get(),
+            getAllSmsAnnouncements = get(),
+            hasSmsAnnouncementsUseCase = get(),
+            deleteAnnouncementByIdUseCase = get()
         )
     }
 

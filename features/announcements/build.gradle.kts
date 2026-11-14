@@ -9,6 +9,12 @@ android {
 
 dependencies {
 
+    // domain
+    implementation(projects.core.domain)
+
+    // model
+    implementation(projects.core.model)
+
     // design system
     implementation(projects.core.designsystem)
 

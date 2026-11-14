@@ -22,3 +22,26 @@
 
 # Preserve annotations used by serializers and dependency injection
 -keepattributes *Annotation*,Signature,InnerClasses,EnclosingMethod
+
+# Keep Fragments referenced in your navigation XML graphs
+-keep class * extends androidx.fragment.app.Fragment {
+    public <init>();
+}
+
+# Keep Safe Args generated 'Args' and 'Directions' classes
+-keep class **.*Args { *; }
+-keep class **.*Args$* { *; }
+-keep class **.*Directions { *; }
+-keep class **.*Directions$* { *; }
+
+# Keep methods required by Safe Args to parse Bundles and SavedStateHandles
+-keepclasseswithmembers class * {
+    public static *** fromBundle(...);
+}
+-keepclasseswithmembers class * {
+    public static *** fromSavedStateHandle(...);
+}
+
+# Keep custom Parcelable and Serializable data classes used as Navigation Arguments
+-keepnames class * extends android.os.Parcelable
+-keepnames class * implements java.io.Serializable

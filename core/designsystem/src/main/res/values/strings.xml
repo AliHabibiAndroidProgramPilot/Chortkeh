@@ -62,6 +62,8 @@
     <string name="empty_mail_box_message">اعلانی برای نمایش نداری</string>
     <string name="bank">بانک</string>
     <string name="inApp">درون برنامه</string>
+    <string name="income_announcement_title">واریز %1$s تومان</string>
+    <string name="outcome_announcement_title">برداشت %1$s تومان</string>
 
     // Profile
     <string name="made_with_love">Made with 💙</string>
