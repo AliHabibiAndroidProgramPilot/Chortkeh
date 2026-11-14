@@ -7,6 +7,7 @@ import android.provider.Telephony
 import android.telephony.SmsMessage
 import info.alihabibi.common.ApplicationScope
 import info.alihabibi.common.PersianDateFormatter
+import info.alihabibi.common.Utils
 import info.alihabibi.designsystem.R
 import info.alihabibi.domain.local.usecases.database.announcement.usecase.AnnouncementUseCases
 import info.alihabibi.domain.local.usecases.database.channel.usecase.ChannelUseCases
@@ -19,6 +20,7 @@ import info.alihabibi.domain.models.transaction.TransactionType
 import info.alihabibi.model.data.TransactionData
 import info.alihabibi.sms.notification.SmsNotifier
 import info.alihabibi.sms.parser.SmsMatcher
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -63,7 +65,8 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                         sms.timestampMillis
                     )
                     transactionData?.let { transactionData ->
-                        val announcementId = updateAnnouncement(transactionData, matchedChannel, context)
+                        val announcementId =
+                            updateAnnouncement(transactionData, matchedChannel, context)
                         datastoreUseCases.saveHomeAnnouncementRedBadge.invoke(true)
                         smsNotifier.pushNotification(
                             channelName = matchedChannel.channelName,
@@ -72,6 +75,8 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                         )
                     }
                 }
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 e.printStackTrace()
             } finally {
@@ -80,10 +85,22 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
         }
     }
 
-    private suspend fun updateAnnouncement(transactionData: TransactionData, channel: Channel, context: Context): Long {
-        val typeText: String = when(transactionData.transactionType) {
-            TransactionType.INCOME -> context.getString(R.string.income_announcement_title, transactionData.amount)
-            TransactionType.OUTCOME -> context.getString(R.string.outcome_announcement_title, transactionData.amount)
+    private suspend fun updateAnnouncement(
+        transactionData: TransactionData,
+        channel: Channel,
+        context: Context
+    ): Long {
+        val formattedAmount = Utils.decimalFormatterPattern.format(transactionData.amount ?: 0L)
+        val typeText: String = when (transactionData.transactionType) {
+            TransactionType.INCOME -> context.getString(
+                R.string.income_announcement_title,
+                formattedAmount
+            )
+
+            TransactionType.OUTCOME -> context.getString(
+                R.string.outcome_announcement_title,
+                formattedAmount
+            )
         }
         val description = PersianDateFormatter.format(
             transactionData.year,
@@ -107,7 +124,12 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                     month = transactionData.month,
                     day = transactionData.dayOfMonth,
                     dayOfWeekName = transactionData.dayOfWeekName,
-                    time = String.format(Locale.US, "%02d : %02d", transactionData.hour, transactionData.minute)
+                    time = String.format(
+                        Locale.US,
+                        "%02d : %02d",
+                        transactionData.hour,
+                        transactionData.minute
+                    )
                 )
             )
         )
