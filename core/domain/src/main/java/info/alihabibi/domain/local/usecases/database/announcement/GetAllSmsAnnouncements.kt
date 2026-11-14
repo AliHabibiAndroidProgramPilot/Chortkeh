@@ -1,0 +1,13 @@
+package info.alihabibi.domain.local.usecases.database.announcement
+
+import info.alihabibi.domain.local.repositories.AnnouncementRepository
+import info.alihabibi.domain.models.announcement.Announcement
+import kotlinx.coroutines.flow.Flow
+
+class GetAllSmsAnnouncements(
+    private val repository: AnnouncementRepository
+) {
+
+    operator fun invoke(): Flow<List<Announcement>> = repository.getAllSmsAnnouncements()
+
+}

@@ -1,6 +1,7 @@
 package info.alihabibi.database.repositories
 
 import info.alihabibi.database.dao.AnnouncementDao
+import info.alihabibi.database.entities.DetailedAnnouncement
 import info.alihabibi.database.mappers.asEntity
 import info.alihabibi.database.mappers.asExternalModel
 import info.alihabibi.domain.local.repositories.AnnouncementRepository
@@ -25,8 +26,16 @@ class AnnouncementRepositoryImpl(private val dao: AnnouncementDao) : Announcemen
             .flowOn(Dispatchers.IO)
     }
 
+    override fun getAllSmsAnnouncements(): Flow<List<Announcement>> {
+        return dao.getAllSmsAnnouncements()
+            .map { entity -> entity.map(DetailedAnnouncement::asExternalModel) }
+            .flowOn(Dispatchers.IO)
+    }
+
     override suspend fun deleteAnnouncementById(id: Long) {
-        dao.deleteAnnouncementById(id)
+        withContext(Dispatchers.IO) {
+            dao.deleteAnnouncementById(id)
+        }
     }
 
 }

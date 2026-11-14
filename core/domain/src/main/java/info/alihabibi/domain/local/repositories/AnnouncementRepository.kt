@@ -9,6 +9,8 @@ interface AnnouncementRepository {
 
     fun getAnnouncementById(id: Long): Flow<Announcement?>
 
+    fun getAllSmsAnnouncements(): Flow<List<Announcement>>
+
     suspend fun deleteAnnouncementById(id: Long)
 
 }

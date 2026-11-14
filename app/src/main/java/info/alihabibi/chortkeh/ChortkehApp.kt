@@ -1,6 +1,7 @@
 package info.alihabibi.chortkeh
 
 import android.app.Application
+import info.alihabibi.announcements.di.announcementsModule
 import info.alihabibi.channels.di.channelsModule
 import info.alihabibi.chortkeh.di.mainActivityModule
 import info.alihabibi.common.di.commonModule
@@ -37,7 +38,8 @@ class ChortkehApp : Application() {
                     profileModule,
                     channelsModule,
                     reminderModule,
-                    reportModule
+                    reportModule,
+                    announcementsModule
                 )
             )
         }

@@ -18,6 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,17 +30,25 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray8
 import info.alihabibi.model.ui_model.announcement.AnnouncementTypeOptionUiModel
 import info.alihabibi.model.ui_model.announcement.AnnouncementUiModel
 import info.alihabibi.ui.buttons.AppToggle
 import info.alihabibi.ui.headrs.AppHeader
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun AnnouncementsDestination(
+    viewModel: AnnouncementViewModel = koinViewModel(),
     onBackPressed: () -> Unit
 ) {
+
+    val bankSMSAnnouncements by viewModel.bankSMSAnnouncements.collectAsStateWithLifecycle()
+    SideEffect(Unit) {
+        viewModel.onEvent(AnnouncementUiIntent.ClearRedBadge)
+    }
 
     var selectedOption by remember {
         mutableStateOf(AnnouncementTypeOptionUiModel.IN_APP)
@@ -47,7 +56,7 @@ fun AnnouncementsDestination(
 
     AnnouncementsScreen(
         inAppAnnouncements = emptyList(),
-        bankSMSAnnouncements = emptyList(),
+        bankSMSAnnouncements = bankSMSAnnouncements,
         selectedOption = selectedOption,
         onOptionChanged = { selectedOption = it },
         onBackPressed = onBackPressed

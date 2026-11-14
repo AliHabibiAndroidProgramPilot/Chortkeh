@@ -3,6 +3,7 @@ package info.alihabibi.domain.di
 import info.alihabibi.domain.local.coordinators.ReminderUndoManager
 import info.alihabibi.domain.local.coordinators.TransactionUndoManager
 import info.alihabibi.domain.local.usecases.database.announcement.DeleteAnnouncementByIdUseCase
+import info.alihabibi.domain.local.usecases.database.announcement.GetAllSmsAnnouncements
 import info.alihabibi.domain.local.usecases.database.category.DeleteCategoriesUseCase
 import info.alihabibi.domain.local.usecases.database.announcement.GetAnnouncementByIdUseCase
 import info.alihabibi.domain.local.usecases.database.announcement.SaveAnnouncementUseCase
@@ -191,12 +192,14 @@ val domainModule = module {
 
     factory { SaveAnnouncementUseCase(get()) }
     factory { GetAnnouncementByIdUseCase(get()) }
+    factory { GetAllSmsAnnouncements(get()) }
     factory { DeleteAnnouncementByIdUseCase(get()) }
 
     factory {
         AnnouncementUseCases(
             saveAnnouncementUseCase = get(),
             getAnnouncementByIdUseCase = get(),
+            getAllSmsAnnouncements = get(),
             deleteAnnouncementByIdUseCase = get()
         )
     }
