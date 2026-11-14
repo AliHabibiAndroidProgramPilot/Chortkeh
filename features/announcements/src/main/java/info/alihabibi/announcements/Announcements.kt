@@ -52,7 +52,7 @@ fun AnnouncementsDestination(
     }
 
     var selectedOption by remember {
-        mutableStateOf(AnnouncementTypeOptionUiModel.IN_APP)
+        mutableStateOf(AnnouncementTypeOptionUiModel.BANK_SMS)
     }
 
     AnnouncementsScreen(
