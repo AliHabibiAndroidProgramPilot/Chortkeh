@@ -24,6 +24,9 @@ interface AnnouncementDao {
     @Query("SELECT * FROM ${Keys.ANNOUNCEMENT_TABLE_NAME} ORDER BY id DESC LIMIT 200")
     fun getAllSmsAnnouncements(): Flow<List<DetailedAnnouncement>>
 
+    @Query("SELECT EXISTS(SELECT 1 FROM ${Keys.ANNOUNCEMENT_TABLE_NAME} WHERE announcementType = 'BANK_SMS')")
+    suspend fun hasSmsAnnouncements(): Boolean
+
     @Query("DELETE FROM ${Keys.ANNOUNCEMENT_TABLE_NAME} WHERE id = :id")
     suspend fun deleteAnnouncementById(id: Long)
 

@@ -6,6 +6,7 @@ import info.alihabibi.domain.local.usecases.database.announcement.DeleteAnnounce
 import info.alihabibi.domain.local.usecases.database.announcement.GetAllSmsAnnouncements
 import info.alihabibi.domain.local.usecases.database.category.DeleteCategoriesUseCase
 import info.alihabibi.domain.local.usecases.database.announcement.GetAnnouncementByIdUseCase
+import info.alihabibi.domain.local.usecases.database.announcement.HasSmsAnnouncementsUseCase
 import info.alihabibi.domain.local.usecases.database.announcement.SaveAnnouncementUseCase
 import info.alihabibi.domain.local.usecases.database.announcement.usecase.AnnouncementUseCases
 import info.alihabibi.domain.local.usecases.database.category.GetCategoriesUseCase
@@ -193,6 +194,7 @@ val domainModule = module {
     factory { SaveAnnouncementUseCase(get()) }
     factory { GetAnnouncementByIdUseCase(get()) }
     factory { GetAllSmsAnnouncements(get()) }
+    factory { HasSmsAnnouncementsUseCase(get()) }
     factory { DeleteAnnouncementByIdUseCase(get()) }
 
     factory {
@@ -200,6 +202,7 @@ val domainModule = module {
             saveAnnouncementUseCase = get(),
             getAnnouncementByIdUseCase = get(),
             getAllSmsAnnouncements = get(),
+            hasSmsAnnouncementsUseCase = get(),
             deleteAnnouncementByIdUseCase = get()
         )
     }

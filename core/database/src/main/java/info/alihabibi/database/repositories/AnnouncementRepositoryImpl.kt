@@ -32,6 +32,12 @@ class AnnouncementRepositoryImpl(private val dao: AnnouncementDao) : Announcemen
             .flowOn(Dispatchers.IO)
     }
 
+    override suspend fun hasSmsAnnouncements(): Boolean {
+        return withContext(Dispatchers.IO) {
+            dao.hasSmsAnnouncements()
+        }
+    }
+
     override suspend fun deleteAnnouncementById(id: Long) {
         withContext(Dispatchers.IO) {
             dao.deleteAnnouncementById(id)
