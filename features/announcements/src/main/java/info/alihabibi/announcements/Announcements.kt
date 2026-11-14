@@ -37,6 +37,7 @@ import info.alihabibi.model.ui_model.announcement.AnnouncementTypeOptionUiModel
 import info.alihabibi.model.ui_model.announcement.AnnouncementUiModel
 import info.alihabibi.ui.buttons.AppToggle
 import info.alihabibi.ui.headrs.AppHeader
+import info.alihabibi.ui.items.ListedAnnouncementItem
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -154,7 +155,14 @@ private fun AnnouncementsPage(
                 items = announcements,
                 key = { it.id }
             ) { announcement ->
-                // AnnouncementItem(announcement)
+
+                ListedAnnouncementItem(
+                    title = announcement.title,
+                    subTitle = announcement.description,
+                    iconResId = announcement.transaction?.channel?.icon?.iconResId ?: R.drawable.channel_ic_default,
+                    onClick = {}
+                )
+
             }
         }
 
