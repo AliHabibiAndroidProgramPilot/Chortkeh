@@ -46,7 +46,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import info.alihabibi.designsystem.R
 import info.alihabibi.designsystem.theme.Gray8
-import info.alihabibi.designsystem.theme.NeutralGray
 import info.alihabibi.model.ui_model.announcement.AnnouncementTypeOptionUiModel
 import info.alihabibi.model.ui_model.announcement.AnnouncementUiModel
 import info.alihabibi.ui.buttons.AppButton
@@ -76,7 +75,7 @@ fun AnnouncementsDestination(
         selectedOption = selectedOption,
         onOptionChanged = { selectedOption = it },
         onDeleteAnnouncement = { id ->
-
+            viewModel.onEvent(AnnouncementUiIntent.DeleteAnnouncement(id))
         },
         onRegisterAnnouncement = { announcementsModule ->
 

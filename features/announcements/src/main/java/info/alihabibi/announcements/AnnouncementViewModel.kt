@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class AnnouncementViewModel(
-    announcementUseCases: AnnouncementUseCases,
+    private val announcementUseCases: AnnouncementUseCases,
     private val datastoreUseCases: DatastoreUseCases
 ) : ViewModel() {
 
@@ -32,8 +32,12 @@ class AnnouncementViewModel(
     }
 
     fun onEvent(event: AnnouncementUiIntent) {
-        when(event) {
+        when (event) {
+
             is AnnouncementUiIntent.ClearRedBadge -> clearRedBadge()
+
+            is AnnouncementUiIntent.DeleteAnnouncement -> deleteAnnouncement(event.id)
+
         }
     }
 
@@ -45,10 +49,18 @@ class AnnouncementViewModel(
         }
     }
 
+    private fun deleteAnnouncement(id: Long) {
+        viewModelScope.launch {
+            announcementUseCases.deleteAnnouncementByIdUseCase.invoke(id)
+        }
+    }
+
 }
 
 sealed interface AnnouncementUiIntent {
 
     data object ClearRedBadge : AnnouncementUiIntent
+
+    data class DeleteAnnouncement(val id: Long) : AnnouncementUiIntent
 
 }
