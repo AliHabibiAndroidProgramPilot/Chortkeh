@@ -474,7 +474,9 @@ class NewTransactionViewModel(
                         transactionCategory = transaction.category
                     )
                 }
+                announcementUseCases.deleteAnnouncementByIdUseCase.invoke(announcementId)
             }
+
         }
     }
 
