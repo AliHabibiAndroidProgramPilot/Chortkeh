@@ -126,7 +126,7 @@ class SmsReceiver : BroadcastReceiver(), KoinComponent {
                     dayOfWeekName = transactionData.dayOfWeekName,
                     time = String.format(
                         Locale.US,
-                        "%02d : %02d",
+                        "%02d:%02d",
                         transactionData.hour,
                         transactionData.minute
                     )
