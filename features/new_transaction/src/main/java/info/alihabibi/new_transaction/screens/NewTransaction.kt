@@ -95,7 +95,7 @@ fun NewTransactionDestination(
             return@SideEffect
         }
         if (announcementId != null) {
-            viewModel
+            viewModel.onEvent(NewTransactionUiIntent.FetchAnnouncementTransaction(announcementId))
             return@SideEffect
         }
     }

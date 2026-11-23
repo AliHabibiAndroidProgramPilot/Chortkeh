@@ -35,6 +35,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalTime
 import java.util.Locale
 
 class NewTransactionViewModel(
@@ -450,7 +451,30 @@ class NewTransactionViewModel(
 
     private fun fetchAnnouncementTransaction(announcementId: Long) {
         viewModelScope.launch {
-//            val transaction = announcementUseCases.getTransactionByAnnouncementUseCases.invoke(announcementId)
+            val transaction = announcementUseCases.getTransactionByAnnouncementUseCases
+                .invoke(announcementId)
+                ?.toUiModel(false)
+            transaction?.let {
+                val hourAndMinute = runCatching {
+                    LocalTime.parse(transaction.time).run {
+                        this.hour to this.minute
+                    }
+                }.getOrNull()
+                _newTransactionUiState.update {
+                    it.copy(
+                        transactionType = transaction.type,
+                        transactionPrice = transaction.amount,
+                        transactionHour = hourAndMinute?.first,
+                        transactionMinute = hourAndMinute?.second,
+                        formattedTransactionTime = "${hourAndMinute?.first} : ${hourAndMinute?.second}",
+                        transactionYear = transaction.year,
+                        transactionMonth = transaction.month,
+                        transactionDay = transaction.day to transaction.dayOfWeekName,
+                        transactionChannel = transaction.channel,
+                        transactionCategory = transaction.category
+                    )
+                }
+            }
         }
     }
 
