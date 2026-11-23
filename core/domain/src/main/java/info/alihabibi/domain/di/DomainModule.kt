@@ -4,8 +4,8 @@ import info.alihabibi.domain.local.coordinators.ReminderUndoManager
 import info.alihabibi.domain.local.coordinators.TransactionUndoManager
 import info.alihabibi.domain.local.usecases.database.announcement.DeleteAnnouncementByIdUseCase
 import info.alihabibi.domain.local.usecases.database.announcement.GetAllSmsAnnouncements
+import info.alihabibi.domain.local.usecases.database.announcement.GetTransactionByAnnouncementIdUseCase
 import info.alihabibi.domain.local.usecases.database.category.DeleteCategoriesUseCase
-import info.alihabibi.domain.local.usecases.database.announcement.GetAnnouncementByIdUseCase
 import info.alihabibi.domain.local.usecases.database.announcement.HasSmsAnnouncementsUseCase
 import info.alihabibi.domain.local.usecases.database.announcement.SaveAnnouncementUseCase
 import info.alihabibi.domain.local.usecases.database.announcement.usecase.AnnouncementUseCases
@@ -192,7 +192,7 @@ val domainModule = module {
     // region Announcement
 
     factory { SaveAnnouncementUseCase(get()) }
-    factory { GetAnnouncementByIdUseCase(get()) }
+    factory { GetTransactionByAnnouncementIdUseCase(get()) }
     factory { GetAllSmsAnnouncements(get()) }
     factory { HasSmsAnnouncementsUseCase(get()) }
     factory { DeleteAnnouncementByIdUseCase(get()) }
@@ -200,7 +200,7 @@ val domainModule = module {
     factory {
         AnnouncementUseCases(
             saveAnnouncementUseCase = get(),
-            getAnnouncementByIdUseCase = get(),
+            getTransactionByAnnouncementUseCases = get(),
             getAllSmsAnnouncements = get(),
             hasSmsAnnouncementsUseCase = get(),
             deleteAnnouncementByIdUseCase = get()

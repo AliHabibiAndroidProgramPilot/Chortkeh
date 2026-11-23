@@ -137,6 +137,8 @@ class NewTransactionViewModel(
 
             is NewTransactionUiIntent.FetchEditingTransaction -> fetchEditingTransaction(event.transactionId)
 
+            is NewTransactionUiIntent.FetchAnnouncementTransaction -> fetchAnnouncementTransaction(event.announcementId)
+
             is NewTransactionUiIntent.ResetCategoryDrafts -> resetCategoryDrafts()
 
             is NewTransactionUiIntent.TransactionTypeChanged -> changeTransactionType(event.type)
@@ -446,6 +448,12 @@ class NewTransactionViewModel(
         }
     }
 
+    private fun fetchAnnouncementTransaction(announcementId: Long) {
+        viewModelScope.launch {
+//            val transaction = announcementUseCases.getTransactionByAnnouncementUseCases.invoke(announcementId)
+        }
+    }
+
     private fun resetCategoryDrafts() {
         _categoryUiState.update {
             CategoryUiState(
@@ -520,6 +528,8 @@ sealed interface NewTransactionUiIntent {
     data class FetchEditingCategory(val categoryId: Int) : NewTransactionUiIntent
 
     data class FetchEditingTransaction(val transactionId: Long) : NewTransactionUiIntent
+
+    data class FetchAnnouncementTransaction(val announcementId: Long) : NewTransactionUiIntent
 
     data object ResetCategoryDrafts : NewTransactionUiIntent
 

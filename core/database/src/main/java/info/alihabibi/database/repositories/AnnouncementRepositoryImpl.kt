@@ -6,6 +6,7 @@ import info.alihabibi.database.mappers.asEntity
 import info.alihabibi.database.mappers.asExternalModel
 import info.alihabibi.domain.local.repositories.AnnouncementRepository
 import info.alihabibi.domain.models.announcement.Announcement
+import info.alihabibi.domain.models.transaction.Transaction
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -20,10 +21,10 @@ class AnnouncementRepositoryImpl(private val dao: AnnouncementDao) : Announcemen
         }
     }
 
-    override fun getAnnouncementById(id: Long): Flow<Announcement?> {
-        return dao.getAnnouncementById(id)
-            .map { entity -> entity?.asExternalModel() }
-            .flowOn(Dispatchers.IO)
+    override suspend fun getTransactionByAnnouncementId(id: Long): Transaction? {
+        return withContext(Dispatchers.IO) {
+            dao.getTransactionByAnnouncementId(id)?.asExternalModel()
+        }
     }
 
     override fun getAllSmsAnnouncements(): Flow<List<Announcement>> {

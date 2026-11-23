@@ -10,8 +10,8 @@ import info.alihabibi.channels.AddChannel
 import info.alihabibi.channels.ChannelGraphRoute
 import info.alihabibi.channels.channelsGraph
 import info.alihabibi.home.HomeDestination
-import info.alihabibi.new_transaction.navigation.NewTransactionGraphRoute
-import info.alihabibi.new_transaction.navigation.newTransactionGraph
+import info.alihabibi.new_transaction.NewTransactionGraphRoute
+import info.alihabibi.new_transaction.newTransactionGraph
 import info.alihabibi.onboarding.OnBoardingDestination
 import info.alihabibi.profile.Profile
 import info.alihabibi.profile.profileGraph
@@ -76,6 +76,9 @@ fun DemoNavHost(
 
         composable<Announcements> {
             AnnouncementsDestination(
+                onRegisterAnnouncement = { announcementId ->
+                    navController.navigate(NewTransactionGraphRoute(announcementId = announcementId))
+                },
                 onBackPressed = {
                     navController.navigateUp()
                 }

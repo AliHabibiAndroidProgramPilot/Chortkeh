@@ -1,4 +1,4 @@
-package info.alihabibi.new_transaction.navigation
+package info.alihabibi.new_transaction
 
 import android.content.Intent
 import androidx.compose.runtime.LaunchedEffect
@@ -14,8 +14,6 @@ import androidx.navigation.toRoute
 import info.alihabibi.domain.Keys
 import info.alihabibi.model.data.TransactionData
 import info.alihabibi.model.mapper.toUiPrefill
-import info.alihabibi.new_transaction.NewTransactionUiIntent
-import info.alihabibi.new_transaction.NewTransactionViewModel
 import info.alihabibi.new_transaction.screens.AddCategoryDestination
 import info.alihabibi.new_transaction.screens.NewTransactionDestination
 import kotlinx.serialization.Serializable
@@ -24,7 +22,7 @@ import org.koin.androidx.compose.koinViewModel
 const val NEW_TRANSACTION_DEEP_LINK_BASE_URI = "chortkeh://new_transaction"
 
 @Serializable
-data class NewTransactionGraphRoute(val editingTransactionId: Long? = null)
+data class NewTransactionGraphRoute(val editingTransactionId: Long? = null, val announcementId: Long? = null)
 
 @Serializable
 object NewTransaction
@@ -49,9 +47,18 @@ fun NavGraphBuilder.newTransactionGraph(
                 navController.getBackStackEntry<NewTransactionGraphRoute>()
             }
             val viewModel: NewTransactionViewModel = koinViewModel(viewModelStoreOwner = parentEntry)
+
             val editingTransactionId = remember(parentEntry) {
                 try {
                     parentEntry.toRoute<NewTransactionGraphRoute>().editingTransactionId
+                } catch (_: Exception) {
+                    null
+                }
+            }
+
+            val announcementId = remember(parentEntry) {
+                try {
+                    parentEntry.toRoute<NewTransactionGraphRoute>().announcementId
                 } catch (_: Exception) {
                     null
                 }
@@ -80,6 +87,7 @@ fun NavGraphBuilder.newTransactionGraph(
             NewTransactionDestination(
                 viewModel = viewModel,
                 editingTransactionId = editingTransactionId,
+                announcementId = announcementId,
                 onAddNewCategory = {
                     navController.navigate(AddCategory())
                 },

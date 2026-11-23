@@ -36,3 +36,8 @@ data class DetailedAnnouncement(
     @Embedded val announcement: AnnouncementEntity,
     @Relation(parentColumn = "tx_transactionChannelId", entityColumn = "id") val channel: ChannelEntity?
 )
+
+data class DetailedAnnouncementTransaction(
+    @Embedded(prefix = "tx_") val transaction: TransactionEntity?,
+    @Relation(parentColumn = "tx_transactionChannelId", entityColumn = "id") val channel: ChannelEntity?
+)

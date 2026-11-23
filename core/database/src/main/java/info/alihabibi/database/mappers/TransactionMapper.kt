@@ -1,6 +1,9 @@
 package info.alihabibi.database.mappers
 
+import info.alihabibi.database.entities.CategoryEntity
 import info.alihabibi.database.entities.CategoryTransactionExpensesData
+import info.alihabibi.database.entities.ChannelEntity
+import info.alihabibi.database.entities.DetailedAnnouncementTransaction
 import info.alihabibi.database.entities.DetailedTransaction
 import info.alihabibi.database.entities.IncomeExpenseBucketData
 import info.alihabibi.database.entities.TransactionEntity
@@ -20,6 +23,21 @@ fun DetailedTransaction.asExternalModel(): Transaction = Transaction(
     dayOfWeekName = transaction.dayOfWeekName,
     time = transaction.time
 )
+
+fun TransactionEntity.asExternalModel(channel: ChannelEntity? = null, category: CategoryEntity? = null): Transaction = Transaction(
+    id = id,
+    transactionType = transactionType,
+    amount = amount,
+    channel = channel?.asExternalModel(),
+    category = category?.asExternalModel(),
+    year = year,
+    month = month,
+    day = day,
+    dayOfWeekName = dayOfWeekName,
+    time = time
+)
+
+fun DetailedAnnouncementTransaction.asExternalModel(): Transaction? = transaction?.asExternalModel(channel = channel)
 
 fun Transaction.asEntity(): TransactionEntity = TransactionEntity(
     id = id,

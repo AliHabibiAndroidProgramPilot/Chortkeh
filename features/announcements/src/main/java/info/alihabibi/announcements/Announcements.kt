@@ -57,6 +57,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun AnnouncementsDestination(
     viewModel: AnnouncementViewModel = koinViewModel(),
+    onRegisterAnnouncement: (announcementId: Long) -> Unit,
     onBackPressed: () -> Unit
 ) {
 
@@ -77,9 +78,7 @@ fun AnnouncementsDestination(
         onDeleteAnnouncement = { id ->
             viewModel.onEvent(AnnouncementUiIntent.DeleteAnnouncement(id))
         },
-        onRegisterAnnouncement = { announcementsModule ->
-
-        },
+        onRegisterAnnouncement = onRegisterAnnouncement,
         onBackPressed = onBackPressed
     )
 
@@ -92,7 +91,7 @@ private fun AnnouncementsScreen(
     selectedOption: AnnouncementTypeOptionUiModel,
     onOptionChanged: (AnnouncementTypeOptionUiModel) -> Unit,
     onDeleteAnnouncement: (announcementId: Long) -> Unit = {},
-    onRegisterAnnouncement: (announcement: AnnouncementUiModel) -> Unit = {},
+    onRegisterAnnouncement: (announcementId: Long) -> Unit = {},
     onBackPressed: () -> Unit
 ) {
 
@@ -107,15 +106,17 @@ private fun AnnouncementsScreen(
         }
     }
 
-    val smsSheetState = rememberBankSmsSheetState()
+    val smsSheetState = remember { BankSmsSheetState() }
     if (smsSheetState.isSheetVisible)
         BankSmsActionBottomSheet(
-            state = smsSheetState,
+            onDismissed = smsSheetState::onDismissed,
             onRegisterClick = {
-                smsSheetState.selectedAnnouncement?.let { onRegisterAnnouncement(it) }
+                if (smsSheetState.selectedAnnouncementId > 0L)
+                    onRegisterAnnouncement(smsSheetState.selectedAnnouncementId)
             },
             onDeleteClick = {
-                smsSheetState.selectedAnnouncement?.let { onDeleteAnnouncement(it.id) }
+                if (smsSheetState.selectedAnnouncementId > 0L)
+                    onDeleteAnnouncement(smsSheetState.selectedAnnouncementId)
             }
         )
 
@@ -178,7 +179,7 @@ private fun AnnouncementsScreen(
 private fun AnnouncementsPage(
     modifier: Modifier = Modifier,
     announcements: List<AnnouncementUiModel>,
-    onAnnouncementClick: (announcement: AnnouncementUiModel) -> Unit = {}
+    onAnnouncementClick: (announcementId: Long) -> Unit = {}
 ) {
 
     if (announcements.isEmpty())
@@ -198,7 +199,7 @@ private fun AnnouncementsPage(
                     iconResId = announcement.transaction?.channel?.icon?.iconResId
                         ?: R.drawable.channel_ic_default,
                     onClick = {
-                        onAnnouncementClick(announcement)
+                        onAnnouncementClick(announcement.id)
                     }
                 )
             }
@@ -241,15 +242,14 @@ private fun EmptyAnnouncementState(modifier: Modifier = Modifier) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun BankSmsActionBottomSheet(
-    state: BankSmsSheetState,
+    onDismissed: () -> Unit,
     onRegisterClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
 
     ModalBottomSheet(
-        onDismissRequest = state::onDismissed,
-        containerColor = MaterialTheme.colorScheme.surface,
-        sheetState = state.sheetState
+        onDismissRequest = onDismissed,
+        containerColor = MaterialTheme.colorScheme.surface
     ) {
 
         Surface(modifier = Modifier.fillMaxWidth()) {
@@ -280,7 +280,7 @@ private fun BankSmsActionBottomSheet(
                         .clip(shape = RoundedCornerShape(size = 12.dp))
                         .clickable {
                             onRegisterClick()
-                            state.hideSheet()
+                            onDismissed()
                         },
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.End
@@ -319,7 +319,7 @@ private fun BankSmsActionBottomSheet(
                         .clip(shape = RoundedCornerShape(size = 12.dp))
                         .clickable {
                             onDeleteClick()
-                            state.hideSheet()
+                            onDismissed()
                         },
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.End
@@ -350,7 +350,7 @@ private fun BankSmsActionBottomSheet(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),
-                    onClick = state::hideSheet,
+                    onClick = onDismissed,
                     text = stringResource(id = R.string.dismiss),
                     color = MaterialTheme.colorScheme.primaryContainer,
                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer

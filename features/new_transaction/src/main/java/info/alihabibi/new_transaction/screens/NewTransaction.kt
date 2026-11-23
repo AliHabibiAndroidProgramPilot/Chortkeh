@@ -82,15 +82,22 @@ import java.time.LocalTime
 fun NewTransactionDestination(
     viewModel: NewTransactionViewModel = koinViewModel(),
     editingTransactionId: Long?,
+    announcementId: Long?,
     onAddNewCategory: () -> Unit = {},
     onAddNewChannel: () -> Unit = {},
     onEditCategory: (categoryId: Int) -> Unit = {},
     onBackPressed: () -> Unit
 ) {
 
-    SideEffect(editingTransactionId) {
-        if (editingTransactionId != null)
+    SideEffect(editingTransactionId, announcementId) {
+        if (editingTransactionId != null) {
             viewModel.onEvent(NewTransactionUiIntent.FetchEditingTransaction(editingTransactionId))
+            return@SideEffect
+        }
+        if (announcementId != null) {
+            viewModel
+            return@SideEffect
+        }
     }
 
     val context = LocalContext.current
