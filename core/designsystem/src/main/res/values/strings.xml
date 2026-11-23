@@ -61,7 +61,9 @@
     <string name="announcements">اعلان‌ها</string>
     <string name="empty_mail_box_message">اعلانی برای نمایش نداری</string>
     <string name="bank">بانک</string>
+    <string name="bank_sms">پیامک بانک</string>
     <string name="inApp">درون برنامه</string>
+    <string name="delete_sms_announcement">حذف پیامک</string>
     <string name="income_announcement_title">واریز %1$s تومان</string>
     <string name="outcome_announcement_title">برداشت %1$s تومان</string>
 
